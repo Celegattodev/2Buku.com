@@ -1,0 +1,16 @@
+/* Variáveis de cor globais */
+:root {
+    --primary-color: #f57c00;
+    --secondary-color: #fff;
+    --text-color-dark: #000;
+    --text-color-light: #fff;
+    --icon-color: #f3f3f3;
+  }
+  
+  /* Estilos globais */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Red Hat Display", sans-serif;
+  }

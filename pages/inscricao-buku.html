@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/324b71f187.js" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;700;900&display=swap"
+        rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
+
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/styles.css.map">
+    <link rel="stylesheet" href="../../assets/css/inscricao.css">
+    <title>Buku</title>
+</head>
+
+<body>
+    <main>
+        <div class="login-container" id="login-container">
+            <div class="form-container">
+                <form class="form form-login">
+                    <h2 class="form-title">Entrar</h2>
+                    <div class="form-input-container">
+                        <div class="input-group">
+                            <input type="email" id="email" class="form-input" placeholder="" required>
+                            <label for="email" class="form-label">Email</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="password" id="password" class="form-input" placeholder="" required>
+                            <label for="password" class="form-label">Senha</label>
+                        </div>
+                    </div>
+                    <a href="#" class="form-link">Esqueceu a senha?</a>
+                    <button type="button" class="form-button">Logar</button>
+                    <p class="mobile-text">
+                        Não tem conta?
+                        <a href="#" id="open-register-mobile">Registre-se</a>
+                    </p>
+                </form>
+                <form class="form form-register">
+                    <h2 class="form-title">Criar Conta</h2>
+                    <div class="form-input-container">
+                        <div class="input-group">
+                            <input type="text" id="initials" class="form-input" placeholder="" required>
+                            <label for="initials" class="form-label">Nome Completo</label>
+                        </div>
+                        <div class="input-group-container">
+                            <div class="input-group input-group-email">
+                                <input type="email" id="register-email" class="form-input" placeholder="" required>
+                                <label for="register-email" class="form-label">Email</label>
+                            </div>
+                            <div class="input-group input-group-small">
+                                <select id="state" class="form-input" required>
+                                    <option value="" disabled selected>UF</option>
+                                    <!-- Opções do estado -->
+                                    <option value="AC">AC</option>
+                                    <option value="AL">AL</option>
+                                    <option value="AP">AP</option>
+                                    <option value="AM">AM</option>
+                                    <option value="BA">BA</option>
+                                    <option value="CE">CE</option>
+                                    <option value="DF">DF</option>
+                                    <option value="ES">ES</option>
+                                    <option value="GO">GO</option>
+                                    <option value="MA">MA</option>
+                                    <option value="MT">MT</option>
+                                    <option value="MS">MS</option>
+                                    <option value="MG">MG</option>
+                                    <option value="PA">PA</option>
+                                    <option value="PB">PB</option>
+                                    <option value="PR">PR</option>
+                                    <option value="PE">PE</option>
+                                    <option value="PI">PI</option>
+                                    <option value="RJ">RJ</option>
+                                    <option value="RN">RN</option>
+                                    <option value="RS">RS</option>
+                                    <option value="RO">RO</option>
+                                    <option value="RR">RR</option>
+                                    <option value="SC">SC</option>
+                                    <option value="SP">SP</option>
+                                    <option value="SE">SE</option>
+                                    <option value="TO">TO</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <input type="password" id="register-password" class="form-input" placeholder="" required>
+                            <label for="register-password" class="form-label">Senha</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="password" id="confirm-password" class="form-input" placeholder="" required>
+                            <label for="confirm-password" class="form-label">Confirmar Senha</label>
+                        </div>
+                    </div>
+                    <button type="button" class="form-button">Cadastrar</button>
+                    <p class="mobile-text">
+                        Já tem conta?
+                        <a href="#" id="open-login-mobile">Login</a>
+                    </p>
+                </form>
+            </div>
+            <div class="overlay-container">
+                <div class="overlay">
+                    <h2 class="form-title form-title-light">Já tem conta?</h2>
+                    <p class="form-text">Faça login para acessar seus dados.</p>
+                    <button class="form-button form-button-light" id="open-login">Entrar</button>
+                </div>
+                <div class="overlay">
+                    <h2 class="form-title form-title-light">Novo por aqui?</h2>
+                    <p class="form-text">Faça seu cadastro e descubra muitas novidades!</p>
+                    <button class="form-button form-button-light" id="open-register">Cadastrar</button>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+<script src="../../assets/js/login-cadastro/inscricao.js"></script>
+
+</html>

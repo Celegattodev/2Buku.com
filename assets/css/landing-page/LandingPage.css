@@ -1,0 +1,52 @@
+body{
+    height: 100vh;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+#nav{
+    background-image: linear-gradient(to right,  #fd9323, #fd9323);
+}
+#text-orange{
+    color: #fd9323;
+}
+#text-blue{
+    color: #6c8bf7;
+}
+#text-green{
+    color: #a5e29f;
+
+}
+#conteudo{
+    margin:6vh 1vh 5vh 5vh;
+    text-align: left;
+}
+#livros{
+    margin-left: 50vh;
+}
+#footer{
+    background-color: #6c8bf7;
+    color: white;
+}
+#cards{
+    margin :2vh 10vh 1vh;
+}
+ul {
+    padding: 0;
+    margin-left:auto;
+    list-style-type: none; 
+}
+
+ul li {
+    display: inline-block;
+    margin-right: 1vh /* Espaço entre os itens, opcional */
+}
+.logo{
+    margin-left: 1vh;
+    height: 10vh;
+
+}
+#linksNav :hover{
+    height: max-content;
+
+    background-color: #fd9323;
+}
