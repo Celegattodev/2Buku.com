@@ -1,16 +1,19 @@
-const productContainers = [...document.querySelectorAll('product-container')];
-const nxtBtn = [...document.querySelectorAll('.nxt-btn')];
-const preBtn = [...document.querySelectorAll('.pre-brn')];
+document.addEventListener("DOMContentLoaded", function () {
+    const productContainers = [...document.querySelectorAll('.product-container')];
+    const nxtBtn = [...document.querySelectorAll('.nxt-btn')];
+    const preBtn = [...document.querySelectorAll('.pre-btn')];
 
-productContainers.forEach((item, i) => {
-    let containerDimensions = item.getBoundingClientRect();
-    let containerWidth = containerDimensions.width;
+    const scrollAmount = 800;
 
-    nxtBtn[i].addEventListener('click', () => {
-        item.scrollLeft += containerWidth;
+    productContainers.forEach((item, i) => {
+        let containerWidth = item.getBoundingClientRect().width;
+
+        nxtBtn[i].addEventListener('click', () => {
+            item.scrollLeft += scrollAmount;
+        })
+
+        preBtn[i].addEventListener('click', () => {
+            item.scrollLeft -= scrollAmount;
+        })
     })
-
-    preBtn[i].addEventListener('click', () => {
-        item.scrollLeft -= containerWidth
-    })
-})
+});

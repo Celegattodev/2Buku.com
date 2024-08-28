@@ -1,21 +1,28 @@
-/*------------ PRODUCT SLIDER ---------------*/
 body{
-    background-color: #ee9536;
+    background-color: #ffffff;
 }
-
+/*------------ NAVBAR ---------------*/
+.text-bg-light{
+    background-color: #8fa5f5 !important;
+}
+/*------------ PRODUCT SLIDER ---------------*/
 .product{
     position: relative;
     overflow: hidden;
-    padding: 10px;
+    /* padding: 10px; */
+    width: 100%;
 }
 
-.product-category{
+.product-category {
     padding: 0 10vw;
-    font-size: 30px;
-    font-weight: 500;
-    margin-bottom: 40px;
-    text-transform: capitalize;
-    /* background-color: yellowgreen; */
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    background-color: #fd9323;
+    color: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .product-container{
@@ -23,7 +30,6 @@ body{
     display: flex;
     overflow-x: auto;
     scroll-behavior: smooth;
-    /* background-color: bisque; */
 }
 
 .product-container::-webkit-scrollbar{
@@ -31,28 +37,34 @@ body{
 }
 
 .product-card{
-    flex: 0 0 auto;
-    width: 250px;
-    height: 550px;
-    margin-right: 40px;
-    margin-top: 30px;
-    border: 4px, solid, black;
+    background-color: #f8f9fa;
     border-radius: 10px;
-    background-color: #7899ff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 200px;
+    margin: 10px;
+    flex: 0 0 auto;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 .product-image{
     position: relative;
     width: 100%;
-    height: 350px;
+    height: 300px;
     overflow: hidden;
+    border-radius: 15px 15px 0 0;
 }
 
 .product-thumb{
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border: 3px, solid, black;
+    display: block;
+    border-bottom: 1px solid #e9ecef;
 }
 
 .discont-tag {
@@ -67,20 +79,23 @@ body{
 }
 
 .card-btn {
-    position: absolute;
-    bottom: 10px;
-    left: 125px;
+    font-size: 14px;
+    left: 50%;
     transform: translateX(-50%);
-    padding: 8px;
     width: 90%;
     text-transform: capitalize;
-    border: none;
     outline: none;
-    background: #fff;
-    border-radius: 5px;
     transition: 0.5s;
     cursor: pointer;
     opacity: 0;
+    position: absolute;
+    bottom: 10px;
+    background-color: #ff6f61;
+    color: #fff;
+    border: none;
+    padding: 8px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
 }
 
 .product-card:hover .card-btn{
@@ -93,33 +108,35 @@ body{
 }
 
 .product-info {
-    width: 100%;
-    height: 200px;
-    padding-top: 10px;
+    padding: 15px;
+    text-align: center;
 }
 
-/* .product-title {
-    text-transform: uppercase;
-} */
+.product-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #343a40;
+    height: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 .product-author {
-    width: 100%;
-    height: 20px;
-    line-height: 20px;
-    overflow: hidden;
-    opacity: 0.5;
-    text-transform: capitalize;
-    margin: 5px 0;
+    font-size: 14px;
+    color: #6c757d;
+    margin-bottom: 10px;
 }
 
-/* .product-status {
-    font-weight: 700;
-    font-size: 15px;
-    background-color: rgb(43, 255, 0);
-    border-radius: 5px;
-    padding: 3px;
-    margin-bottom: 15px;
-} */
+.product-status {
+    margin-bottom: 10px;
+}
+
+.product-genres .badge {
+    font-size: 12px;
+    margin: 2px;
+    padding: 5px 10px;
+}
 
 .pre-btn, .nxt-btn {
     border: none;
@@ -130,7 +147,7 @@ body{
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(241, 161, 13, 0.568) 100%);
+    background: transparent;
     cursor: pointer;
     z-index: 9;
 }
@@ -138,18 +155,24 @@ body{
 .pre-btn{
     left: 0;
     transform: rotate(180deg);
+    opacity: 0.8;
 }
 
 .nxt-btn {
     right: 0;
+    opacity: 0.8;
 }
 
 .pre-btn img, .nxt-btn img{
     opacity: 0.2;
+    width: 50%;
+    height: auto;
 }
 
-.pre-btn:hover img, .nxt-btn:hover img {
+ .pre-btn:hover img, .nxt-btn:hover img {
     opacity: 1;
+    width: 40%;
+    height: auto;
 }
 
 .collection-container {
