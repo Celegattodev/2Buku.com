@@ -1,52 +1,152 @@
-body{
-    height: 100vh;
-    overflow-x: hidden;
-    overflow-y: hidden;
+/* Configuração geral para ocupar a altura total da tela e organizar o layout em colunas */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
-#nav{
-    background-image: linear-gradient(to right,  #fd9323, #fd9323);
-}
-#text-orange{
-    color: #fd9323;
-}
-#text-blue{
-    color: #6c8bf7;
-}
-#text-green{
-    color: #a5e29f;
 
+/* Estilo do conteúdo principal */
+#conteudo {
+  margin: 6vh 1vh 5vh 5vh;
+  text-align: left; /* Alinha o texto à esquerda em telas grandes */
 }
-#conteudo{
-    margin:6vh 1vh 5vh 5vh;
-    text-align: left;
+
+/* Estilo para a coluna de livros */
+#livros {
+  margin: 0 0 0 5vh; /* Empurra a coluna para a direita */
 }
-#livros{
-    margin-left: 50vh;
+#livros img {
+  height: 300px; /* Diminui a altura da imagem */
+  width: auto; /* Mantém a proporção original */
 }
-#footer{
-    background-color: #6c8bf7;
-    color: white;
+
+/* Estilo geral dos cartões */
+#cards {
+  width: 100%; /* Garante que os cartões ocupem toda a largura disponível */
 }
-#cards{
-    margin :2vh 10vh 1vh;
-}
+
+/* Remove o estilo padrão das listas e centraliza */
 ul {
-    padding: 0;
-    margin-left:auto;
-    list-style-type: none; 
+  padding: 0;
+  margin-left: auto;
+  list-style-type: none;
 }
 
+/* Exibe os itens da lista em linha */
 ul li {
-    display: inline-block;
-    margin-right: 1vh /* Espaço entre os itens, opcional */
+  display: inline-block;
+  margin-right: 1vh;
 }
-.logo{
-    margin-left: 1vh;
-    height: 10vh;
 
+/* Estilo da logo */
+.logo {
+  margin-left: 1vh;
+  height: 10vh; /* Define a altura da logo */
 }
-#linksNav :hover{
-    height: max-content;
 
-    background-color: #fd9323;
+/* Estilo do rodapé fixo */
+.sticky-footer {
+  margin-top: auto;
+  width: 100%;
+  background-color: #6c8bf7; /* Cor de fundo do rodapé */
+  padding: 10px 0;
+  text-align: center;
+}
+
+/* Cores do texto */
+#text-orange {
+  color: #fd9323;
+}
+
+#text-blue {
+  color: #6c8bf7;
+}
+
+#text-green {
+  color: #a5e29f;
+}
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #6c8bf7;
+  color: #fff;
+}
+
+.logo img {
+  height: 50px;
+}
+
+.menu ul {
+  list-style-type: none;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.menu ul li {
+  display: inline;
+}
+
+.menu ul li a {
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  transition: background-color 0.3s, color 0.3s;
+  display: flex;
+  align-items: center;
+}
+
+.nav-btn {
+  background-color: #fd9323;
+  margin-top: 15px;
+}
+
+.menu ul li a:hover {
+  background-color: #f18c1f;
+  color: #fff;
+}
+
+.tagline {
+  font-size: 14px;
+  align-items: center;
+  margin-top: 15px;
+}
+
+/* Media query para telas menores */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .menu ul {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .tagline {
+    margin-top: 12px;
+    font-size: 14px;
+    text-align: center;
+    width: 100%;
+  }
+}
+/* Ajusta o conteúdo em telas pequenas */
+#conteudo {
+  margin: 4vh 1vh;
+  text-align: center; /* Centraliza o texto em telas menores */
+}
+
+/* Remove a margem à esquerda para a coluna de livros */
+#livros {
+  margin: 5vh 0;
+}
+
+/* Ajusta a largura dos cartões em telas pequenas */
+#cards {
+  margin: 1vh 0.5vh;
+  width: 100%;
 }

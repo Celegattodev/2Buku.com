@@ -11,15 +11,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;700;900&display=swap"
         rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
-
     <link rel="stylesheet" href="../assets/css/global.css">
     <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="../assets/css/styles.css.map">
-    <link rel="stylesheet" href="../../assets/css/inscricao.css">
+    <link rel="stylesheet" href="../assets/css/inscricao/inscricao.css">
+
     <title>Buku</title>
 </head>
 
 <body>
+    <nav class="navbar">
+
+        <div class="menu">
+            <ul>
+                <div class="logo">
+                    <a href=""><img src="../assets/img/Logo-Buku.png" alt="Logo"></a>
+                </div>
+            </ul>
+        </div>
+        <div class="tagline">
+            <p><i>Compartilhando Histórias</i></p>
+        </div>
+    </nav>
+
     <main>
         <div class="login-container" id="login-container">
             <div class="form-container">
@@ -42,7 +56,7 @@
                         <a href="#" id="open-register-mobile">Registre-se</a>
                     </p>
                 </form>
-                <form class="form form-register">
+                <form class="form form-register" onsubmit="return validateRegisterForm()">
                     <h2 class="form-title">Criar Conta</h2>
                     <div class="form-input-container">
                         <div class="input-group">
@@ -91,13 +105,15 @@
                         <div class="input-group">
                             <input type="password" id="register-password" class="form-input" placeholder="" required>
                             <label for="register-password" class="form-label">Senha</label>
+                            <span id="password-error" class="error-message"></span>
                         </div>
                         <div class="input-group">
                             <input type="password" id="confirm-password" class="form-input" placeholder="" required>
                             <label for="confirm-password" class="form-label">Confirmar Senha</label>
+                            <span id="confirm-password-error" class="error-message"></span>
                         </div>
                     </div>
-                    <button type="button" class="form-button">Cadastrar</button>
+                    <button type="submit" class="form-button">Cadastrar</button>
                     <p class="mobile-text">
                         Já tem conta?
                         <a href="#" id="open-login-mobile">Login</a>
@@ -118,7 +134,8 @@
             </div>
         </div>
     </main>
+    <script src="../assets/js/login-cadastro/inscricao.js"></script>
+    <script src="../assets/js/login-cadastro/verificacao.js"></script>
 </body>
-<script src="../../assets/js/login-cadastro/inscricao.js"></script>
 
 </html>
