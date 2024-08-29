@@ -1,305 +1,399 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Catálogo</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="../assets/css/global.css">
-    <link rel="stylesheet" href="../assets/css/styles.css">
-    <link rel="stylesheet" href="../assets/css/styles.css.map">
-    <link rel="stylesheet" href="../assets/css/catalogo/Catalog.css">
-</head>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="../assets/css/global.css" />
+    <link rel="stylesheet" href="../assets/css/styles.css" />
+    <link rel="stylesheet" href="../assets/css/styles.css.map" />
+    <link rel="stylesheet" href="../assets/css/catalogo/Catalog.css" />
+  </head>
 
-<body>
-<!------------ NAVBAR --------------->
-    <div class="row p-2 text-bg-light align-items-end">
-        <div class="col sm-3">
-          <a href="LandingPage.html">
-            <img class="logo ms-5" src="../assets/img/Logo-Buku.png" alt="Logo-Buku" height="55px" margin-top="10px" >
-          </a>
-        </div>
-          <p class="text-black col text-end"><i>Compartilhando histórias.</i></p>
-    </div>
+  <body>
+    <!------------ NAVBAR --------------->
+    <nav class="navbar">
+      <div class="logo">
+        <img src="../assets/img/Logo-Buku.png" alt="Logo" />
+      </div>
+      <div class="menu">
+        <ul>
+          <li><a href="#" class="nav-btn">Perfil</a></li>
+          <li><a href="#" class="nav-btn">Sobre Nós</a></li>
+          <li><a href="#" class="nav-btn">Adicionar Livro</a></li>
+        </ul>
+      </div>
+      <div class="tagline">
+        <p><i>Compartilhando Histórias</i></p>
+      </div>
+    </nav>
+    <!------------ PRODUCT SLIDER 1--------------->
     &nbsp;
-<!------------ PRODUCT SLIDER 1--------------->
     <section class="product">
-        <h2 class="product-category">• Mais Populares</h2>
-        <button class="pre-btn"><img src="../assets/img/arrow-icon.png" alt=""></button>
-        <button class="nxt-btn"><img src="../assets/img/arrow-icon.png" alt=""></button>
-        <div class="product-container">
-            <!--Cards-->
-            <!--Card1-->
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="../assets/img/capas/1984_capa.jpg" class="product-thumb">
-                    <button class="card-btn">Adicionar aos Favoritos ♥</button>
-                </div>
-                <div class="product-info">
-                    <h4 class="product-title">1984</h4>
-                    <p class="product-author">por <strong>George Orwell</strong></p>
-                    <h4><span class="badge text-bg-success">Disponível</span></h4>
-                    <span class="badge rounded-pill text-bg-primary">Distopia</span> 
-                    <span class="badge rounded-pill text-bg-primary">Político</span>
-                </div>
-            </div>            
-            <!--Card2-->
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="../assets/img/capas/guiadomochileirodasgláxias_capa.jpg" class="product-thumb">
-                    <button class="card-btn">Adicionar aos Favoritos ♥</button>
-                </div>
-                <div class="product-info">
-                    <h4 class="product-title">O Guia Definitivo do Mochileiro das Galáxias</h4>
-                    <p class="product-author">por <strong>Douglas Adams</strong></p>
-                    <h4><span class="badge text-bg-danger">Indisponível</span></h4> 
-                    <span class="badge rounded-pill text-bg-primary">Ficção</span> 
-                    <span class="badge rounded-pill text-bg-primary">Espaço</span>
-                </div>
-            </div>
-            <!--Card3-->
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="../assets/img/capas/asutilartedeligarofodase_capa.jpg" class="product-thumb">
-                    <button class="card-btn">Adicionar aos Favoritos ♥</button>
-                </div>
-                <div class="product-info">
-                    <h4 class="product-title">A Sutil Arte de Ligar o F*da-se</h4>
-                    <p class="product-author">por <strong>Mark Manson</strong></p>
-                    <h4><span class="badge text-bg-danger">Indisponível</span></h4> 
-                    <span class="badge rounded-pill text-bg-primary">Auto-ajuda</span> 
-                    <span class="badge rounded-pill text-bg-primary">Motivacional</span>
-                </div>
-            </div>
-            <!--Card4-->
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="../assets/img/capas/ordemparanormalrpg_capa.jpg" class="product-thumb">
-                    <button class="card-btn">Adicionar aos Favoritos ♥</button>
-                </div>
-                <div class="product-info">
-                    <h4 class="product-title">Ordem Paranormal RPG - Livro de Regras</h4>
-                    <p class="product-author">por <strong>Jambo Editora</strong></p>
-                    <h4><span class="badge text-bg-success">Disponível</span></h4> 
-                    <span class="badge rounded-pill text-bg-primary">RPG</span> 
-                    <span class="badge rounded-pill text-bg-primary">Terror</span>
-                </div>
-            </div>
-            <!--Card5-->
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="../assets/img/capas/percyjacksonoladraoderaios_capa.jpg" class="product-thumb">
-                    <button class="card-btn">Adicionar aos Favoritos ♥</button>
-                </div>
-                <div class="product-info">
-                    <h4 class="product-title">Percy Jackson - O Ladrão de Raios</h4>
-                    <p class="product-author">por <strong>Rick Riordan</strong></p>
-                    <h4><span class="badge text-bg-success">Disponível</span></h4> 
-                    <span class="badge rounded-pill text-bg-primary">Fantasia</span> 
-                    <span class="badge rounded-pill text-bg-primary">Aventura</span>
-                    <span class="badge rounded-pill text-bg-primary">Mitologia</span>
-                </div>
-            </div>
-            <!--Card6-->
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="../assets/img/capas/sherlockholmesumestudoemvermelho_capa.jpg" class="product-thumb">
-                    <button class="card-btn">Adicionar aos Favoritos ♥</button>
-                </div>
-                <div class="product-info">
-                    <h4 class="product-title">Sherlock Holmes - Um Estudo em Vermelho</h4>
-                    <p class="product-author">por <strong>Arthur Conan Doyle</strong></p>
-                    <h4><span class="badge text-bg-success">Disponível</span></h4> 
-                    <span class="badge rounded-pill text-bg-primary">Investigação</span> 
-                    <span class="badge rounded-pill text-bg-primary">Mistério</span>
-                </div>
-            </div>
-            <!--Card7-->
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="/../assets/img/capas/domcasmurro_capa.jpg" class="product-thumb">
-                    <button class="card-btn">Adicionar aos Favoritos ♥</button>
-                </div>
-                <div class="product-info">
-                    <h4 class="product-title">Dom Casmurro</h4>
-                    <p class="product-author">por <strong>Machado de Assis</strong></p>
-                    <h4><span class="badge text-bg-danger">Indisponível</span></h4> 
-                    <span class="badge rounded-pill text-bg-primary">Clássico</span> 
-                    <span class="badge rounded-pill text-bg-primary">Romance</span>
-                </div>
-            </div>
-            <!--Card8-->
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="../assets/img/capas/narnia_capa.jpg" class="product-thumb">
-                    <button class="card-btn">Adicionar aos Favoritos ♥</button>
-                </div>
-                <div class="product-info">
-                    <h4 class="product-title">As Crônicas de Nárnia</h4>
-                    <p class="product-author">por <strong>C. S. Lewis</strong></p>
-                    <h4><span class="badge text-bg-danger">Indisponível</span></h4> 
-                    <span class="badge rounded-pill text-bg-primary">Clássico</span> 
-                    <span class="badge rounded-pill text-bg-primary">Romance</span>
-                    <span class="badge rounded-pill text-bg-primary">Fantasia</span>
-                </div>
-            </div>
-            <!--Card9-->
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="../assets/img/capas/diariodeumbanana_capa.jpg" class="product-thumb">
-                    <button class="card-btn">Adicionar aos Favoritos ♥</button>
-                </div>
-                <div class="product-info">
-                    <h4 class="product-title">Diário de um Banana</h4>
-                    <p class="product-author">por <strong>Jeff Kinney</strong></p>
-                    <h4><span class="badge text-bg-success">Disponível</span></h4> 
-                    <span class="badge rounded-pill text-bg-primary">Comédia</span> 
-                    <span class="badge rounded-pill text-bg-primary">Juvenil</span>
-                </div>
-            </div>
+      <h2 class="product-category">• Mais Populares</h2>
+      <button class="pre-btn">
+        <img src="../assets/img/arrow-icon.png" alt="" />
+      </button>
+      <button class="nxt-btn">
+        <img src="../assets/img/arrow-icon.png" alt="" />
+      </button>
+      <div class="product-container">
+        <!--Cards-->
+        <!--Card1-->
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              src="../assets/img/capas/1984_capa.jpg"
+              class="product-thumb"
+            />
+            <button class="card-btn">Adicionar aos Favoritos ♥</button>
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">1984</h4>
+            <p class="product-author">por <strong>George Orwell</strong></p>
+            <h4><span class="badge text-bg-success">Disponível</span></h4>
+            <span class="badge rounded-pill text-bg-primary">Distopia</span>
+            <span class="badge rounded-pill text-bg-primary">Político</span>
+          </div>
         </div>
-        &nbsp;
+        <!--Card2-->
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              src="../assets/img/capas/guiadomochileirodasgláxias_capa.jpg"
+              class="product-thumb"
+            />
+            <button class="card-btn">Adicionar aos Favoritos ♥</button>
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">
+              O Guia Definitivo do Mochileiro das Galáxias
+            </h4>
+            <p class="product-author">por <strong>Douglas Adams</strong></p>
+            <h4><span class="badge text-bg-danger">Indisponível</span></h4>
+            <span class="badge rounded-pill text-bg-primary">Ficção</span>
+            <span class="badge rounded-pill text-bg-primary">Espaço</span>
+          </div>
+        </div>
+        <!--Card3-->
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              src="../assets/img/capas/asutilartedeligarofodase_capa.jpg"
+              class="product-thumb"
+            />
+            <button class="card-btn">Adicionar aos Favoritos ♥</button>
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">A Sutil Arte de Ligar o F*da-se</h4>
+            <p class="product-author">por <strong>Mark Manson</strong></p>
+            <h4><span class="badge text-bg-danger">Indisponível</span></h4>
+            <span class="badge rounded-pill text-bg-primary">Auto-ajuda</span>
+            <span class="badge rounded-pill text-bg-primary">Motivacional</span>
+          </div>
+        </div>
+        <!--Card4-->
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              src="../assets/img/capas/ordemparanormalrpg_capa.jpg"
+              class="product-thumb"
+            />
+            <button class="card-btn">Adicionar aos Favoritos ♥</button>
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">
+              Ordem Paranormal RPG - Livro de Regras
+            </h4>
+            <p class="product-author">por <strong>Jambo Editora</strong></p>
+            <h4><span class="badge text-bg-success">Disponível</span></h4>
+            <span class="badge rounded-pill text-bg-primary">RPG</span>
+            <span class="badge rounded-pill text-bg-primary">Terror</span>
+          </div>
+        </div>
+        <!--Card5-->
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              src="../assets/img/capas/percyjacksonoladraoderaios_capa.jpg"
+              class="product-thumb"
+            />
+            <button class="card-btn">Adicionar aos Favoritos ♥</button>
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">Percy Jackson - O Ladrão de Raios</h4>
+            <p class="product-author">por <strong>Rick Riordan</strong></p>
+            <h4><span class="badge text-bg-success">Disponível</span></h4>
+            <span class="badge rounded-pill text-bg-primary">Fantasia</span>
+            <span class="badge rounded-pill text-bg-primary">Aventura</span>
+            <span class="badge rounded-pill text-bg-primary">Mitologia</span>
+          </div>
+        </div>
+        <!--Card6-->
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              src="../assets/img/capas/sherlockholmesumestudoemvermelho_capa.jpg"
+              class="product-thumb"
+            />
+            <button class="card-btn">Adicionar aos Favoritos ♥</button>
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">
+              Sherlock Holmes - Um Estudo em Vermelho
+            </h4>
+            <p class="product-author">
+              por <strong>Arthur Conan Doyle</strong>
+            </p>
+            <h4><span class="badge text-bg-success">Disponível</span></h4>
+            <span class="badge rounded-pill text-bg-primary">Investigação</span>
+            <span class="badge rounded-pill text-bg-primary">Mistério</span>
+          </div>
+        </div>
+        <!--Card7-->
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              src="/../assets/img/capas/domcasmurro_capa.jpg"
+              class="product-thumb"
+            />
+            <button class="card-btn">Adicionar aos Favoritos ♥</button>
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">Dom Casmurro</h4>
+            <p class="product-author">por <strong>Machado de Assis</strong></p>
+            <h4><span class="badge text-bg-danger">Indisponível</span></h4>
+            <span class="badge rounded-pill text-bg-primary">Clássico</span>
+            <span class="badge rounded-pill text-bg-primary">Romance</span>
+          </div>
+        </div>
+        <!--Card8-->
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              src="../assets/img/capas/narnia_capa.jpg"
+              class="product-thumb"
+            />
+            <button class="card-btn">Adicionar aos Favoritos ♥</button>
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">As Crônicas de Nárnia</h4>
+            <p class="product-author">por <strong>C. S. Lewis</strong></p>
+            <h4><span class="badge text-bg-danger">Indisponível</span></h4>
+            <span class="badge rounded-pill text-bg-primary">Clássico</span>
+            <span class="badge rounded-pill text-bg-primary">Romance</span>
+            <span class="badge rounded-pill text-bg-primary">Fantasia</span>
+          </div>
+        </div>
+        <!--Card9-->
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              src="../assets/img/capas/diariodeumbanana_capa.jpg"
+              class="product-thumb"
+            />
+            <button class="card-btn">Adicionar aos Favoritos ♥</button>
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">Diário de um Banana</h4>
+            <p class="product-author">por <strong>Jeff Kinney</strong></p>
+            <h4><span class="badge text-bg-success">Disponível</span></h4>
+            <span class="badge rounded-pill text-bg-primary">Comédia</span>
+            <span class="badge rounded-pill text-bg-primary">Juvenil</span>
+          </div>
+        </div>
+      </div>
+      &nbsp;
     </section>
 
     <section class="product">
-        <h2 class="product-category">• Novidades</h2>
-        <button class="pre-btn"><img src="../assets/img/arrow-icon.png" alt=""></button>
-        <button class="nxt-btn"><img src="../assets/img/arrow-icon.png" alt=""></button>
-        <div class="product-container">
-            <!--Cards-->
-            <!--Card1-->
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="../assets/img/capas/1984_capa.jpg" class="product-thumb">
-                    <button class="card-btn">Adicionar aos Favoritos ♥</button>
-                </div>
-                <div class="product-info">
-                    <h4 class="product-title">1984</h4>
-                    <p class="product-author">por <strong>George Orwell</strong></p>
-                    <h4><span class="badge text-bg-success">Disponível</span></h4>
-                    <span class="badge rounded-pill text-bg-primary">Distopia</span> 
-                    <span class="badge rounded-pill text-bg-primary">Político</span>
-                </div>
-            </div>            
-            <!--Card2-->
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="../assets/img/capas/guiadomochileirodasgláxias_capa.jpg" class="product-thumb">
-                    <button class="card-btn">Adicionar aos Favoritos ♥</button>
-                </div>
-                <div class="product-info">
-                    <h4 class="product-title">O Guia Definitivo do Mochileiro das Galáxias</h4>
-                    <p class="product-author">por <strong>Douglas Adams</strong></p>
-                    <h4><span class="badge text-bg-danger">Indisponível</span></h4> 
-                    <span class="badge rounded-pill text-bg-primary">Ficção</span> 
-                    <span class="badge rounded-pill text-bg-primary">Espaço</span>
-                </div>
-            </div>
-            <!--Card3-->
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="../assets/img/capas/asutilartedeligarofodase_capa.jpg" class="product-thumb">
-                    <button class="card-btn">Adicionar aos Favoritos ♥</button>
-                </div>
-                <div class="product-info">
-                    <h4 class="product-title">A Sutil Arte de Ligar o F*da-se</h4>
-                    <p class="product-author">por <strong>Mark Manson</strong></p>
-                    <h4><span class="badge text-bg-danger">Indisponível</span></h4> 
-                    <span class="badge rounded-pill text-bg-primary">Auto-ajuda</span> 
-                    <span class="badge rounded-pill text-bg-primary">Motivacional</span>
-                </div>
-            </div>
-            <!--Card4-->
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="../assets/img/capas/ordemparanormalrpg_capa.jpg" class="product-thumb">
-                    <button class="card-btn">Adicionar aos Favoritos ♥</button>
-                </div>
-                <div class="product-info">
-                    <h4 class="product-title">Ordem Paranormal RPG - Livro de Regras</h4>
-                    <p class="product-author">por <strong>Jambo Editora</strong></p>
-                    <h4><span class="badge text-bg-success">Disponível</span></h4> 
-                    <span class="badge rounded-pill text-bg-primary">RPG</span> 
-                    <span class="badge rounded-pill text-bg-primary">Terror</span>
-                </div>
-            </div>
-            <!--Card5-->
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="../assets/img/capas/percyjacksonoladraoderaios_capa.jpg" class="product-thumb">
-                    <button class="card-btn">Adicionar aos Favoritos ♥</button>
-                </div>
-                <div class="product-info">
-                    <h4 class="product-title">Percy Jackson - O Ladrão de Raios</h4>
-                    <p class="product-author">por <strong>Rick Riordan</strong></p>
-                    <h4><span class="badge text-bg-success">Disponível</span></h4> 
-                    <span class="badge rounded-pill text-bg-primary">Fantasia</span> 
-                    <span class="badge rounded-pill text-bg-primary">Aventura</span>
-                    <span class="badge rounded-pill text-bg-primary">Mitologia</span>
-                </div>
-            </div>
-            <!--Card6-->
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="../assets/img/capas/sherlockholmesumestudoemvermelho_capa.jpg" class="product-thumb">
-                    <button class="card-btn">Adicionar aos Favoritos ♥</button>
-                </div>
-                <div class="product-info">
-                    <h4 class="product-title">Sherlock Holmes - Um Estudo em Vermelho</h4>
-                    <p class="product-author">por <strong>Arthur Conan Doyle</strong></p>
-                    <h4><span class="badge text-bg-success">Disponível</span></h4> 
-                    <span class="badge rounded-pill text-bg-primary">Investigação</span> 
-                    <span class="badge rounded-pill text-bg-primary">Mistério</span>
-                </div>
-            </div>
-            <!--Card7-->
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="../assets/img/capas/domcasmurro_capa.jpg" class="product-thumb">
-                    <button class="card-btn">Adicionar aos Favoritos ♥</button>
-                </div>
-                <div class="product-info">
-                    <h4 class="product-title">Dom Casmurro</h4>
-                    <p class="product-author">por <strong>Machado de Assis</strong></p>
-                    <h4><span class="badge text-bg-danger">Indisponível</span></h4> 
-                    <span class="badge rounded-pill text-bg-primary">Clássico</span> 
-                    <span class="badge rounded-pill text-bg-primary">Romance</span>
-                </div>
-            </div>
-            <!--Card8-->
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="../assets/img/capas/narnia_capa.jpg" class="product-thumb">
-                    <button class="card-btn">Adicionar aos Favoritos ♥</button>
-                </div>
-                <div class="product-info">
-                    <h4 class="product-title">As Crônicas de Nárnia</h4>
-                    <p class="product-author">por <strong>C. S. Lewis</strong></p>
-                    <h4><span class="badge text-bg-danger">Indisponível</span></h4> 
-                    <span class="badge rounded-pill text-bg-primary">Clássico</span> 
-                    <span class="badge rounded-pill text-bg-primary">Romance</span>
-                    <span class="badge rounded-pill text-bg-primary">Fantasia</span>
-                </div>
-            </div>
-            <!--Card9-->
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="../assets/img/capas/diariodeumbanana_capa.jpg" class="product-thumb">
-                    <button class="card-btn">Adicionar aos Favoritos ♥</button>
-                </div>
-                <div class="product-info">
-                    <h4 class="product-title">Diário de um Banana</h4>
-                    <p class="product-author">por <strong>Jeff Kinney</strong></p>
-                    <h4><span class="badge text-bg-success">Disponível</span></h4> 
-                    <span class="badge rounded-pill text-bg-primary">Comédia</span> 
-                    <span class="badge rounded-pill text-bg-primary">Juvenil</span>
-                </div>
-            </div>
+      <h2 class="product-category">• Novidades</h2>
+      <button class="pre-btn">
+        <img src="../assets/img/arrow-icon.png" alt="" />
+      </button>
+      <button class="nxt-btn">
+        <img src="../assets/img/arrow-icon.png" alt="" />
+      </button>
+      <div class="product-container">
+        <!--Cards-->
+        <!--Card1-->
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              src="../assets/img/capas/1984_capa.jpg"
+              class="product-thumb"
+            />
+            <button class="card-btn">Adicionar aos Favoritos ♥</button>
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">1984</h4>
+            <p class="product-author">por <strong>George Orwell</strong></p>
+            <h4><span class="badge text-bg-success">Disponível</span></h4>
+            <span class="badge rounded-pill text-bg-primary">Distopia</span>
+            <span class="badge rounded-pill text-bg-primary">Político</span>
+          </div>
         </div>
-        &nbsp;
+        <!--Card2-->
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              src="../assets/img/capas/guiadomochileirodasgláxias_capa.jpg"
+              class="product-thumb"
+            />
+            <button class="card-btn">Adicionar aos Favoritos ♥</button>
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">
+              O Guia Definitivo do Mochileiro das Galáxias
+            </h4>
+            <p class="product-author">por <strong>Douglas Adams</strong></p>
+            <h4><span class="badge text-bg-danger">Indisponível</span></h4>
+            <span class="badge rounded-pill text-bg-primary">Ficção</span>
+            <span class="badge rounded-pill text-bg-primary">Espaço</span>
+          </div>
+        </div>
+        <!--Card3-->
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              src="../assets/img/capas/asutilartedeligarofodase_capa.jpg"
+              class="product-thumb"
+            />
+            <button class="card-btn">Adicionar aos Favoritos ♥</button>
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">A Sutil Arte de Ligar o F*da-se</h4>
+            <p class="product-author">por <strong>Mark Manson</strong></p>
+            <h4><span class="badge text-bg-danger">Indisponível</span></h4>
+            <span class="badge rounded-pill text-bg-primary">Auto-ajuda</span>
+            <span class="badge rounded-pill text-bg-primary">Motivacional</span>
+          </div>
+        </div>
+        <!--Card4-->
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              src="../assets/img/capas/ordemparanormalrpg_capa.jpg"
+              class="product-thumb"
+            />
+            <button class="card-btn">Adicionar aos Favoritos ♥</button>
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">
+              Ordem Paranormal RPG - Livro de Regras
+            </h4>
+            <p class="product-author">por <strong>Jambo Editora</strong></p>
+            <h4><span class="badge text-bg-success">Disponível</span></h4>
+            <span class="badge rounded-pill text-bg-primary">RPG</span>
+            <span class="badge rounded-pill text-bg-primary">Terror</span>
+          </div>
+        </div>
+        <!--Card5-->
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              src="../assets/img/capas/percyjacksonoladraoderaios_capa.jpg"
+              class="product-thumb"
+            />
+            <button class="card-btn">Adicionar aos Favoritos ♥</button>
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">Percy Jackson - O Ladrão de Raios</h4>
+            <p class="product-author">por <strong>Rick Riordan</strong></p>
+            <h4><span class="badge text-bg-success">Disponível</span></h4>
+            <span class="badge rounded-pill text-bg-primary">Fantasia</span>
+            <span class="badge rounded-pill text-bg-primary">Aventura</span>
+            <span class="badge rounded-pill text-bg-primary">Mitologia</span>
+          </div>
+        </div>
+        <!--Card6-->
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              src="../assets/img/capas/sherlockholmesumestudoemvermelho_capa.jpg"
+              class="product-thumb"
+            />
+            <button class="card-btn">Adicionar aos Favoritos ♥</button>
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">
+              Sherlock Holmes - Um Estudo em Vermelho
+            </h4>
+            <p class="product-author">
+              por <strong>Arthur Conan Doyle</strong>
+            </p>
+            <h4><span class="badge text-bg-success">Disponível</span></h4>
+            <span class="badge rounded-pill text-bg-primary">Investigação</span>
+            <span class="badge rounded-pill text-bg-primary">Mistério</span>
+          </div>
+        </div>
+        <!--Card7-->
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              src="../assets/img/capas/domcasmurro_capa.jpg"
+              class="product-thumb"
+            />
+            <button class="card-btn">Adicionar aos Favoritos ♥</button>
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">Dom Casmurro</h4>
+            <p class="product-author">por <strong>Machado de Assis</strong></p>
+            <h4><span class="badge text-bg-danger">Indisponível</span></h4>
+            <span class="badge rounded-pill text-bg-primary">Clássico</span>
+            <span class="badge rounded-pill text-bg-primary">Romance</span>
+          </div>
+        </div>
+        <!--Card8-->
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              src="../assets/img/capas/narnia_capa.jpg"
+              class="product-thumb"
+            />
+            <button class="card-btn">Adicionar aos Favoritos ♥</button>
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">As Crônicas de Nárnia</h4>
+            <p class="product-author">por <strong>C. S. Lewis</strong></p>
+            <h4><span class="badge text-bg-danger">Indisponível</span></h4>
+            <span class="badge rounded-pill text-bg-primary">Clássico</span>
+            <span class="badge rounded-pill text-bg-primary">Romance</span>
+            <span class="badge rounded-pill text-bg-primary">Fantasia</span>
+          </div>
+        </div>
+        <!--Card9-->
+        <div class="product-card">
+          <div class="product-image">
+            <img
+              src="../assets/img/capas/diariodeumbanana_capa.jpg"
+              class="product-thumb"
+            />
+            <button class="card-btn">Adicionar aos Favoritos ♥</button>
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">Diário de um Banana</h4>
+            <p class="product-author">por <strong>Jeff Kinney</strong></p>
+            <h4><span class="badge text-bg-success">Disponível</span></h4>
+            <span class="badge rounded-pill text-bg-primary">Comédia</span>
+            <span class="badge rounded-pill text-bg-primary">Juvenil</span>
+          </div>
+        </div>
+      </div>
+      &nbsp;
     </section>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
     <script src="../assets/js/catalogo/Catalog.js"></script>
-</body>
+  </body>
 </html>
