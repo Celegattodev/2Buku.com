@@ -5,74 +5,285 @@ body {
 #list-message{
     background-color: #6c8bf7;
 }
-#delete-button{
-    background-color: #6c8bf7;
+#edit-button{
+  background-color: #fd9323;
 }
+
+#delete-button{
+    background-color: #cc0c0c;
+}
+
+/*---------NAVBAR-----------*/
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    background-color: #6c8bf7;
-    color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #6c8bf7;
+  color: #fff;
+}
+
+.logo img {
+  height: 50px;
+}
+
+.menu ul {
+  list-style-type: none;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.menu ul li {
+  display: inline;
+}
+
+.menu ul li a {
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  transition: background-color 0.3s, color 0.3s;
+  display: flex;
+  align-items: center;
+}
+
+.nav-btn {
+  background-color: #fd9323;
+  margin-top: 15px;
+}
+
+.menu ul li a:hover {
+  background-color: #f18c1f;
+  color: #fff;
+}
+
+.tagline {
+  font-size: 14px;
+  align-items: center;
+  margin-top: 15px;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
   }
-  
-  .logo img {
-    height: 50px;
-  }
-  
+
   .menu ul {
-    list-style-type: none;
-    display: flex;
-    gap: 20px;
-    align-items: center;
+    flex-direction: column;
+    gap: 10px;
   }
-  
-  .menu ul li {
-    display: inline;
-  }
-  
-  .menu ul li a {
-    color: #fff;
-    text-decoration: none;
-    padding: 10px 20px;
-    border-radius: 25px;
-    transition: background-color 0.3s, color 0.3s;
-    display: flex;
-    align-items: center;
-  }
-  
-  .nav-btn {
-    background-color: #fd9323;
-    margin-top: 15px;
-  }
-  
-  .menu ul li a:hover {
-    background-color: #f18c1f;
-    color: #fff;
-  }
-  
+
   .tagline {
+    margin-top: 12px;
     font-size: 14px;
-    align-items: center;
-    margin-top: 15px;
+    text-align: center;
+    width: 100%;
   }
-  
-  @media (max-width: 768px) {
-    .navbar {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  
-    .menu ul {
-      flex-direction: column;
-      gap: 10px;
-    }
-  
-    .tagline {
-      margin-top: 12px;
-      font-size: 14px;
-      text-align: center;
-      width: 100%;
-    }
-  }
+}
+/*------------- Livros -------------*/
+.product {
+  position: relative;
+  overflow: hidden;
+  /* padding: 10px; */
+  width: 100%;
+}
+
+.product-category {
+  padding: 0 10vw;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 30px;
+  background-color: #fd9323;
+  color: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.product-container {
+  padding: 10 10vw;
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+}
+
+.product-container::-webkit-scrollbar {
+  display: none;
+}
+
+.product-card {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 200px;
+  margin: 10px;
+  flex: 0 0 auto;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.product-image {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  border-radius: 15px 15px 0 0;
+}
+
+.product-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.discont-tag {
+  position: absolute;
+  background-color: aliceblue;
+  padding: 5px;
+  border-radius: 5px;
+  color: aqua;
+  right: 10px;
+  top: 10px;
+  text-transform: capitalize;
+}
+
+.card-btn {
+  font-size: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  text-transform: capitalize;
+  outline: none;
+  transition: 0.5s;
+  cursor: pointer;
+  opacity: 0;
+  position: absolute;
+  bottom: 10px;
+  background-color: #fd9323;
+  color: #fff;
+  border: none;
+  padding: 8px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.product-card:hover .card-btn {
+  opacity: 1;
+}
+
+.card-btn:hover {
+  background: #ff8400;
+  color: #fff;
+}
+
+.product-info {
+  padding: 15px;
+  text-align: center;
+}
+
+.product-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #343a40;
+  height: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.product-author {
+  font-size: 14px;
+  color: #6c757d;
+  margin-bottom: 10px;
+}
+
+.product-status {
+  margin-bottom: 10px;
+}
+
+.product-genres .badge {
+  font-size: 12px;
+  margin: 2px;
+  padding: 5px 10px;
+}
+
+.pre-btn,
+.nxt-btn {
+  border: none;
+  width: 10vw;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  cursor: pointer;
+  z-index: 9;
+}
+
+.pre-btn {
+  left: 0;
+  transform: rotate(180deg);
+  opacity: 0.8;
+}
+
+.nxt-btn {
+  right: 0;
+  opacity: 0.8;
+}
+
+.pre-btn img,
+.nxt-btn img {
+  opacity: 0.2;
+  width: 50%;
+  height: auto;
+}
+
+.pre-btn:hover img,
+.nxt-btn:hover img {
+  opacity: 1;
+  width: 40%;
+  height: auto;
+}
+
+.collection-container {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 10px;
+}
+
+.collection {
+  position: relative;
+}
+
+.collection img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.collection p {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #fff;
+  font-size: 50px;
+  text-transform: capitalize;
+}
+
+.collection:nth-child(3) {
+  grid-column: span 2;
+  margin-bottom: 10px;
+}
