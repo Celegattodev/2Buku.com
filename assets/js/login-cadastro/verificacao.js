@@ -25,3 +25,4 @@ function validateRegisterForm() {
 
   return isValid; // Permite o envio do formulário se tudo estiver correto
 }
+
