@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar livro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/styles.css.map">
+    <link rel="stylesheet" href="../assets/css/addBook.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="../assets/img/Logo-Buku.png" alt="Logo">
+        </div>
+        <div class="menu">
+            <ul>
+                <li><a href="#" class="nav-btn">Perfil</a></li>
+                <li><a href="#" class="nav-btn">Sobre Nós</a></li>
+                <li><a href="#" class="nav-btn">Adicionar Livro</a></li>
+            </ul>
+        </div>
+        <div class="tagline">
+            <p><i>Compartilhando Histórias</i></p>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row d-flex justify-content-center align-items-center">
+            <div class="card shadow mt-5">
+                <div class="card-body">
+                    <form id="form" action="#" method="post">
+                        <p class="fs-3 text-center" style="font-weight: lighter;">Adicionar Livro</p>
+                        <div id="row-form">
+                            <div class="side">
+                                <div class="mb-3">
+                                    <label name="labelBook">Título: </label>
+                                    <input type="text" name="title" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label name="labelBook">ISBN: </label>
+                                    <input type="text" name="isbn" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label name="labelBook">Data de lançamento: </label>
+                                    <input type="date" name="datalancamento" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label name="labelBook">Autor: </label>
+                                    <input type="text" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label name="labelBook">Gêneros: </label>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="flexRadioDefault" value="1" checked>
+                                                <label class="form-check-label" for="flexRadioDefault1">
+                                                  Ação
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="flexRadioDefault" value="2">
+                                                <label class="form-check-label" for="flexRadioDefault1">
+                                                  Terror
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="flexRadioDefault" value="3">
+                                                <label class="form-check-label" for="flexRadioDefault1">
+                                                  Suspense
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="flexRadioDefault" value="4">
+                                                <label class="form-check-label" for="flexRadioDefault1">
+                                                  Fantasia
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="flexRadioDefault" value="5">
+                                                <label class="form-check-label" for="flexRadioDefault1">
+                                                  Romance
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="flexRadioDefault" value="6">
+                                                <label class="form-check-label" for="flexRadioDefault1">
+                                                  Poesia
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="flexRadioDefault" value="7">
+                                                <label class="form-check-label" for="flexRadioDefault1">
+                                                  Ficção Científica
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="flexRadioDefault" value="8">
+                                                <label class="form-check-label" for="flexRadioDefault1">
+                                                    Música
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="flexRadioDefault" value="9">
+                                                <label class="form-check-label" for="flexRadioDefault1">
+                                                  Biografia
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="flexRadioDefault" value="10">
+                                                <label class="form-check-label" for="flexRadioDefault1">
+                                                  Música
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="flexRadioDefault" value="11">
+                                                <label class="form-check-label" for="flexRadioDefault1">
+                                                  Fantasia
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="flexRadioDefault" value="12">
+                                                <label class="form-check-label" for="flexRadioDefault1">
+                                                  Conto
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="flexRadioDefault" value="13">
+                                                <label class="form-check-label" for="flexRadioDefault1" aria-required="true">
+                                                  Acadêmico/Científico
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="side">
+                                <label for="input-file" id="label-image" tabindex="0">
+                                    <span class="picture-image"></span>
+                                </label>
+                                <input type="file" name="imagem" id="input-file" class="form-control" accept="image/jpeg, image/png, image/jpg" required>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center mb-3 mt-3">
+                            <button type="submit" class="btn btn-my-color-1 text-white" id="button-create-book">Adicionar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../assets/js/addBook/addBook.js"></script>
+</body>
+</html>

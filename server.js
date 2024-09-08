@@ -43,33 +43,28 @@ app.post('/register', (req, res) => {
 // Rota para login do usuário
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
-
-    // Verificar se os campos email e senha estão presentes
-    if (!email || !password) {
-        return res.status(400).send('Email e senha são necessários');
-    }
-
     const sql = 'SELECT * FROM users WHERE email = ?';
 
     db.query(sql, [email], (err, results) => {
         if (err) {
-            return res.status(500).send('Erro ao fazer login');
+            return res.status(500).json({ success: false, message: 'Erro ao fazer login' });
         }
 
         if (results.length === 0) {
-            return res.status(404).send('Usuário não encontrado');
+            return res.status(404).json({ success: false, message: 'Usuário não encontrado' });
         }
 
         const user = results[0];
         const passwordMatch = bcrypt.compareSync(password, user.password);
 
         if (passwordMatch) {
-            res.send({ success: true, message: 'Login bem-sucedido', redirect: '/pages/user-profile.html' });
+            res.json({ success: true, message: 'Login bem-sucedido', redirect: '/pages/UserProfile.html' });
         } else {
-            res.status(401).send('Senha incorreta');
+            res.status(401).json({ success: false, message: 'Senha incorreta' });
         }
     });
 });
+
 
 const PORT = 3000;
 
