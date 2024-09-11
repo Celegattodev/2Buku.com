@@ -1,0 +1,119 @@
+  /* linha 01 */
+  body {
+      width: 100%;
+      min-height: 100vh;
+      /* display: flex; */
+      align-items: center;
+      justify-content: center;
+  }
+
+  /* linha 02 */
+  .containerMain {
+      width: 100%;
+      padding: 0px 10%;
+  }
+
+  .box {
+      background: #ffffff;
+  }
+
+  /* linha 03 */
+  .containerMain {
+      margin-right: calc(10% - 30px);
+  }
+
+  /* linha 04 */
+  /* main.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  } */
+
+  /* linha 05 */
+  .coluna-00 header.coluna-Titulo {
+      color: #ffffff;
+      margin-bottom: 20px;
+  }
+
+  /* linha 06 */
+  .coluna-00 .content {
+      padding: 0 30px;
+      border-left: solid 2px #f39e43;
+  }
+
+  /* linha 07 */
+  .coluna-00 .content .box {
+      position: relative;
+      padding: 20px;
+      border: solid 1px #eaeaea;
+      cursor: pointer;
+      transition: all 0.4s;
+      margin-bottom: 20px;
+  }
+
+  /* linha 08 */
+  .coluna-00 .content .box:hover {
+      box-shadow: 0px 3px 12px 0px #ccc;
+      border: solid 1px transparent;
+  }
+
+  /* linha 09 */
+  .coluna-00 .content .box::before {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      right: calc(100% + 22px);
+      top: 0;
+      background-color: #f39e43;
+      border: solid 2px #fff;
+  }
+
+  /* linha 10 */
+  .box h4 {
+      position: relative;
+      color: #f39e43;
+      font-weight: 600;
+  }
+
+  /* linha 11 */
+  .box h3 {
+      font-size: 18px;
+      padding: 10px 0 6px;
+      color: #313b44;
+  }
+
+  /* linha 12 */
+  .box p {
+      line-height: 1.2;
+      color: #ffffff;
+      font-size: 17px;
+  }
+
+  .icon-text {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+  }
+
+  .icon-text h4 {
+      margin: 0;
+  }
+
+  @media screen and (max-width: 768px) {
+      main.row {
+          grid-template-columns: 1fr;
+      }
+
+      .row .coluna-00:nth-child(2) {
+          margin-top: 30px;
+      }
+
+      .coluna-00 .content {
+          padding: 0 6px;
+      }
+
+      .box p {
+          font-size: 16px;
+      }
+  }
