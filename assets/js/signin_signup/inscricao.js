@@ -169,7 +169,6 @@ if (registerForm) {
         const state = stateSelect.value;
         const city = citySelect.value;
 
-        // Verifique se todos os campos têm valor
         if (!name || !email || !password || !confirmPassword || !state || !city) {
             alert('Por favor, preencha todos os campos.');
             return;
@@ -199,9 +198,8 @@ if (registerForm) {
 
             if (data.success) {
                 // Registro bem-sucedido
-                alert('Cadastro realizado com sucesso!');
-                // Redireciona para a página de login após registro bem-sucedido
-                window.location.href = '/';
+                alert(data.message); // Mensagem do servidor
+                window.location.href = '/'; // Redireciona para a página de login
             } else {
                 // Registro falhou, exibe a mensagem de erro
                 alert(data.message || 'Ocorreu um erro ao registrar a conta.');
@@ -212,4 +210,6 @@ if (registerForm) {
             alert('Ocorreu um erro ao fazer o registro. Por favor, tente novamente.');
         });
     });
+} else {
+    console.error('Formulário de registro não encontrado.');
 }

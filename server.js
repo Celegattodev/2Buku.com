@@ -172,44 +172,53 @@ app.post("/login", async (req, res) => {
 
 // Rota para processar o registro
 app.post("/register", (req, res) => {
-  const { name, email, state, city, password } = req.body;
+  const { name, email, password, state, city } = req.body;
 
-  console.log("Dados recebidos:", { name, email, state, city, password });
-
-  if (!name || !email || !state || !city || !password) {
-    return res.status(400).send("Todos os campos são obrigatórios.");
+  if (!name || !email || !password || !state || !city) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Todos os campos são obrigatórios." });
   }
 
-  // Verificar se o email já existe
   db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
     if (err) {
       console.error("Erro ao verificar email:", err);
-      return res.status(500).send("Erro no servidor.");
+      return res
+        .status(500)
+        .json({ success: false, message: "Erro no servidor." });
     }
 
     if (results.length > 0) {
-      return res.status(400).send("Email já cadastrado!");
+      return res
+        .status(400)
+        .json({ success: false, message: "Email já cadastrado!" });
     }
 
-    // Criptografar a senha
     bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
       if (err) {
         console.error("Erro ao criptografar a senha:", err);
-        return res.status(500).send("Erro no servidor.");
+        return res
+          .status(500)
+          .json({ success: false, message: "Erro no servidor." });
       }
 
-      // Inserir novo usuário
       db.query(
         "INSERT INTO users (name, email, state, city, password) VALUES (?, ?, ?, ?, ?)",
         [name, email, state, city, hashedPassword],
         (err) => {
           if (err) {
             console.error("Erro ao cadastrar usuário:", err);
-            return res.status(500).send("Erro no servidor.");
+            return res
+              .status(500)
+              .json({ success: false, message: "Erro ao registrar usuário." });
           }
 
-          // Enviar uma mensagem de sucesso
-          res.status(200).send("Cadastro realizado com sucesso!");
+          res
+            .status(200)
+            .json({
+              success: true,
+              message: "Cadastro realizado com sucesso!",
+            });
         }
       );
     });
