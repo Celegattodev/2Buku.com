@@ -93,8 +93,9 @@ body{
 }
 
 
-#button-create-book{
-    width: 20vh;
+.btn{
+  width: 150px;
+  margin: 4px;
 }
 #label-image{
     background-color: #ddd;

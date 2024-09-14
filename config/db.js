@@ -1,18 +1,21 @@
-const mysql = require('mysql');
+const mysql = require('mysql2');
 
-const db = mysql.createConnection({
-    host: 'localhost',  // Localhost para o XAMPP
-    user: 'root',       // O usuário padrão do MySQL
-    password: '',       // Deixe em branco se não definiu uma senha
-    database: 'buku_db' // Nome do banco de dados
-});
+// Configuração do banco de dados
+const dbOptions = {
+    host: 'localhost',
+    user: 'root',
+    password: '', // Senha do MySQL (deixe em branco se não houver)
+    database: 'buku_db' // Nome do seu banco de dados
+};
 
-db.connect((err) => {
+const connection = mysql.createConnection(dbOptions);
+
+connection.connect(err => {
     if (err) {
-        console.error('Erro ao conectar ao banco de dados:', err);
-    } else {
-        console.log('Conectado ao banco de dados MySQL.');
+        console.error('Erro ao conectar com o banco de dados:', err);
+        process.exit(1);
     }
+    console.log('Conectado ao banco de dados MySQL.');
 });
 
-module.exports = db;
+module.exports = connection;

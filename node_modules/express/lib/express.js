@@ -114,3 +114,4 @@ removedMiddlewares.forEach(function (name) {
     configurable: true
   });
 });
+

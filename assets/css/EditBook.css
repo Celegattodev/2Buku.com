@@ -1,0 +1,190 @@
+body{
+    background-image: url(../Img/Buku-fundo.png);
+    background-size: cover;
+    height: 100vh;
+}
+/*------------- NAVBAR -------------*/
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #6c8bf7;
+    color: #fff;
+  }
+  
+  .logo img {
+    height: 50px;
+  }
+  
+  .menu ul {
+    list-style-type: none;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+  
+  .menu ul li {
+    display: inline;
+  }
+  
+  .menu ul li a {
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    transition: background-color 0.3s, color 0.3s;
+    display: flex;
+    align-items: center;
+  }
+  
+  .nav-btn {
+    background-color: #fd9323;
+    margin-top: 15px;
+  }
+  
+  .menu ul li a:hover {
+    background-color: #f18c1f;
+    color: #fff;
+  }
+  
+  .tagline {
+    font-size: 14px;
+    align-items: center;
+    margin-top: 15px;
+  }
+
+  @media (max-width: 768px) {
+    .navbar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .menu ul {
+      flex-direction: column;
+      gap: 10px;
+    }
+  
+    .tagline {
+      margin-top: 12px;
+      font-size: 14px;
+      text-align: center;
+      width: 100%;
+    }
+  }
+
+/*--------------FORMULÁRIO--------------*/
+
+.card{
+    width: 100vh;
+}
+
+.form-check-input{
+  border-color: #888;
+}
+
+.side{
+  width: 40vh;
+}
+#row-form{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+}
+
+
+.btn{
+    width: 150px;
+    margin: 4px;
+}
+#label-image{
+    background-color: #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+    width: 100%;
+    color: #aaa;
+    border-style: dashed;
+    border-color: #bbb;
+}
+#label-image:hover{
+  cursor: pointer;
+  background-color: #eee;
+  color: #bbb;
+  border-color: #ccc;
+}
+
+.picture-image{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.picture-img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media screen and (max-width: 950px) and (max-height: 450px){
+  .side{
+    width: 200vh;
+  }
+  #button-create-book{
+    width: 30vh;
+  }
+  #label-image{
+    height: 400px;
+    width: 100%;
+  }
+}
+@media screen and (min-height: 500px) and (max-height: 600px){
+  .card{
+    width: 120vh;
+  }
+  .side{
+    width: 50vh;
+  }
+  #label-image{
+    height: 70vh;
+  }
+}
+@media screen and (min-height: 700px) and (max-height: 740px){
+  .card{
+    width: 50vh;
+  }
+}
+@media screen and (min-height:1000px) and (max-height: 1200px){
+  .card{
+    width: 50vh;
+    scale: 1.04;
+  }
+}
+@media screen and (min-height: 1250px) and (max-height: 1300px) {
+  .container-fluid{
+    margin-top: 10vh;
+  }
+  .card{
+    width: 35vh;
+    scale: 1.2;
+  }
+  #label-image{
+    height: 40vh;
+  }
+}
+
+@media screen and (min-height: 1300px) and (max-height: 1400px) and (min-width: 750px) and (max-width: 1050px){
+  .container-fluid{
+    margin-top: 30vh;
+  }
+  .card{
+    width: 30vh;
+    scale: 1.6;
+  }
+  #label-image{
+    height: 30vh;
+  }
+}

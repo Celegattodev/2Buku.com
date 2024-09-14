@@ -1,0 +1,140 @@
+body{
+    background-image: url(../Img/Buku-fundo.png);
+    background-size: cover;
+    height: 100vh;
+}
+/*------------- NAVBAR -------------*/
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #6c8bf7;
+    color: #fff;
+  }
+  
+  .logo img {
+    height: 50px;
+  }
+  
+  .menu ul {
+    list-style-type: none;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+  
+  .menu ul li {
+    display: inline;
+  }
+  
+  .menu ul li a {
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    transition: background-color 0.3s, color 0.3s;
+    display: flex;
+    align-items: center;
+  }
+  
+  .nav-btn {
+    background-color: #fd9323;
+    margin-top: 15px;
+  }
+  
+  .menu ul li a:hover {
+    background-color: #f18c1f;
+    color: #fff;
+  }
+  
+  .tagline {
+    font-size: 14px;
+    align-items: center;
+    margin-top: 15px;
+  }
+
+  @media (max-width: 768px) {
+    .navbar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .menu ul {
+      flex-direction: column;
+      gap: 10px;
+    }
+  
+    .tagline {
+      margin-top: 12px;
+      font-size: 14px;
+      text-align: center;
+      width: 100%;
+    }
+  }
+
+
+.card{
+    width: 140vh;
+}
+#img-title-book{
+    background-color: #fd9323;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+#details{
+  color: #fff;
+  background-color: #6c8bf7;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+#button-divs{
+  display: flex;
+  flex-wrap: wrap;
+}
+.btn{
+  width: 120px;
+  margin: 10px;
+}
+#buttons-div{
+  display: flex;
+  flex-wrap: wrap;
+}
+#edit-button{
+  background-color: #fd9323;
+}
+#delete-button{
+  background-color: #cc0c0c;
+}
+.buttons-action{
+    width: min-content;
+    background-color: #cc0c0c;
+}
+.picture-image{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+    width: 40vh;
+}
+.picture-img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-style: solid;
+  border-radius: 10px;
+  border-color: #8f5416;
+}
+@media screen and (max-width: 1000px){
+  .picture-image{
+    width: 250px;
+    height: 400px;
+  }
+}

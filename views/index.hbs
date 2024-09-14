@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="utf-8">
+  <!-- Configuração da viewport para responsividade -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Buku.com</title>
+
+  <!-- Ícone do site -->
+  <link rel="shortcut icon" type="imagex/png" href="../assets/img/Icon-Buku.png">
+
+  <!-- Inclusão do CSS do Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+  <!-- Inclusão do CSS personalizado -->
+  <link rel="stylesheet" href="../assets/css/landingPage/LandingPage.css">
+</head>
+
+<body>
+  <!-- Inclusão do JS do Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+
+  <!-- Navbar (menu de navegação) -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="../assets/img/Logo-Buku-sem-texto.png" alt="Logo">
+    </div>
+    <div class="menu">
+      <ul>
+        <li><a href="../pages/Catalog.html" class="nav-btn">Catálogo</a></li>
+        <li><a href="#" class="nav-btn">Sobre Nós</a></li>
+        <li><a href="#" class="nav-btn">Adicionar Livro</a></li>
+      </ul>
+    </div>
+    <div class="tagline">
+      <p><i>Compartilhando Histórias</i></p>
+    </div>
+  </nav>
+
+  <!-- Conteúdo principal -->
+  <div class="container text-center">
+    <div class="row align-items-center" id="conteudo">
+      <!-- Coluna de texto com chamada principal -->
+      <div class="col-12 col-lg-6">
+        <h1 class="texto">
+          <!-- Texto colorido com diferentes cores -->
+          <span id="text-orange">Empreste</span>, <br />
+          <span id="text-blue">Peça</span> e <br />
+          <span id="text-green">Leia</span>!
+        </h1>
+        <!-- Texto descritivo sobre a plataforma -->
+        <p> Sabe aquele livro na sua estante que agora só pega poeira? Dê uma renovada na utilidade dele!</p>
+        <p>Através do Buku você consegue emprestar e trocar livros com outras pessoas de sua região de maneira prática!
+        </p>
+      </div>
+      <!-- Coluna com imagem -->
+      <div class="col-12 col-lg-6" id="livros">
+        <img src="../assets/img/img_livros.png"
+          alt="Desenho de livros de capas de cores azul, laranja, preto e verdes empilhados." class="img-fluid" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Rodapé fixo com informações adicionais -->
+  <div class="row sticky-footer">
+    <div class="col-12 d-flex justify-content-center flex-wrap">
+      <!-- Cartão 1 -->
+      <div class="card mx-2 my-3" style="width: 18rem;" id="cards">
+        <div class="card-body">
+          <h5 class="card-title"><img src="../assets/img/truck.svg" alt="Desenho de um caminhão." /> Envie pelo correios
+          </h5>
+          <p class="card-text">Com o registro módico, você paga o frete com o troco do pão!</p>
+        </div>
+      </div>
+
+      <!-- Cartão 2 -->
+      <div class="card mx-2 my-3" style="width: 18rem;" id="cards">
+        <div class="card-body">
+          <h5 class="card-title"><img src="../assets/img/shield-check.svg"
+              alt="Desenho de uma caixa com um sinal de verificado." /> Segurança e rastreio</h5>
+          <p class="card-text">Será possível rastrear o seu querido livro para que ele não fuja.</p>
+        </div>
+      </div>
+
+      <!-- Cartão 3 -->
+      <div class="card mx-2 my-3" style="width: 18rem;" id="cards">
+        <div class="card-body">
+          <h5 class="card-title"><img src="../assets/img/coins.svg"
+              alt="Desenho de cofrinho de formato de porco com uma moeda em cima." /> Bem mais barato</h5>
+          <p class="card-text">Você terá um novo livro para ler por um preço bem mais acessível!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

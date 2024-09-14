@@ -3,6 +3,11 @@ body{
     background-size: cover;
     height: 100vh;
 }
+
+.card{
+  width: 200vh;
+}
+
 #list-group{
     height: 65vh;
     background-color: #6c8bf7;

@@ -1,0 +1,58 @@
+/* assets/css/navbar.css */
+#navbar {
+    background-color: #333;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#navbar_logo {
+    height: 40px;
+}
+
+#nav_list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+}
+
+#nav_list .nav-item a {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+}
+
+#nav_list .nav-item.active a {
+    background-color: #555;
+    border-radius: 5px;
+}
+
+.btn-default {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#mobile_btn {
+    display: none; /* Ocultando o botão para visualização em desktop */
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    #mobile_btn {
+        display: block;
+    }
+    
+    #mobile_menu {
+        display: none;
+    }
+    
+    #mobile_menu.active {
+        display: block;
+    }
+}
