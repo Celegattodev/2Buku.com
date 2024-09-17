@@ -5,29 +5,15 @@
 <div class="login-container" id="login-container">
   <div class="form-container">
     <!-- Formulário de Login -->
-    <form class="form form-login" action="/login" method="POST">
+    <form class="form form-login">
       <h2 class="form-title">Entrar</h2>
       <div class="form-input-container">
         <div class="input-group">
-          <input
-            type="email"
-            id="login-email"
-            name="email"
-            class="form-input"
-            placeholder=""
-            required
-          />
+          <input type="email" id="login-email" name="email" class="form-input" placeholder="" required />
           <label for="login-email" class="form-label">Email</label>
         </div>
         <div class="input-group">
-          <input
-            type="password"
-            id="login-password"
-            name="password"
-            class="form-input"
-            placeholder=""
-            required
-          />
+          <input type="password" id="login-password" name="password" class="form-input" placeholder="" required />
           <label for="login-password" class="form-label">Senha</label>
         </div>
       </div>
@@ -40,68 +26,46 @@
     </form>
 
     <!-- Formulário de Registro -->
-    <form class="form form-register" action="/register" method="POST">
+    <form class="form form-register" action="/register" method="POST" id="register-form">
       <h2 class="form-title">Criar Conta</h2>
       <div class="form-input-container">
         <div class="input-group">
-          <input
-            type="text"
-            id="name"
-            class="form-input"
-            name="name"
-            placeholder=""
-            required
-          />
+          <input type="text" id="name" class="form-input" name="name" placeholder="" required />
           <label for="name" class="form-label">Nome Completo</label>
         </div>
         <div class="input-group-container">
           <div class="input-group input-group-email">
-            <input
-              type="email"
-              id="register-email"
-              class="form-input"
-              name="email"
-              placeholder=""
-              required
-            />
+            <input type="email" id="register-email" class="form-input" name="email" placeholder="" required />
             <label for="register-email" class="form-label">Email</label>
           </div>
           <div class="input-group input-group-small">
             <select id="state" class="form-input" name="state" required>
               <option value="" disabled selected>UF</option>
-              <!-- Estados serão carregados dinamicamente -->
             </select>
           </div>
           <div class="input-group input-group-small">
             <select id="city" class="form-input" name="city" required>
               <option value="" disabled selected>Cidade</option>
-              <!-- Cidades serão carregadas dinamicamente -->
             </select>
           </div>
         </div>
         <div class="input-group">
-          <input
-            type="password"
-            id="register-password"
-            class="form-input"
-            name="password"
-            placeholder=""
-            required
-          />
+          <input type="password" id="register-password" class="form-input" name="password" placeholder="" required />
           <label for="register-password" class="form-label">Senha</label>
           <span id="password-error" class="error-message"></span>
         </div>
         <div class="input-group">
-          <input
-            type="password"
-            id="confirm-password"
-            class="form-input"
-            name="confirm_password"
-            placeholder=""
-            required
-          />
+          <input type="password" id="confirm-password" class="form-input" name="confirm_password" placeholder=""
+            required />
           <label for="confirm-password" class="form-label">Confirmar Senha</label>
           <span id="confirm-password-error" class="error-message"></span>
+        </div>
+
+        <!-- Checkbox de aceitação de política de privacidade -->
+        <div class="checkbox-container">
+          <input type="checkbox" id="privacy-policy" name="privacy_policy" required />
+          <label for="privacy-policy">Eu aceito a <a href="/privacy-policy" target="_blank">política de
+              privacidade</a>.</label>
         </div>
       </div>
       <button type="submit" class="form-button">Cadastrar</button>
@@ -117,18 +81,12 @@
     <div class="overlay">
       <h2 class="form-title form-title-light">Já tem conta?</h2>
       <p class="form-text">Faça login para acessar seus dados.</p>
-      <button
-        class="form-button form-button-light"
-        id="open-login"
-      >Entrar</button>
+      <button class="form-button form-button-light" id="open-login">Entrar</button>
     </div>
     <div class="overlay">
       <h2 class="form-title form-title-light">Novo por aqui?</h2>
       <p class="form-text">Faça seu cadastro e descubra muitas novidades!</p>
-      <button
-        class="form-button form-button-light"
-        id="open-register"
-      >Cadastrar</button>
+      <button class="form-button form-button-light" id="open-register">Cadastrar</button>
     </div>
   </div>
 </div>

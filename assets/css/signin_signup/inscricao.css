@@ -142,6 +142,8 @@ a {
 }
 
 /* Estilos para o formulário de registro */
+
+
 .form-register {
   transform: translateX(-100%);
   z-index: -1;
@@ -156,6 +158,32 @@ a {
   transform: translateX(0%);
   z-index: 1;
   opacity: 1;
+}
+
+/* Estilo para o container do checkbox */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espaçamento entre o checkbox e o texto */
+}
+
+/* Estilo para o checkbox */
+.checkbox-container input[type="checkbox"] {
+  margin: 0; /* Remove margens padrão */
+}
+
+/* Estilo para o label do checkbox */
+.checkbox-container label {
+  font-size: 0.875rem; /* Ajusta o tamanho da fonte do label */
+}
+
+/* Link dentro do checkbox */
+.checkbox-container a {
+  color: var(--primary-color); /* Cor do link */
+}
+
+.checkbox-container a:hover {
+  text-decoration: underline; /* Adiciona sublinhado ao passar o mouse */
 }
 
 /* Estilos para responsividade em telas maiores */
@@ -193,9 +221,12 @@ a {
   border-radius: 12px;
   box-shadow: 0 5px 20px #a0a0a0;
   overflow: hidden;
-  background-color: var(
-    --secondary-color
-  ); /* Garante que o fundo seja branco */
+}
+
+.inscricao-page {
+  background: url("../../img/Buku-fundo.png") no-repeat center center;
+  background-size: cover;
+  min-height: 100vh; /* Garante que o corpo ocupe pelo menos a altura total da tela */
 }
 
 /* Estilos para responsividade em telas menores */

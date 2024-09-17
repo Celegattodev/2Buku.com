@@ -1,105 +1,67 @@
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{title}}</title>
-    <link rel="stylesheet" href="/css/style.css" />
-  </head>
-  <body>
-    <div class="container-fluid p-5">
-      <div class="col d-flex justify-content-center">
-        <div class="card shadow p-1">
-          <div class="card-body">
-            <section class="details-profile mb-5">
-              <div class="profile-row">
-                <div class="image-profile">
-                  <img
-                    src="{{profileImageUrl}}"
-                    class="profile-img"
-                    alt="Imagem de perfil"
-                    id="profile-img"
-                  />
-                </div>
-                <h3
-                  class="card-title text-center"
-                  id="profile-name"
-                >{{userName}}</h3>
-                <p
-                  class="card-text text-center"
-                  id="profile-email"
-                >{{userEmail}} - {{userState}}</p>
-                <p
-                  class="card-text text-center"
-                  id="profile-city"
-                >{{userCity}}</p>
-                <div class="card mt-4" id="desc-card">
-                  <div class="card-body">
-                    <p id="profile-description">{{userDescription}}</p>
-                  </div>
-                </div>
+<div class="container-fluid p-5">
+  <div class="col d-flex justify-content-center">
+    <div class="card shadow p-1">
+      <div class="card-body">
+        <section class="details-profile mb-5">
+          <div class="profile-row">
+            <div class="image-profile">
+              <img src="{{profileImageUrl}}" class="profile-img" alt="Imagem de perfil" id="profile-img" />
+            </div>
+            <h3 class="card-title text-center" id="profile-name">{{userName}}</h3>
+            <p class="card-text text-center" id="profile-email">{{userEmail}} - {{userState}}</p>
+            <p class="card-text text-center" id="profile-city">{{userCity}}</p>
+            <div class="card mt-4" id="desc-card">
+              <div class="card-body">
+                <p id="profile-description">{{userDescription}}</p>
               </div>
-            </section>
-            &nbsp;
-            <section class="product">
-              <h2 class="product-category">Seus livros</h2>
-              <button class="pre-btn">
-                <img src="/img/arrow-icon.png" alt="Seta para a esquerda" />
-              </button>
-              <button class="nxt-btn">
-                <img src="/img/arrow-icon.png" alt="Seta para a direita" />
-              </button>
-              <div class="product-container">
-                <!-- Cards -->
-                <!-- Exemplo de Card -->
-                <div class="product-card">
-                  <div class="product-image">
-                    <img
-                      src="/img/capas/1984_capa.jpg"
-                      class="product-thumb"
-                      alt="Capa do livro 1984"
-                    />
-                    <a href="/pages/BookDetails.html">
-                      <button class="card-btn">Editar</button>
-                    </a>
-                  </div>
-                  <div class="product-info">
-                    <h4 class="product-title">1984</h4>
-                    <p class="product-author">por
-                      <strong>George Orwell</strong></p>
-                    <h4><span
-                        class="badge text-bg-success"
-                      >Disponível</span></h4>
-                    <span
-                      class="badge rounded-pill text-bg-primary"
-                    >Distopia</span>
-                    <span
-                      class="badge rounded-pill text-bg-primary"
-                    >Político</span>
-                  </div>
-                </div>
-                <!-- Adicione mais cards conforme necessário -->
-              </div>
-            </section>
-            
-            <!-- Botões de perfil -->
-            <div class="mb-3 d-flex justify-content-end" id="buttons-div">
-              <a href="UpdateProfile.html" class="button-link" id="edit-button">
-                Editar Perfil
-              </a>
-              <a
-                href="UpdateProfile.html"
-                class="button-link"
-                id="delete-button"
-              >Deletar Conta</a>
-              <!-- Botão de Logout -->
-              <a href="/logout" class="button-link" id="logout-button">
-                Logout
-              </a>
             </div>
           </div>
+        </section>
+        &nbsp;
+        <section class="product">
+          <h2 class="product-category">Seus livros</h2>
+          <button class="pre-btn">
+            <img src="/img/arrow-icon.png" alt="Seta para a esquerda" />
+          </button>
+          <button class="nxt-btn">
+            <img src="/img/arrow-icon.png" alt="Seta para a direita" />
+          </button>
+          <div class="product-container">
+            <!-- Cards -->
+            <!-- Exemplo de Card -->
+            <div class="product-card">
+              <div class="product-image">
+                <img src="/img/capas/1984_capa.jpg" class="product-thumb" alt="Capa do livro 1984" />
+                <a href="/pages/BookDetails.html">
+                  <button class="card-btn">Editar</button>
+                </a>
+              </div>
+              <div class="product-info">
+                <h4 class="product-title">1984</h4>
+                <p class="product-author">por
+                  <strong>George Orwell</strong>
+                </p>
+                <h4><span class="badge text-bg-success">Disponível</span></h4>
+                <span class="badge rounded-pill text-bg-primary">Distopia</span>
+                <span class="badge rounded-pill text-bg-primary">Político</span>
+              </div>
+            </div>
+            <!-- Adicione mais cards conforme necessário -->
+          </div>
+        </section>
+
+        <!-- Botões de perfil -->
+        <div class="mb-3 d-flex justify-content-end" id="buttons-div">
+          <a href="UpdateProfile.html" class="button-link" id="edit-button">
+            Editar Perfil
+          </a>
+          <a href="UpdateProfile.html" class="button-link" id="delete-button">Deletar Conta</a>
+          <!-- Botão de Logout -->
+          <a href="/logout?logout=success" class="button-link" id="logout-button">
+            Logout
+          </a>
         </div>
       </div>
     </div>
-    <script src="/js/script.js"></script>
-  </body>
-</html>
+  </div>
+</div>

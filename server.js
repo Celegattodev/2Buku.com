@@ -80,7 +80,7 @@ app.get("/", (req, res) => {
 // Rota para a página do perfil do usuário
 app.get("/user-profile", async (req, res) => {
   if (!req.session.userId) {
-    return res.redirect("/");
+    return res.redirect("/"); // Redireciona para a página inicial se o usuário não estiver logado
   }
 
   // Consultar o banco de dados para obter as informações do usuário
@@ -100,19 +100,19 @@ app.get("/user-profile", async (req, res) => {
       const user = results[0];
       const cityName = await getCityNameById(user.state, user.city);
 
-      res.render("userProfile", {
+      res.render("userProfile", { // Certifique-se de que o nome do arquivo é 'userProfile.hbs'
         title: "Perfil do Usuário",
         profileImageUrl: "/img/profile-placeholder.png", // Substitua se tiver uma URL específica
         userName: user.name,
         userEmail: user.email,
         userState: user.state,
         userCity: cityName, // Usar o nome da cidade
-        userDescription:
-          "Lorem ipsum dolor sit amet, consectetur adipisicing elit...", // Substitua com descrição real se tiver
+        userDescription: "Lorem ipsum dolor sit amet, consectetur adipisicing elit...", // Substitua com descrição real se tiver
       });
     }
   );
 });
+
 
 // Rota para processar o login
 app.post("/login", async (req, res) => {
@@ -120,9 +120,10 @@ app.post("/login", async (req, res) => {
 
   // Verifica se o e-mail e a senha foram fornecidos
   if (!email || !password) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Email e senha são obrigatórios." });
+    return res.status(400).json({
+      success: false,
+      message: "Email e senha são obrigatórios."
+    });
   }
 
   try {
@@ -130,15 +131,17 @@ app.post("/login", async (req, res) => {
     db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
       if (err) {
         console.error("Erro ao verificar email:", err);
-        return res
-          .status(500)
-          .json({ success: false, message: "Erro no servidor." });
+        return res.status(500).json({
+          success: false,
+          message: "Erro no servidor."
+        });
       }
 
       if (results.length === 0) {
-        return res
-          .status(401)
-          .json({ success: false, message: "Email não encontrado." });
+        return res.status(401).json({
+          success: false,
+          message: "Email não encontrado."
+        });
       }
 
       const user = results[0];
@@ -147,59 +150,83 @@ app.post("/login", async (req, res) => {
       bcrypt.compare(password, user.password, (err, isMatch) => {
         if (err) {
           console.error("Erro na comparação da senha:", err);
-          return res
-            .status(500)
-            .json({ success: false, message: "Erro no servidor." });
+          return res.status(500).json({
+            success: false,
+            message: "Erro no servidor."
+          });
         }
 
         if (isMatch) {
           // Senha correta
           req.session.userId = user.id;
-          res.json({ success: true });
+          return res.status(200).json({
+            success: true,
+            message: "Login realizado com sucesso!",
+            redirect: "/user-profile" // Certifique-se de que este campo está presente
+          });
         } else {
           // Senha incorreta
-          res.status(401).json({ success: false, message: "Senha incorreta." });
+          return res.status(401).json({
+            success: false,
+            message: "Senha incorreta."
+          });
         }
       });
     });
   } catch (error) {
     console.error("Erro ao autenticar o usuário:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Erro interno do servidor." });
+    return res.status(500).json({
+      success: false,
+      message: "Erro interno do servidor."
+    });
   }
 });
+
 
 // Rota para processar o registro
 app.post("/register", (req, res) => {
   const { name, email, password, state, city } = req.body;
 
   if (!name || !email || !password || !state || !city) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Todos os campos são obrigatórios." });
+    return res.status(400).json({
+      success: false,
+      message: "Todos os campos são obrigatórios."
+    });
+  }
+
+  // Validação da senha
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+  if (!passwordRegex.test(password)) {
+    return res.status(400).json({
+      success: false,
+      message: "A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, uma minúscula, um número e um caractere especial."
+    });
   }
 
   db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
     if (err) {
       console.error("Erro ao verificar email:", err);
-      return res
-        .status(500)
-        .json({ success: false, message: "Erro no servidor." });
+      return res.status(500).json({
+        success: false,
+        message: "Erro no servidor."
+      });
     }
 
     if (results.length > 0) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Email já cadastrado!" });
+      return res.status(400).json({
+        success: false,
+        message: "Email já cadastrado!"
+      });
     }
 
     bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
       if (err) {
         console.error("Erro ao criptografar a senha:", err);
-        return res
-          .status(500)
-          .json({ success: false, message: "Erro no servidor." });
+        return res.status(500).json({
+          success: false,
+          message: "Erro no servidor."
+        });
       }
 
       db.query(
@@ -208,21 +235,25 @@ app.post("/register", (req, res) => {
         (err) => {
           if (err) {
             console.error("Erro ao cadastrar usuário:", err);
-            return res
-              .status(500)
-              .json({ success: false, message: "Erro ao registrar usuário." });
+            return res.status(500).json({
+              success: false,
+              message: "Erro ao registrar usuário."
+            });
           }
 
-          res
-            .status(200)
-            .json({
-              success: true,
-              message: "Cadastro realizado com sucesso!",
-            });
+          res.status(200).json({
+            success: true,
+            message: "Cadastro realizado com sucesso!"
+          });
         }
       );
     });
   });
+});
+
+// Rota para a política de privacidade
+app.get('/privacy-policy', (req, res) => {
+  res.render('privacy-policy');
 });
 
 // Rota para fazer logout
@@ -233,8 +264,8 @@ app.get("/logout", (req, res) => {
       return res.status(500).send("Erro ao fazer logout.");
     }
 
-    // Redireciona para a página inicial após o logout
-    res.redirect("/");
+    // Redireciona para a página inicial com um parâmetro de sucesso
+    res.redirect("/?logout=success");
   });
 });
 
