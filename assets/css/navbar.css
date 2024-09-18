@@ -1,58 +1,152 @@
-/* assets/css/navbar.css */
+/* CSS do header */
+header {
+    width: 100%;
+    position: fixed; /* Fixar o header no topo */
+    top: 0; /* Alinhar ao topo */
+    left: 0;
+    padding: 0 8%; /* Ajuste o padding se necessário */
+    background-color: #6c8bf7;
+    z-index: 1000; /* Garante que o header fique acima de outros elementos */
+}
+
+/* CSS para o navbar */
 #navbar {
-    background-color: #333;
-    padding: 10px;
+    width: 100%;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    padding: 10px 0; /* Ajuste o padding vertical para aumentar a altura */
 }
 
 #navbar_logo {
-    height: 40px;
+    width: 100px;
 }
 
 #nav_list {
-    list-style: none;
-    padding: 0;
     display: flex;
-    gap: 15px;
+    list-style: none;
+    gap: 48px;
+    font-weight: 500;
 }
 
-#nav_list .nav-item a {
-    color: white;
+.nav-item a {
+    font-size: 18px;
     text-decoration: none;
-    padding: 10px;
+    color: #ffffff;
 }
 
-#nav_list .nav-item.active a {
-    background-color: #555;
-    border-radius: 5px;
+.nav-item.active a {
+    color: #ffffff;
+    border-bottom: 3px solid #f39e43;
 }
 
 .btn-default {
-    background-color: #007bff;
-    color: white;
+    color: #ffffff;
     border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    background-color: #f39e43;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-weight: 600;
+    box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.1);
     cursor: pointer;
+    transition: background-color .3s ease;
 }
 
+.btn-default:hover {
+    background-color: #f8b87d;
+}
+
+/* Estilo para o botão do menu móvel */
 #mobile_btn {
-    display: none; /* Ocultando o botão para visualização em desktop */
+    display: none; /* Escondido em telas maiores */
 }
 
-/* Mobile Styles */
-@media (max-width: 768px) {
+#mobile_menu {
+    display: none; /* Inicialmente escondido */
+    position: absolute; /* Para que ele apareça sobre outros elementos */
+    top: 70px; /* Ajuste para alinhar logo abaixo do header */
+    left: 0;
+    width: 100%;
+    background-color: #6c8bf7;
+    padding: 20px; /* Ajuste o padding conforme necessário */
+    z-index: 1000; /* Garante que o menu fique acima de outros elementos */
+}
+
+#mobile_menu.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#mobile_nav_list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#mobile_nav_list .nav-item {
+    text-align: center;
+}
+
+/* Estilos para o ícone do menu hambúrguer */
+#mobile_btn {
+    display: none; /* Inicialmente escondido */
+    border: none;
+    background-color: transparent;
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin-right: 50px;
+    color: #ffffff; /* Cor do ícone */
+}
+
+/* Adicionar estilos para o ícone de fechar */
+.fa-x:before {
+    content: '\f00d'; /* Código Unicode para o ícone de fechar (X) */
+    font-family: 'Font Awesome 5 Free'; /* Certifique-se de que FontAwesome está carregado */
+    font-weight: 900; /* Peso do ícone */
+}
+
+/* Estilo do ícone do menu hambúrguer */
+.fa-bars:before {
+    content: '\f0c9'; /* Código Unicode para o ícone de menu (três linhas) */
+    font-family: 'Font Awesome 5 Free'; /* Certifique-se de que FontAwesome está carregado */
+    font-weight: 900; /* Peso do ícone */
+}
+
+/* Media queries para telas menores */
+@media screen and (max-width: 1170px) {
+    #nav_list,
+    #navbar .btn-default {
+        display: none; /* Esconder a lista de navegação e o botão em telas menores */
+    }
+
     #mobile_btn {
-        display: block;
+        display: block; /* Mostrar o botão do menu móvel em telas menores */
     }
-    
-    #mobile_menu {
-        display: none;
-    }
-    
+
     #mobile_menu.active {
-        display: block;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #mobile_nav_list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    #mobile_nav_list .nav-item {
+        text-align: center;
     }
 }

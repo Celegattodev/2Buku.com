@@ -29,3 +29,4 @@ inputFile.addEventListener('change', function (e) {
         pictureImage.innerHTML = picImageText;
     }
 });
+

@@ -1,69 +1,82 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // Carrega dados do perfil
+// updateProfile.js
+
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('form');
+  const saveButton = document.getElementById('save-edit');
+
+  // Adiciona um listener de evento de submit ao formulário
+  form.addEventListener('submit', function (e) {
+    e.preventDefault(); // Evita o envio padrão do formulário
+
+    // Obtém os dados do formulário
+    const formData = new FormData(form);
+
+    // Converte os dados do FormData para um objeto JavaScript
+    const data = {};
+    formData.forEach((value, key) => {
+      data[key] = value;
+    });
+
+    console.log('Dados enviados:', data); // Adiciona log para debug
+
+    // Faz a requisição POST para atualizar o perfil
+    fetch('/update-profile', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Perfil atualizado com sucesso!',
+            text: 'Suas informações foram salvas.',
+            confirmButtonText: 'OK'
+          }).then(() => {
+            // Verifique a URL de redirecionamento aqui
+            window.location.href = '/profile'; // Redireciona para a página de perfil
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro ao atualizar perfil',
+            text: data.message || 'Ocorreu um erro ao atualizar o perfil. Tente novamente mais tarde.',
+            confirmButtonText: 'OK'
+          });
+        }
+      })
+      .catch(error => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao atualizar perfil',
+          text: 'Ocorreu um erro ao atualizar o perfil. Tente novamente mais tarde.',
+          confirmButtonText: 'OK'
+        });
+        console.error('Error:', error);
+      });
+  });
+
+  // Requisição para buscar os dados do perfil
   fetch('/api/profile')
     .then(response => response.json())
     .then(data => {
       if (data) {
+        // Preencher os campos com os dados retornados do banco de dados
         document.getElementById('name').value = data.name || '';
         document.getElementById('phone').value = data.phone || '';
         document.getElementById('biography').value = data.biography || '';
-
-        const imagePreview = document.querySelector('#img-profile-div img');
-        if (data.image) {
-          imagePreview.src = data.image;
-        } else {
-          imagePreview.src = '/img/profile-placeholder.png';
-        }
+      } else {
+        console.error('Nenhum dado encontrado');
       }
+    })
+    .catch(error => {
+      console.error('Erro ao carregar os dados do usuário:', error);
     });
-
-  // Adiciona o listener ao formulário
-  const form = document.getElementById('form');
-  if (form) {
-    form.addEventListener('submit', function (event) {
-      event.preventDefault();
-
-      const formData = new FormData(this);
-
-      fetch('/update-profile', {
-        method: 'POST',
-        body: formData
-      })
-        .then(response => response.json())
-        .then(data => {
-          // Exibe o alerta baseado na resposta do servidor
-          if (data.success) {
-            showSuccessAlert();
-          } else {
-            showErrorAlert(data.message || 'Erro desconhecido.');
-          }
-        })
-        .catch(error => {
-          console.error('Erro ao atualizar perfil:', error);
-          showErrorAlert('Houve um problema ao atualizar seu perfil. Por favor, tente novamente.');
-        });
-    });
-  }
 });
 
-// Função para mostrar alerta de sucesso
-function showSuccessAlert() {
-  Swal.fire({
-    icon: 'success',
-    title: 'Atualização bem-sucedida!',
-    text: 'Seu perfil foi atualizado com sucesso.',
-    confirmButtonText: 'OK'
-  }).then(() => {
-    window.location.href = '/user-profile'; // Redireciona após a confirmação
-  });
-}
-
-// Função para mostrar alerta de erro
-function showErrorAlert(message) {
-  Swal.fire({
-    icon: 'error',
-    title: 'Erro ao atualizar perfil',
-    text: message,
-    confirmButtonText: 'OK'
-  });
+function cancelEdit() {
+  window.location.href = '/profile'; // Redirecionar para a página de perfil ou outra página
 }

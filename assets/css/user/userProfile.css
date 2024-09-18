@@ -1,5 +1,5 @@
 body {
-  background: url("../../assets/img/Buku-fundo.png");
+  background-image: url("/img/Buku-fundo.png");
   background-size: cover;
 }
 
@@ -366,4 +366,24 @@ body {
     width: 90%;
     height: 30vh;
   }
+}
+
+/* Container da imagem de perfil */
+.profile-image-container {
+  display: flex;
+  justify-content: center; /* Centraliza horizontalmente */
+  align-items: center; /* Centraliza verticalmente */
+  width: 150px; /* Define uma largura fixa para o container da imagem */
+  height: 150px; /* Define uma altura fixa para o container da imagem */
+  border-radius: 50%; /* Torna o container circular */
+  overflow: hidden; /* Garante que a imagem não ultrapasse os limites do container */
+  margin: 0 auto; /* Centraliza o container na página */
+  border: 2px solid #ddd; /* Adiciona uma borda ao redor do container */
+}
+
+/* Estilização da imagem do perfil */
+.profile-image {
+  width: 100%; /* Garante que a imagem preencha o container */
+  height: 100%; /* Garante que a imagem preencha o container */
+  object-fit: cover; /* Garante que a imagem se ajuste sem distorcer */
 }

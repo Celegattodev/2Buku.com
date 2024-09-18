@@ -2,31 +2,25 @@
 
 const express = require("express");
 const path = require("path");
-const { engine } = require("express-handlebars");
 const mysql = require("mysql2");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
-const multer = require('multer');
+const fs = require('fs');
 const axios = require("axios");
+const crypto = require('crypto');
+
 
 const app = express();
 const saltRounds = 10; // Número de rounds para bcrypt
 
-// Configuração do multer para armazenamento em memória
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+// Gera uma chave secreta aleatória para a sessão
+const generateSecret = () => {
+  return crypto.randomBytes(64).toString('hex');
+};
 
-// Configura o motor de templates Handlebars
-app.engine(
-  "hbs",
-  engine({
-    extname: "hbs",
-    defaultLayout: "main",
-    layoutsDir: path.join(__dirname, "views/layouts"),
-  })
-);
-app.set("view engine", "hbs");
-app.set("views", path.join(__dirname, "views"));
+// Configura o engine de visualização para EJS
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 // Configura o diretório de arquivos estáticos
 app.use(express.static(path.join(__dirname, "assets")));
@@ -38,7 +32,7 @@ app.use(express.json());
 // Configuração do middleware de sessão
 app.use(
   session({
-    secret: "your-secret-key", // Substitua por uma chave secreta segura
+    secret: generateSecret(), // Substitua por uma chave secreta segura
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false }, // Defina como `true` se usar HTTPS
@@ -77,19 +71,52 @@ const getCityNameById = async (stateCode, cityId) => {
   }
 };
 
-// Rota para a página inicial que renderiza inscricao-buku.hbs
-app.get("/", (req, res) => {
-  res.render("inscricao-buku", { title: "Inscrição Buku" });
+app.get('/api/profile', (req, res) => {
+  const userId = req.session.userId; // Certifique-se de que o ID do usuário está na sessão
+  if (!userId) {
+    return res.status(401).json({ message: 'Usuário não autenticado' });
+  }
+
+  // Consulta SQL para buscar os dados do usuário
+  const sql = 'SELECT name, phone, biography FROM users WHERE id = ?';
+  db.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar dados do usuário:', err);
+      return res.status(500).json({ message: 'Erro ao buscar dados do usuário' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Usuário não encontrado' });
+    }
+
+    // Retornar os dados do usuário
+    const user = results[0];
+    res.json(user);
+  });
 });
 
-// Rota para a página do perfil do usuário
-app.get('/user-profile', (req, res) => {
+// Middleware para verificar se o usuário está autenticado
+const isAuthenticated = (req, res, next) => {
+  if (req.session.userId) {
+    next();
+  } else {
+    res.redirect('/login'); // Redireciona para login se não estiver autenticado
+  }
+};
+
+// Rota para a página inicial
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "views", "inscricao-buku.html"));
+});
+
+// Rota para exibir o perfil do usuário
+app.get('/profile', isAuthenticated, (req, res) => {
   if (!req.session.userId) {
     return res.redirect('/'); // Redireciona para a página inicial se o usuário não estiver logado
   }
 
   db.query(
-    'SELECT name, email, state, city, phone, biography, profile_image FROM users WHERE id = ?',
+    'SELECT name, email, state, city, phone, biography FROM users WHERE id = ?',
     [req.session.userId],
     async (err, results) => {
       if (err) {
@@ -102,24 +129,52 @@ app.get('/user-profile', (req, res) => {
       }
 
       const user = results[0];
+
+      // Obter o nome da cidade usando o código da cidade e do estado
       const cityName = await getCityNameById(user.state, user.city);
 
-      res.render('userProfile', {
-        title: 'Perfil do Usuário',
-        profileImageUrl: user.profile_image ? `data:image/jpeg;base64,${user.profile_image}` : '/img/profile-placeholder.png',
-        userName: user.name,
-        userEmail: user.email,
-        userState: user.state,
-        userCity: cityName,
-        userPhone: user.phone,  
-        userDescription: user.biography,
+      // Substituição de placeholders no HTML
+      const filePath = path.join(__dirname, 'views', 'UserProfile.html');
+      fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).send('Erro interno do servidor');
+        }
+
+        // Dados do perfil
+        const profileData = {
+          profileImage: user.profile_image ? `data:image/jpeg;base64,${user.profile_image}` : '/img/profile-mage/th.jpeg',
+          name: user.name || 'Nome não disponível',
+          email: user.email || 'Email não disponível',
+          state: user.state || 'Estado não disponível',
+          city: cityName || 'Cidade não disponível',
+          phone: user.phone || 'Telefone não disponível',
+          description: user.biography || 'Descrição não disponível',
+        };
+
+        // Substituir placeholders no HTML
+        let html = data
+          .replace('{{profileImage}}', profileData.profileImage)
+          .replace('{{userName}}', profileData.name)
+          .replace('{{userEmail}}', profileData.email)
+          .replace('{{userState}}', profileData.state)
+          .replace('{{userCity}}', profileData.city)
+          .replace('{{userPhone}}', profileData.phone)
+          .replace('{{userDescription}}', profileData.description);
+
+        res.send(html);
       });
     }
   );
 });
 
+// Rota para a página de login
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'inscricao-buku.html'));
+});
+
 // Rota para processar o login
-app.post("/login", async (req, res) => {
+app.post("/login", (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -129,56 +184,48 @@ app.post("/login", async (req, res) => {
     });
   }
 
-  try {
-    db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
+  db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
+    if (err) {
+      console.error("Erro ao verificar email:", err);
+      return res.status(500).json({
+        success: false,
+        message: "Erro no servidor."
+      });
+    }
+
+    if (results.length === 0) {
+      return res.status(401).json({
+        success: false,
+        message: "Email não encontrado."
+      });
+    }
+
+    const user = results[0];
+
+    bcrypt.compare(password, user.password, (err, isMatch) => {
       if (err) {
-        console.error("Erro ao verificar email:", err);
+        console.error("Erro na comparação da senha:", err);
         return res.status(500).json({
           success: false,
           message: "Erro no servidor."
         });
       }
 
-      if (results.length === 0) {
+      if (isMatch) {
+        req.session.userId = user.id;
+        return res.status(200).json({
+          success: true,
+          message: "Login realizado com sucesso!",
+          redirect: "/profile" // Redireciona para a página de perfil após o login
+        });
+      } else {
         return res.status(401).json({
           success: false,
-          message: "Email não encontrado."
+          message: "Senha incorreta."
         });
       }
-
-      const user = results[0];
-
-      bcrypt.compare(password, user.password, (err, isMatch) => {
-        if (err) {
-          console.error("Erro na comparação da senha:", err);
-          return res.status(500).json({
-            success: false,
-            message: "Erro no servidor."
-          });
-        }
-
-        if (isMatch) {
-          req.session.userId = user.id;
-          return res.status(200).json({
-            success: true,
-            message: "Login realizado com sucesso!",
-            redirect: "/user-profile"
-          });
-        } else {
-          return res.status(401).json({
-            success: false,
-            message: "Senha incorreta."
-          });
-        }
-      });
     });
-  } catch (error) {
-    console.error("Erro ao autenticar o usuário:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Erro interno do servidor."
-    });
-  }
+  });
 });
 
 // Rota para processar o registro
@@ -192,116 +239,80 @@ app.post("/register", (req, res) => {
     });
   }
 
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
-  if (!passwordRegex.test(password)) {
-    return res.status(400).json({
-      success: false,
-      message: "A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, uma minúscula, um número e um caractere especial."
-    });
-  }
-
-  db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
+  bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
     if (err) {
-      console.error("Erro ao verificar email:", err);
+      console.error("Erro ao criptografar a senha:", err);
       return res.status(500).json({
         success: false,
         message: "Erro no servidor."
       });
     }
 
-    if (results.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Email já cadastrado!"
-      });
-    }
-
-    bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
-      if (err) {
-        console.error("Erro ao criptografar a senha:", err);
-        return res.status(500).json({
-          success: false,
-          message: "Erro no servidor."
-        });
-      }
-
-      db.query(
-        "INSERT INTO users (name, email, state, city, password) VALUES (?, ?, ?, ?, ?)",
-        [name, email, state, city, hashedPassword],
-        (err) => {
-          if (err) {
-            console.error("Erro ao cadastrar usuário:", err);
-            return res.status(500).json({
-              success: false,
-              message: "Erro ao registrar usuário."
-            });
-          }
-
-          res.status(200).json({
-            success: true,
-            message: "Cadastro realizado com sucesso!"
+    db.query(
+      "INSERT INTO users (name, email, password, state, city) VALUES (?, ?, ?, ?, ?)",
+      [name, email, hashedPassword, state, city],
+      (err, results) => {
+        if (err) {
+          console.error("Erro ao registrar o usuário:", err);
+          return res.status(500).json({
+            success: false,
+            message: "Erro no servidor."
           });
         }
-      );
-    });
+
+        res.status(201).json({
+          success: true,
+          message: "Usuário registrado com sucesso!"
+        });
+      }
+    );
   });
 });
 
-// Rota para a política de privacidade
-app.get('/privacy-policy', (req, res) => {
-  res.render('privacy-policy');
-});
-
-// Rota para a página de edição de perfil
+// Rota para atualizar o perfil
 app.get('/update-profile', (req, res) => {
   if (!req.session.userId) {
     return res.redirect('/'); // Redireciona se o usuário não estiver logado
   }
 
-  db.query(
-    'SELECT * FROM users WHERE id = ?',
-    [req.session.userId],
-    (err, results) => {
-      if (err) {
-        console.error('Erro ao buscar dados do usuário:', err);
-        return res.status(500).send('Erro ao buscar dados do usuário.');
-      }
-
-      if (results.length === 0) {
-        return res.status(404).send('Usuário não encontrado.');
-      }
-
-      const user = results[0];
-      res.render('updateProfile', {
-        title: 'Atualizar Perfil',
-        userId: user.id,
-        userName: user.name || '',
-        userPhone: user.phone || '',
-        userDescription: user.biography || '',
-        profileImageUrl: user.profile_image || '/img/profile-placeholder.png'
-      });
+  db.query('SELECT * FROM users WHERE id = ?', [req.session.userId], (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar dados do usuário:', err);
+      return res.status(500).send('Erro ao buscar dados do usuário.');
     }
-  );
+
+    if (results.length === 0) {
+      return res.status(404).send('Usuário não encontrado.');
+    }
+
+    const user = results[0];
+
+    // Carregar o arquivo HTML diretamente
+    res.sendFile(path.join(__dirname, 'views', 'updateProfile.html'));
+  });
 });
 
-// Rota para processar a atualização do perfil
-app.post('/update-profile', upload.single('profile_image'), (req, res) => {
-  const { userId, name, phone, biography } = req.body;
-  const profileImage = req.file ? req.file.buffer.toString('base64') : null;
 
+
+// Rota para processar a atualização do perfil
+app.post('/update-profile', (req, res) => {
+  const { name, phone, biography } = req.body;
+  const userId = req.session.userId; // Obtemos o ID do usuário da sessão
+
+  // Verifica se o userId e o nome foram passados corretamente
   if (!userId || !name) {
+    console.log('Dados recebidos:', req.body); // Adiciona log para debug
     return res.status(400).json({
       success: false,
       message: 'Nome e ID do usuário são obrigatórios.'
     });
   }
 
-  const updateValues = [name, phone, biography, profileImage, userId];
+  const updateValues = [name, phone, biography, userId];
 
   db.query(
     `UPDATE users
-     SET name = ?, phone = ?, biography = ?, profile_image = ?
+     SET name = ?, phone = ?, biography = ?
      WHERE id = ?`,
     updateValues,
     (err) => {
@@ -321,19 +332,61 @@ app.post('/update-profile', upload.single('profile_image'), (req, res) => {
   );
 });
 
+// Rota para deletar a conta
+app.get('/delete-account', (req, res) => {
+  if (!req.session.userId) {
+    return res.redirect('/login'); // Redireciona para o login se o usuário não estiver logado
+  }
 
-// Rota para o logout
-app.get("/logout", (req, res) => {
+  db.query(
+    'DELETE FROM users WHERE id = ?',
+    [req.session.userId],
+    (err, results) => {
+      if (err) {
+        console.error('Erro ao deletar a conta:', err);
+        return res.status(500).json({
+          success: false,
+          message: 'Erro no servidor.'
+        });
+      }
+
+      req.session.destroy((err) => {
+        if (err) {
+          console.error('Erro ao encerrar a sessão:', err);
+          return res.status(500).json({
+            success: false,
+            message: 'Erro no servidor.'
+          });
+        }
+
+        res.json({
+          success: true,
+          message: 'Conta deletada com sucesso!'
+        });
+      });
+    }
+  );
+});
+
+// Rota para logout
+app.get('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) {
-      console.error("Erro ao encerrar a sessão:", err);
-      return res.status(500).send("Erro ao encerrar a sessão.");
+      console.error('Erro ao encerrar a sessão:', err);
+      return res.status(500).json({
+        success: false,
+        message: 'Erro no servidor.'
+      });
     }
-    res.redirect("/");
+
+    // Redireciona para a página de login com um parâmetro de consulta
+    res.redirect('/login?logout=success');
   });
 });
 
+
+// Configuração da porta do servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta http://localhost:${PORT}`);
+  console.log(`Servidor ouvindo na porta http://localhost:${PORT}`);
 });

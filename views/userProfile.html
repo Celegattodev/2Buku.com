@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil do Usuário</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <!-- Sweet Alert -->
+  <link rel="stylesheet" href="/css/user/userProfile.css">
+  <link rel="stylesheet" href="/css/user/updateProfile.css">
+  <link rel="stylesheet" href="/css/navbar.css">
+</head>
+
+<body>
+  <header>
+    <nav id="navbar">
+      <img id="navbar_logo" src="/img/Logo-Buku-branco.png" alt="Logo" />
+      <ul id="nav_list">
+        <li class="nav-item active">
+          <a href="#">Sobre Nós</a>
+        </li>
+        <li class="nav-item">
+          <a href="#">Funcionamento</a>
+        </li>
+        <li class="nav-item">
+          <a href="#">Perguntas Frequentes</a>
+        </li>
+      </ul>
+      <button class="btn-default">Cadastre-se</button>
+      <button id="mobile_btn">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </nav>
+    <div id="mobile_menu">
+      <ul id="mobile_nav_list">
+        <li class="nav-item">
+          <a href="#">Sobre Nós</a>
+        </li>
+        <li class="nav-item">
+          <a href="#">Funcionamento</a>
+        </li>
+        <li class="nav-item">
+          <a href="#">Perguntas Frequentes</a>
+        </li>
+      </ul>
+      <button class="btn-default">Cadastre-se</button>
+    </div>
+  </header>
+
+  <div class="container-fluid p-5">
+    <div class="col d-flex justify-content-center">
+      <div class="card shadow p-1 wider-card">
+        <div class="card-body">
+          <section class="details-profile mb-5">
+            <div class="profile-row">
+              <!-- Imagem de perfil -->
+              <div class="profile-image-container">
+                <img src="/img/profile-image/th.jpeg" alt="Foto de Perfil" class="profile-image">
+              </div>
+
+              <!-- Informações do perfil -->
+              <h3 class="card-title text-center" id="profile-name">{{userName}}</h3>
+              <p class="card-text text-center" id="profile-email">{{userEmail}} - {{userState}}</p>
+              <p class="card-text text-center" id="profile-city">{{userCity}}</p>
+              <p class="card-text text-center" id="profile-phone">{{userPhone}}</p>
+              <div class="card mt-4" id="desc-card">
+                <div class="card-body">
+                  <p id="profile-description">{{userDescription}}</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Seção de livros -->
+          <section class="product">
+            <h2 class="product-category">Seus livros</h2>
+            <button class="pre-btn">
+              <img src="/img/arrow-icon.png" alt="Seta para a esquerda" />
+            </button>
+            <button class="nxt-btn">
+              <img src="/img/arrow-icon.png" alt="Seta para a direita" />
+            </button>
+            <div class="product-container">
+              <!-- Cards de livros -->
+            </div>
+          </section>
+
+          <!-- Botões de perfil -->
+          <div class="mb-3 d-flex justify-content-end" id="buttons-div">
+            <a href="/update-profile" class="button-link" id="edit-button">Editar Perfil</a>
+            <button id="delete-account-button" class="btn btn-danger">Deletar Conta</button>
+            <a href="/logout" class="button-link" id="logout-button">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <!-- Bootstrap -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="/js/navbar.js"></script>
+  <script src="/js/Profile/updateProfile.js"></script>
+  <script src="/js/Profile/logout.js"></script>
+  <script src="/js/Profile/deleteAccount.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- Sweet Alert -->
+
+</body>
+
+</html>

@@ -1,11 +1,6 @@
-// assets/js/navbar.js
-document.addEventListener('DOMContentLoaded', function() {
-    const mobileBtn = document.getElementById('mobile_btn');
-    const mobileMenu = document.getElementById('mobile_menu');
-
-    if (mobileBtn && mobileMenu) {
-        mobileBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('active');
-        });
-    }
+$(document).ready(function() {
+    $('#mobile_btn').on('click', function() {
+        $('#mobile_menu').toggleClass('active');
+        $('#mobile_btn').find('i').toggleClass('fa-x'); // Verifique se a classe 'fa-x' está definida no seu CSS para o ícone
+    });
 });
