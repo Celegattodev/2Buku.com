@@ -9,7 +9,6 @@ const fs = require('fs');
 const axios = require("axios");
 const crypto = require('crypto');
 
-
 const app = express();
 const saltRounds = 10; // Número de rounds para bcrypt
 
@@ -109,6 +108,11 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "views", "inscricao-buku.html"));
 });
 
+// Rota para redirecionar para a página de adicionar livro
+app.get("/addBook", (req, res) => {
+  res.sendFile(path.join(__dirname, "views", "addBook.html"));
+});
+
 // Rota para exibir o perfil do usuário
 app.get('/profile', isAuthenticated, (req, res) => {
   if (!req.session.userId) {
@@ -133,40 +137,60 @@ app.get('/profile', isAuthenticated, (req, res) => {
       // Obter o nome da cidade usando o código da cidade e do estado
       const cityName = await getCityNameById(user.state, user.city);
 
-      // Substituição de placeholders no HTML
-      const filePath = path.join(__dirname, 'views', 'UserProfile.html');
-      fs.readFile(filePath, 'utf8', (err, data) => {
+      // Consulta para buscar os livros do usuário, incluindo a imagem
+      db.query('SELECT titulo, autor, imagem FROM livros WHERE user_id = ?', [req.session.userId], (err, books) => {
         if (err) {
-          console.error(err);
-          return res.status(500).send('Erro interno do servidor');
+          console.error('Erro ao buscar livros do usuário:', err);
+          return res.status(500).send('Erro ao buscar livros.');
         }
 
-        // Dados do perfil
-        const profileData = {
-          profileImage: user.profile_image ? `data:image/jpeg;base64,${user.profile_image}` : '/img/profile-mage/th.jpeg',
-          name: user.name || 'Nome não disponível',
-          email: user.email || 'Email não disponível',
-          state: user.state || 'Estado não disponível',
-          city: cityName || 'Cidade não disponível',
-          phone: user.phone || 'Telefone não disponível',
-          description: user.biography || 'Descrição não disponível',
-        };
+        // Substituição de placeholders no HTML
+        const filePath = path.join(__dirname, 'views', 'UserProfile.html');
+        fs.readFile(filePath, 'utf8', (err, data) => {
+          if (err) {
+            console.error(err);
+            return res.status(500).send('Erro interno do servidor');
+          }
 
-        // Substituir placeholders no HTML
-        let html = data
-          .replace('{{profileImage}}', profileData.profileImage)
-          .replace('{{userName}}', profileData.name)
-          .replace('{{userEmail}}', profileData.email)
-          .replace('{{userState}}', profileData.state)
-          .replace('{{userCity}}', profileData.city)
-          .replace('{{userPhone}}', profileData.phone)
-          .replace('{{userDescription}}', profileData.description);
+          // Dados do perfil
+          const profileData = {
+            name: user.name || 'Nome não disponível',
+            email: user.email || 'Email não disponível',
+            state: user.state || 'Estado não disponível',
+            city: cityName || 'Cidade não disponível',
+            phone: user.phone || 'Telefone não disponível',
+            description: user.biography || 'Descrição não disponível',
+            books: books // Livros do usuário
+          };
 
-        res.send(html);
+          // Renderizar livros como uma lista HTML, incluindo imagens
+          const bookListHTML = profileData.books.map(book => {
+            return `
+              <li>
+                <img src="${book.imagem || '/img/default-book-image.jpg'}" alt="${book.titulo}" style="width:50px; height:auto;">
+                ${book.titulo} - ${book.autor}
+              </li>`;
+          }).join('');
+
+          // Substituir placeholders no HTML
+          let html = data
+            .replace('{{userName}}', profileData.name)
+            .replace('{{userEmail}}', profileData.email)
+            .replace('{{userState}}', profileData.state)
+            .replace('{{userCity}}', profileData.city)
+            .replace('{{userPhone}}', profileData.phone)
+            .replace('{{userDescription}}', profileData.description)
+            .replace('{{userBooks}}', bookListHTML); // Passa a lista de livros renderizada
+
+          res.send(html);
+        });
       });
     }
   );
 });
+
+
+
 
 // Rota para a página de login
 app.get('/login', (req, res) => {
@@ -177,6 +201,7 @@ app.get('/login', (req, res) => {
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
 
+  // Verifique se os campos de email e senha foram fornecidos
   if (!email || !password) {
     return res.status(400).json({
       success: false,
@@ -184,6 +209,7 @@ app.post("/login", (req, res) => {
     });
   }
 
+  // Consulta ao banco de dados para verificar se o email existe
   db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
     if (err) {
       console.error("Erro ao verificar email:", err);
@@ -193,6 +219,7 @@ app.post("/login", (req, res) => {
       });
     }
 
+    // Se o email não for encontrado
     if (results.length === 0) {
       return res.status(401).json({
         success: false,
@@ -202,6 +229,7 @@ app.post("/login", (req, res) => {
 
     const user = results[0];
 
+    // Comparação de senha usando bcrypt
     bcrypt.compare(password, user.password, (err, isMatch) => {
       if (err) {
         console.error("Erro na comparação da senha:", err);
@@ -211,14 +239,18 @@ app.post("/login", (req, res) => {
         });
       }
 
+      // Se a senha for válida, armazene o ID do usuário na sessão
       if (isMatch) {
-        req.session.userId = user.id;
+        req.session.userId = user.id; // Certifique-se de que o ID está correto
+
+        // Sucesso no login, redirecionando para a página de perfil
         return res.status(200).json({
           success: true,
           message: "Login realizado com sucesso!",
           redirect: "/profile" // Redireciona para a página de perfil após o login
         });
       } else {
+        // Senha incorreta
         return res.status(401).json({
           success: false,
           message: "Senha incorreta."
@@ -228,6 +260,8 @@ app.post("/login", (req, res) => {
   });
 });
 
+
+// Rota para processar o registro
 // Rota para processar o registro
 app.post("/register", (req, res) => {
   const { name, email, password, state, city } = req.body;
@@ -239,35 +273,55 @@ app.post("/register", (req, res) => {
     });
   }
 
-  bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
+  // Verifica se o email já existe
+  db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
     if (err) {
-      console.error("Erro ao criptografar a senha:", err);
+      console.error("Erro ao verificar email:", err);
       return res.status(500).json({
         success: false,
         message: "Erro no servidor."
       });
     }
 
-    db.query(
-      "INSERT INTO users (name, email, password, state, city) VALUES (?, ?, ?, ?, ?)",
-      [name, email, hashedPassword, state, city],
-      (err, results) => {
-        if (err) {
-          console.error("Erro ao registrar o usuário:", err);
-          return res.status(500).json({
-            success: false,
-            message: "Erro no servidor."
-          });
-        }
+    if (results.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Email já está registrado."
+      });
+    }
 
-        res.status(201).json({
-          success: true,
-          message: "Usuário registrado com sucesso!"
+    // Se o email não existe, prossegue com o registro
+    bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
+      if (err) {
+        console.error("Erro ao criptografar a senha:", err);
+        return res.status(500).json({
+          success: false,
+          message: "Erro no servidor."
         });
       }
-    );
+
+      db.query(
+        "INSERT INTO users (name, email, password, state, city) VALUES (?, ?, ?, ?, ?)",
+        [name, email, hashedPassword, state, city],
+        (err, results) => {
+          if (err) {
+            console.error("Erro ao registrar o usuário:", err);
+            return res.status(500).json({
+              success: false,
+              message: "Erro no servidor."
+            });
+          }
+
+          res.status(201).json({
+            success: true,
+            message: "Usuário registrado com sucesso!"
+          });
+        }
+      );
+    });
   });
 });
+
 
 // Rota para atualizar o perfil
 app.get('/update-profile', (req, res) => {
@@ -384,6 +438,38 @@ app.get('/logout', (req, res) => {
   });
 });
 
+// Rota para a página de política de privacidade
+app.get('/privacy-policy', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'privacy-policy.html'));
+});
+
+// Exemplo de redirecionamento para a página de política de privacidade
+app.get('/some-route', (req, res) => {
+  res.redirect('/privacy-policy');
+});
+
+// API Google Books
+app.post('/add-book', (req, res) => {
+  const { title, author, imageUrl } = req.body; // Adicionando imageUrl aqui
+  const userId = req.session.userId;
+
+  if (!userId) {
+    return res.status(401).json({ success: false, message: 'Usuário não autenticado' });
+  }
+
+  if (!title || !author || !imageUrl) { // Verifique se a imageUrl também está presente
+    return res.json({ success: false, message: 'Título, autor e imagem são obrigatórios' });
+  }
+
+  const sql = 'INSERT INTO livros (titulo, autor, imagem, user_id) VALUES (?, ?, ?, ?)';
+  db.query(sql, [title, author, imageUrl, userId], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.json({ success: false, message: 'Erro ao adicionar o livro' });
+    }
+    res.json({ success: true, message: 'Livro adicionado com sucesso' });
+  });
+});
 
 // Configuração da porta do servidor
 const PORT = process.env.PORT || 3000;

@@ -40,6 +40,51 @@ body {
   margin-top: 20px; /* Ajuste conforme necessário */
 }
 
+.btn {
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  border: none;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.btn:last-child {
+  margin-right: 0; /* Remove o espaçamento do botão mais à direita */
+}
+
+.btn-primary {
+  background-color: #007bff; /* Cor do botão de editar */
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3; /* Cor do botão de editar ao passar o mouse */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-danger {
+  background-color: #dc3545; /* Cor do botão de deletar */
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background-color: #c82333; /* Cor do botão de deletar ao passar o mouse */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-secondary {
+  background-color: #6c757d; /* Cor do botão de logout */
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268; /* Cor do botão de logout ao passar o mouse */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 .button-link {
   text-decoration: none;
   padding: 10px 20px;
@@ -386,4 +431,23 @@ body {
   width: 100%; /* Garante que a imagem preencha o container */
   height: 100%; /* Garante que a imagem preencha o container */
   object-fit: cover; /* Garante que a imagem se ajuste sem distorcer */
+}
+
+
+.books-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* Espaçamento entre os livros */
+}
+.book-item {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  text-align: center;
+  width: 150px; /* Largura fixa ou ajustável */
+}
+.book-cover {
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
 }

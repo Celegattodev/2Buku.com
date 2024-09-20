@@ -9,10 +9,8 @@
   <link rel="stylesheet" href="/css/global.css">
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-  <!-- Sweet Alert -->
-  <link rel="stylesheet" href="/css/user/userProfile.css">
-  <link rel="stylesheet" href="/css/user/updateProfile.css">
   <link rel="stylesheet" href="/css/navbar.css">
+  <link rel="stylesheet" href="/css/user/userProfile.css">
 </head>
 
 <body>
@@ -57,12 +55,10 @@
         <div class="card-body">
           <section class="details-profile mb-5">
             <div class="profile-row">
-              <!-- Imagem de perfil -->
               <div class="profile-image-container">
                 <img src="/img/profile-image/th.jpeg" alt="Foto de Perfil" class="profile-image">
               </div>
 
-              <!-- Informações do perfil -->
               <h3 class="card-title text-center" id="profile-name">{{userName}}</h3>
               <p class="card-text text-center" id="profile-email">{{userEmail}} - {{userState}}</p>
               <p class="card-text text-center" id="profile-city">{{userCity}}</p>
@@ -75,41 +71,34 @@
             </div>
           </section>
 
-          <!-- Seção de livros -->
-          <section class="product">
-            <h2 class="product-category">Seus livros</h2>
-            <button class="pre-btn">
-              <img src="/img/arrow-icon.png" alt="Seta para a esquerda" />
-            </button>
-            <button class="nxt-btn">
-              <img src="/img/arrow-icon.png" alt="Seta para a direita" />
-            </button>
-            <div class="product-container">
-              <!-- Cards de livros -->
-            </div>
-          </section>
+          <h2>Livros do Usuário</h2>
+    <ul id="userBooks">
+        {{userBooks}} <!-- Este espaço será preenchido pela lista de livros -->
+    </ul>
+          
 
-          <!-- Botões de perfil -->
           <div class="mb-3 d-flex justify-content-end" id="buttons-div">
-            <a href="/update-profile" class="button-link" id="edit-button">Editar Perfil</a>
+            <a href="/update-profile" class="btn btn-primary" id="edit-button">Editar Perfil</a>
             <button id="delete-account-button" class="btn btn-danger">Deletar Conta</button>
-            <a href="/logout" class="button-link" id="logout-button">Logout</a>
+            <a href="/logout" class="btn btn-secondary" id="logout-button">Logout</a>
+          </div>
+
+          <!-- Novo botão para adicionar livro -->
+          <div class="d-flex justify-content-center mt-4">
+            <a href="/addbook" class="btn btn-success">Adicionar seu Livro</a>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-  <!-- Bootstrap -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="/js/navbar.js"></script>
-  <script src="/js/Profile/updateProfile.js"></script>
+  <script src="/js/Profile/book.js"></script>
   <script src="/js/Profile/logout.js"></script>
-  <script src="/js/Profile/deleteAccount.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- Sweet Alert -->
 
+  
 </body>
 
 </html>

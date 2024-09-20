@@ -8,8 +8,7 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 20px; /* Adiciona algum padding geral */
-    box-sizing: border-box; /* Garante que padding e bordas não afetam a largura total */
+    box-sizing: border-box;
 }
 
 .container-privacy-policy {
@@ -20,15 +19,15 @@
     border-radius: 12px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
-    box-sizing: border-box; /* Inclui padding no cálculo da largura total */
+    box-sizing: border-box;
 }
 
 /* Título da página */
 .page-title {
     font-size: 2.5em;
     font-weight: bold;
-    margin: 0; /* Remove margens para ajustes finos */
-    padding-top: 120px; /* Aumenta o espaço extra no topo */
+    margin: 0;
+    padding-top: 120px;
     text-align: center;
     color: #333;
     word-wrap: break-word;
@@ -48,7 +47,7 @@
 /* Conteúdo da Política de Privacidade */
 .privacy-content h2 {
     font-size: 1.7em;
-    margin-top: 25px;
+    margin-top: 20px;
     margin-bottom: 10px;
     color: #444;
     font-weight: 600;
@@ -62,6 +61,29 @@
     color: #555;
     margin-bottom: 20px;
     text-align: justify;
+}
+
+/* Estilos do botão de voltar */
+.button-container {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.back-button {
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 1.2em;
+    background-color: #ff5722;
+    color: white;
+    border: none;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    text-decoration: none;
+}
+
+.back-button:hover {
+    background-color: #e64a19;
+    transform: scale(1.05);
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 /* Rodapé da Política de Privacidade */
@@ -88,12 +110,12 @@
     .container-privacy-policy {
         width: 95%;
         padding: 25px;
-        margin-top: 50px; /* Ajusta a margem superior para telas menores */
+        margin-top: 50px;
     }
 
     .page-title {
         font-size: 2em;
-        padding-top: 130px; /* Aumenta o espaço no topo para telas menores */
+        padding-top: 130px;
     }
 
     .privacy-content h2 {
@@ -107,17 +129,17 @@
 
 @media (max-width: 480px) {
     .privacy-policy {
-        padding: 20px; /* Ajusta o padding geral para melhor visibilidade */
+        padding: 20px;
     }
 
     .container-privacy-policy {
         padding: 15px;
-        margin-top: 40px; /* Ajusta a margem superior para telas menores */
+        margin-top: 40px;
     }
 
     .page-title {
         font-size: 1.8em;
-        padding-top: 150px; /* Aumenta ainda mais o espaço no topo para dispositivos menores */
+        padding-top: 150px;
     }
 
     .privacy-content h2 {
