@@ -163,13 +163,14 @@ app.get('/profile', isAuthenticated, (req, res) => {
             books: books // Livros do usuário
           };
 
-          // Renderizar livros como uma lista HTML, incluindo imagens
+          // Renderizar livros como uma lista em formato Swiper.js
           const bookListHTML = profileData.books.map(book => {
             return `
-              <li>
-                <img src="${book.imagem || '/img/default-book-image.jpg'}" alt="${book.titulo}" style="width:50px; height:auto;">
-                ${book.titulo} - ${book.autor}
-              </li>`;
+              <div class="swiper-slide">
+                <img src="${book.imagem || '/img/default-book-image.jpg'}" alt="${book.titulo}" style="width:120px; height:180px;">
+                <p><strong>${book.titulo}</strong></p> <!-- Nome do livro em negrito -->
+                <p>${book.autor}</p> <!-- Autor do livro -->
+              </div>`;
           }).join('');
 
           // Substituir placeholders no HTML
@@ -180,7 +181,7 @@ app.get('/profile', isAuthenticated, (req, res) => {
             .replace('{{userCity}}', profileData.city)
             .replace('{{userPhone}}', profileData.phone)
             .replace('{{userDescription}}', profileData.description)
-            .replace('{{userBooks}}', bookListHTML); // Passa a lista de livros renderizada
+            .replace('{{userBooks}}', bookListHTML);
 
           res.send(html);
         });
@@ -188,9 +189,6 @@ app.get('/profile', isAuthenticated, (req, res) => {
     }
   );
 });
-
-
-
 
 // Rota para a página de login
 app.get('/login', (req, res) => {
@@ -261,7 +259,6 @@ app.post("/login", (req, res) => {
 });
 
 
-// Rota para processar o registro
 // Rota para processar o registro
 app.post("/register", (req, res) => {
   const { name, email, password, state, city } = req.body;

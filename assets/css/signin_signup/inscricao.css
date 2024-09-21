@@ -1,11 +1,8 @@
 /* Define o estilo global do corpo da página */
 body {
   min-height: 100vh; /* Garante que o corpo ocupe pelo menos a altura total da tela */
-  background: url("../../../assets/img/Buku-fundo.png") no-repeat center center; /* Define a imagem de fundo */
+  background: url("/img/Buku-fundo.png") no-repeat center center; /* Define a imagem de fundo */
   background-size: cover; /* Faz a imagem de fundo cobrir toda a área */
-  display: flex;
-  justify-content: center; /* Centraliza o conteúdo horizontalmente */
-  align-items: center; /* Centraliza o conteúdo verticalmente */
   font-family: "Red Hat Display", sans-serif;
   margin: 0;
   padding: 0;
@@ -223,12 +220,6 @@ a {
   overflow: hidden;
 }
 
-.inscricao-page {
-  background: url("../../img/Buku-fundo.png") no-repeat center center;
-  background-size: cover;
-  min-height: 100vh; /* Garante que o corpo ocupe pelo menos a altura total da tela */
-}
-
 /* Estilos para responsividade em telas menores */
 @media (max-width: 768px) {
   .login-container {
@@ -384,51 +375,6 @@ main {
 
 .form-feedback.valid {
   color: green;
-}
-
-.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background-color: #6c8bf7; /* Cor de fundo da navbar */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra para destaque */
-  z-index: 1000; /* Garantir que a navbar fique acima de outros elementos */
-}
-
-.navbar .logo img {
-  height: 50px; /* Ajuste conforme necessário */
-  margin: 10px; /* Margem para o logo */
-}
-
-.navbar .menu ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  justify-content: center;
-}
-
-.navbar .menu ul li {
-  margin: 0 15px;
-}
-
-.navbar .menu ul li a {
-  text-decoration: none;
-  color: #ffffff; /* Cor do texto dos links */
-  font-weight: bold;
-}
-
-.navbar .tagline {
-  text-align: center;
-  padding: 10px;
-  font-style: italic;
-  color: #ffffff; /* Cor da tagline */
-}
-
-/* Adiciona um espaçamento no topo do conteúdo principal para evitar sobreposição pela navbar */
-main {
-  padding-top: 70px; /* Ajuste conforme necessário */
 }
 
 .error-message {
