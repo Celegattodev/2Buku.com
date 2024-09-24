@@ -138,7 +138,7 @@ app.get('/profile', isAuthenticated, (req, res) => {
       const cityName = await getCityNameById(user.state, user.city);
 
       // Consulta para buscar os livros do usuário, incluindo a imagem
-      db.query('SELECT titulo, autor, imagem FROM livros WHERE user_id = ?', [req.session.userId], (err, books) => {
+      db.query('SELECT id, titulo, autor, imagem FROM livros WHERE user_id = ?', [req.session.userId], (err, books) => {
         if (err) {
           console.error('Erro ao buscar livros do usuário:', err);
           return res.status(500).send('Erro ao buscar livros.');
@@ -163,14 +163,16 @@ app.get('/profile', isAuthenticated, (req, res) => {
             books: books // Livros do usuário
           };
 
-          // Renderizar livros como uma lista em formato Swiper.js
+          // Renderizar livros com ícone de deletar fixo
           const bookListHTML = profileData.books.map(book => {
             return `
-              <div class="swiper-slide">
-                <img src="${book.imagem || '/img/default-book-image.jpg'}" alt="${book.titulo}" style="width:120px; height:180px;">
-                <p><strong>${book.titulo}</strong></p> <!-- Nome do livro em negrito -->
-                <p>${book.autor}</p> <!-- Autor do livro -->
-              </div>`;
+    <div class="swiper-slide book-item" data-book-id="${book.id}" style="position: relative;">
+      <img src="${book.imagem || '/img/default-book-image.jpg'}" alt="${book.titulo}" style="width:120px; height:180px;">
+      <p><strong>${book.titulo}</strong></p>
+      <p>${book.autor}</p>
+      <!-- Ícone de deletar fixo -->
+      <i class="fas fa-trash-alt delete-icon" title="Deletar" style="position: absolute; top: 10px; right: 10px;"></i>
+    </div>`;
           }).join('');
 
           // Substituir placeholders no HTML
@@ -189,6 +191,7 @@ app.get('/profile', isAuthenticated, (req, res) => {
     }
   );
 });
+
 
 // Rota para a página de login
 app.get('/login', (req, res) => {
@@ -447,24 +450,58 @@ app.get('/some-route', (req, res) => {
 
 // API Google Books
 app.post('/add-book', (req, res) => {
-  const { title, author, imageUrl } = req.body; // Adicionando imageUrl aqui
+  const { title, author, imageUrl } = req.body;
   const userId = req.session.userId;
 
   if (!userId) {
     return res.status(401).json({ success: false, message: 'Usuário não autenticado' });
   }
 
-  if (!title || !author || !imageUrl) { // Verifique se a imageUrl também está presente
+  if (!title || !author || !imageUrl) {
     return res.json({ success: false, message: 'Título, autor e imagem são obrigatórios' });
   }
 
-  const sql = 'INSERT INTO livros (titulo, autor, imagem, user_id) VALUES (?, ?, ?, ?)';
-  db.query(sql, [title, author, imageUrl, userId], (err, result) => {
+  // Verificar se o livro já existe na biblioteca do usuário
+  const checkSql = 'SELECT * FROM livros WHERE titulo = ? AND autor = ? AND user_id = ?';
+  db.query(checkSql, [title, author, userId], (err, results) => {
     if (err) {
       console.error(err);
-      return res.json({ success: false, message: 'Erro ao adicionar o livro' });
+      return res.json({ success: false, message: 'Erro ao verificar a duplicidade do livro' });
     }
-    res.json({ success: true, message: 'Livro adicionado com sucesso' });
+
+    if (results.length > 0) {
+      // Se o livro já existe, retorna uma mensagem de erro
+      return res.json({ success: false, message: 'Livro já existe na biblioteca' });
+    }
+
+    // Caso contrário, insere o livro
+    const sql = 'INSERT INTO livros (titulo, autor, imagem, user_id) VALUES (?, ?, ?, ?)';
+    db.query(sql, [title, author, imageUrl, userId], (err, result) => {
+      if (err) {
+        console.error(err);
+        return res.json({ success: false, message: 'Erro ao adicionar o livro' });
+      }
+      res.json({ success: true, message: 'Livro adicionado com sucesso' });
+    });
+  });
+});
+
+app.delete('/delete-book/:id', (req, res) => {
+  const bookId = req.params.id;
+  const userId = req.session.userId; // O ID do usuário logado
+
+  // Verificar se o livro pertence ao usuário logado
+  db.query('DELETE FROM livros WHERE id = ? AND user_id = ?', [bookId, userId], (err, result) => {
+    if (err) {
+      console.error('Erro ao deletar o livro:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao deletar o livro.' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Livro não encontrado ou não pertence ao usuário.' });
+    }
+
+    res.status(200).json({ success: true, message: 'Livro deletado com sucesso.' });
   });
 });
 

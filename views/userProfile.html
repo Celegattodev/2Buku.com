@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOM3Tx7W7A9M12YVJc0DApLqD1KkA2V/ZcfO9g8" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <!-- Font Awesome para ícones -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
     integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -67,11 +69,12 @@
           <h2 class="text-center mb-4">Meus Livros</h2>
           <div class="swiper-container">
             <div class="swiper-wrapper">
-              {{userBooks}}
+              {{userBooks}} <!-- Placeholder para os livros renderizados pelo servidor -->
             </div>
             <div class="swiper-button-next"></div>
             <div class="swiper-button-prev"></div>
           </div>
+
 
           <div class="d-flex justify-content-center mt-4">
             <a href="/addbook" class="btn btn-primary">Adicionar seu Livro</a>
@@ -95,6 +98,7 @@
   <script src="/js/Profile/logout.js"></script>
   <script src="/js/Profile/userProfile.js"></script>
   <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> <!-- jQuery -->
 </body>
 
 </html>

@@ -61,6 +61,13 @@ function addToLibrary(title, author, imageUrl) {
                     icon: 'success',
                     confirmButtonText: 'Ok'
                 });
+            } else if (data.message === 'Livro já existe na biblioteca') {
+                Swal.fire({
+                    title: 'Atenção!',
+                    text: 'Este livro já está na sua biblioteca.',
+                    icon: 'info',
+                    confirmButtonText: 'Ok'
+                });
             } else {
                 Swal.fire({
                     title: 'Erro!',
@@ -83,5 +90,5 @@ function addToLibrary(title, author, imageUrl) {
 
 // Voltar para o perfil
 document.getElementById('backToProfile').addEventListener('click', function () {
-    window.location.href = '/profile'; 
+    window.location.href = '/profile';
 });

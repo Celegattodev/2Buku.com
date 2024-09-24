@@ -54,7 +54,7 @@ body {
 /*--------------BOTÕES-------------*/
 #buttons-div {
   margin-top: 20px;
-  /* Ajuste conforme necessário */
+  
 }
 
 .btn {
@@ -231,7 +231,8 @@ body {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   position: relative;
-  text-align: center; /* centraliza o texto */
+  text-align: center;
+  /* centraliza o texto */
 }
 
 /*------------- Livros -------------*/
@@ -255,7 +256,7 @@ body {
 }
 
 .product-container {
-  padding: 10 10vw;
+  padding: 5 10vw;
   display: flex;
   overflow-x: auto;
   scroll-behavior: smooth;
@@ -321,7 +322,7 @@ body {
   background-color: #fd9323;
   color: #fff;
   border: none;
-  padding: 8px;
+  padding: 10px;
   border-radius: 5px;
   transition: background-color 0.3s ease;
 }
@@ -439,6 +440,29 @@ body {
   margin-bottom: 10px;
 }
 
+.book-item {
+  position: relative;
+  width: 100px; 
+  height: 10px; 
+}
+
+.delete-icon {
+  position: absolute;
+  top: 8px; /* Mantém a mesma posição vertical */
+  left: 220px;
+  color: #ff6b6b;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+
+.delete-icon:hover {
+  opacity: 1;
+  color: #ff4d4d;
+}
+
+
 @media screen and (max-width: 1000px) {
   #desc-card {
     width: 90%;
@@ -468,7 +492,7 @@ body {
 .books-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 5px;
   /* Espaçamento entre os livros */
 }
 
