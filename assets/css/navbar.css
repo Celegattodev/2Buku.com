@@ -1,58 +1,111 @@
-/* assets/css/navbar.css */
+/* CSS do navbar */
+header {
+    width: 100%;
+    padding: 28px 8%;
+    background-color: #6c8bf7;
+}
+
 #navbar {
-    background-color: #333;
-    padding: 10px;
+    width: 100%;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
 }
 
 #navbar_logo {
-    height: 40px;
+    width: 100px;
 }
 
 #nav_list {
-    list-style: none;
-    padding: 0;
     display: flex;
-    gap: 15px;
+    list-style: none;
+    gap: 48px;
+    font-weight: 500;
 }
 
-#nav_list .nav-item a {
-    color: white;
+.nav-item a {
+    font-size: 18px;
     text-decoration: none;
-    padding: 10px;
+    color: #ffffff;
+    transition: transform 0.3s, color 0.3s;
 }
 
-#nav_list .nav-item.active a {
-    background-color: #555;
-    border-radius: 5px;
+.nav-item a:hover {
+    transform: scale(1.1);
+    color: #f39e43;
 }
 
 .btn-default {
-    background-color: #007bff;
-    color: white;
+    color: #ffffff;
     border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    background-color: #f39e43;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-weight: 600;
+    box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.1);
     cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-default:hover {
+    background-color: #f8b87d;
 }
 
 #mobile_btn {
-    display: none; /* Ocultando o botão para visualização em desktop */
+    display: none;
+    /* Inicialmente escondido */
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    margin-right: 20px;
+    /* Ajuste conforme necessário */
 }
 
-/* Mobile Styles */
-@media (max-width: 768px) {
-    #mobile_btn {
-        display: block;
-    }
-    
-    #mobile_menu {
+#mobile_menu {
+    display: none;
+    /* Inicialmente escondido */
+    opacity: 0;
+    /* Começa invisível */
+    transition: opacity 0.3s ease;
+    /* Adiciona a transição */
+    flex-direction: column;
+    /* Organiza os itens em coluna */
+    align-items: center;
+    /* Centraliza os itens */
+    background-color: #6c8bf7;
+    /* Cor de fundo do menu */
+    padding: 10px 0;
+    /* Adiciona espaçamento ao redor do menu */
+}
+
+#mobile_menu.active {
+    display: flex;
+    /* Exibe o menu quando a classe active é adicionada */
+    opacity: 1;
+    /* Torna o menu visível */
+}
+
+#mobile_nav_list {
+    list-style: none;
+    /* Remove as marcas de lista */
+    padding: 0;
+    /* Remove o preenchimento padrão */
+}
+
+@media screen and (max-width: 1170px) {
+
+    #nav_list,
+    #navbar .btn-default {
         display: none;
+        /* Esconde a lista de navegação e o botão em telas menores */
     }
-    
-    #mobile_menu.active {
-        display: block;
+
+    #mobile_btn {
+        display: flex;
+        /* Mostra o botão do menu móvel em telas menores */
     }
 }

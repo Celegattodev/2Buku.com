@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil do Usuário</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <link rel="stylesheet" href="/css/navbar.css">
+  <link rel="stylesheet" href="/css/user/userProfile.css">
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOM3Tx7W7A9M12YVJc0DApLqD1KkA2V/ZcfO9g8" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <!-- Font Awesome para ícones -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+    integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body>
+  <header>
+    <nav id="navbar">
+      <img id="navbar_logo" src="/img/Logo-Buku-branco.png" alt="Logo" />
+      <ul id="nav_list">
+        <li class="nav-item active"><a href="#">Sobre Nós</a></li>
+        <li class="nav-item"><a href="#">Funcionamento</a></li>
+        <li class="nav-item"><a href="#">Perguntas Frequentes</a></li>
+      </ul>
+      <button class="btn-default">Cadastrar/Entrar</button>
+      <button id="mobile_btn">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </nav>
+    <div id="mobile_menu">
+      <ul id="mobile_nav_list">
+        <li class="nav-item"><a href="#">Sobre Nós</a></li>
+        <li class="nav-item"><a href="#">Funcionamento</a></li>
+        <li class="nav-item"><a href="#">Perguntas Frequentes</a></li>
+      </ul>
+      <button class="btn-default">Cadastrar/Entrar</button>
+    </div>
+  </header>
+
+  <div class="container-fluid p-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card shadow p-4">
+          <section class="details-profile text-center mb-5">
+            <div class="profile-image-container">
+              <img src="/img/profile-image/th.jpeg" alt="Foto de Perfil" class="profile-image">
+            </div>
+
+            <h3 class="card-title" id="profile-name">{{userName}}</h3>
+            <p class="card-text" id="profile-email">{{userEmail}} - {{userState}}</p>
+            <p class="card-text" id="profile-city">{{userCity}}</p>
+            <p class="card-text" id="profile-phone">{{userPhone}}</p>
+
+            <div class="card mt-4">
+              <div class="card-body">
+                <p id="profile-description">{{userDescription}}</p>
+              </div>
+            </div>
+          </section>
+
+          <h2 class="text-center mb-4">Meus Livros</h2>
+          <div class="swiper-container">
+            <div class="swiper-wrapper">
+              {{userBooks}} <!-- Placeholder para os livros renderizados pelo servidor -->
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+          </div>
+
+
+          <div class="d-flex justify-content-center mt-4">
+            <a href="/addbook" class="btn btn-primary">Adicionar seu Livro</a>
+          </div>
+
+          <div class="d-flex justify-content-center mt-4">
+            <a href="/update-profile" class="btn btn-primary mx-2" id="edit-button">Editar Perfil</a>
+            <button id="delete-account-button" class="btn btn-danger mx-2">Deletar Conta</button>
+            <a href="/logout" class="btn btn-secondary mx-2" id="logout-button">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="/js/navbar.js"></script>
+
+  <script src="/js/books/book.js"></script>
+  <script src="/js/Profile/logout.js"></script>
+  <script src="/js/Profile/userProfile.js"></script>
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> <!-- jQuery -->
+</body>
+
+</html>

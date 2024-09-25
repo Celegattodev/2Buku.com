@@ -1,11 +1,8 @@
 /* Define o estilo global do corpo da página */
 body {
   min-height: 100vh; /* Garante que o corpo ocupe pelo menos a altura total da tela */
-  background: url("../../../assets/img/Buku-fundo.png") no-repeat center center; /* Define a imagem de fundo */
+  background: url("/img/Buku-fundo.png") no-repeat center center; /* Define a imagem de fundo */
   background-size: cover; /* Faz a imagem de fundo cobrir toda a área */
-  display: flex;
-  justify-content: center; /* Centraliza o conteúdo horizontalmente */
-  align-items: center; /* Centraliza o conteúdo verticalmente */
   font-family: "Red Hat Display", sans-serif;
   margin: 0;
   padding: 0;
@@ -142,6 +139,8 @@ a {
 }
 
 /* Estilos para o formulário de registro */
+
+
 .form-register {
   transform: translateX(-100%);
   z-index: -1;
@@ -156,6 +155,32 @@ a {
   transform: translateX(0%);
   z-index: 1;
   opacity: 1;
+}
+
+/* Estilo para o container do checkbox */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espaçamento entre o checkbox e o texto */
+}
+
+/* Estilo para o checkbox */
+.checkbox-container input[type="checkbox"] {
+  margin: 0; /* Remove margens padrão */
+}
+
+/* Estilo para o label do checkbox */
+.checkbox-container label {
+  font-size: 0.875rem; /* Ajusta o tamanho da fonte do label */
+}
+
+/* Link dentro do checkbox */
+.checkbox-container a {
+  color: var(--primary-color); /* Cor do link */
+}
+
+.checkbox-container a:hover {
+  text-decoration: underline; /* Adiciona sublinhado ao passar o mouse */
 }
 
 /* Estilos para responsividade em telas maiores */
@@ -193,9 +218,6 @@ a {
   border-radius: 12px;
   box-shadow: 0 5px 20px #a0a0a0;
   overflow: hidden;
-  background-color: var(
-    --secondary-color
-  ); /* Garante que o fundo seja branco */
 }
 
 /* Estilos para responsividade em telas menores */
@@ -353,51 +375,6 @@ main {
 
 .form-feedback.valid {
   color: green;
-}
-
-.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background-color: #6c8bf7; /* Cor de fundo da navbar */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra para destaque */
-  z-index: 1000; /* Garantir que a navbar fique acima de outros elementos */
-}
-
-.navbar .logo img {
-  height: 50px; /* Ajuste conforme necessário */
-  margin: 10px; /* Margem para o logo */
-}
-
-.navbar .menu ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  justify-content: center;
-}
-
-.navbar .menu ul li {
-  margin: 0 15px;
-}
-
-.navbar .menu ul li a {
-  text-decoration: none;
-  color: #ffffff; /* Cor do texto dos links */
-  font-weight: bold;
-}
-
-.navbar .tagline {
-  text-align: center;
-  padding: 10px;
-  font-style: italic;
-  color: #ffffff; /* Cor da tagline */
-}
-
-/* Adiciona um espaçamento no topo do conteúdo principal para evitar sobreposição pela navbar */
-main {
-  padding-top: 70px; /* Ajuste conforme necessário */
 }
 
 .error-message {

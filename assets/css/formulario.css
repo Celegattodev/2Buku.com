@@ -1,8 +1,4 @@
-body{
-    background-image: url(../Img/Buku-fundo.png);
-    background-size: cover;
-    height: 100vh;
-}
+
 .navbar {
     display: flex;
     justify-content: space-between;

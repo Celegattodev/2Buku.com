@@ -1,28 +1,22 @@
-function validateRegisterForm() {
-  var password = document.getElementById("register-password").value;
-  var confirmPassword = document.getElementById("confirm-password").value;
-  var passwordError = document.getElementById("password-error");
-  var confirmPasswordError = document.getElementById("confirm-password-error");
-
-  var passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-  var isValid = true;
-
-  // Limpar mensagens de erro
-  passwordError.textContent = "";
-  confirmPasswordError.textContent = "";
-
+document.getElementById('register-form').addEventListener('submit', function(event) {
+  const password = document.getElementById('register-password').value;
+  const confirmPassword = document.getElementById('confirm-password').value;
+  const passwordError = document.getElementById('password-error');
+  const confirmPasswordError = document.getElementById('confirm-password-error');
+  
+  // Limpa mensagens anteriores
+  passwordError.textContent = '';
+  confirmPasswordError.textContent = '';
+  
+  // Regras de validação de senha
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  
   if (!passwordRegex.test(password)) {
-    passwordError.textContent =
-      "A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula, um número e um caractere especial.";
-    isValid = false;
+    event.preventDefault();
   }
-
+  
   if (password !== confirmPassword) {
-    confirmPasswordError.textContent = "As senhas não coincidem.";
-    isValid = false;
+    event.preventDefault();
+    confirmPasswordError.textContent = 'As senhas não coincidem.';
   }
-
-  return isValid; // Permite o envio do formulário se tudo estiver correto
-}
-
+});

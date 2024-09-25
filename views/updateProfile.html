@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Atualizar Perfil</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="/css/user/updateProfile.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+</head>
+
+<body>
+    <header>
+        <nav id="navbar">
+            <img id="navbar_logo" src="/img/Logo-Buku-branco.png" alt="Logo" />
+            <ul id="nav_list">
+                <li class="nav-item active">
+                    <a href="#">Sobre Nós</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#">Funcionamento</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#">Perguntas Frequentes</a>
+                </li>
+            </ul>
+            <button class="btn-default">Cadastre-se</button>
+            <button id="mobile_btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </nav>
+        <div id="mobile_menu">
+            <ul id="mobile_nav_list">
+                <li class="nav-item">
+                    <a href="#">Sobre Nós</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#">Funcionamento</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#">Perguntas Frequentes</a>
+                </li>
+            </ul>
+            <button class="btn-default">Cadastre-se</button>
+        </div>
+    </header>
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10 col-sm-12">
+                <div class="card shadow-sm border-light">
+                    <div class="card-body">
+                        <h1 class="card-title mb-4">Atualizar Perfil</h1>
+                        <form id="form">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Nome</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Telefone</label>
+                                <input type="text" class="form-control" id="phone" name="phone" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="biography" class="form-label">Descrição</label>
+                                <textarea class="form-control" id="biography" name="biography" rows="3"></textarea>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button type="submit" class="btn btn-primary">Salvar</button>
+                                <button type="button" class="btn btn-secondary" onclick="cancelEdit()">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="/js/navbar.js"></script>
+    <script src="/js/Profile/updateProfile.js"></script>
+</body>
+
+</html>
