@@ -510,3 +510,42 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor ouvindo na porta http://localhost:${PORT}`);
 });
+
+// Nodemailler 
+
+const { enviarEmailNotificacao } = require('./emailService'); // Importar a função de envio de emails
+
+app.post('/interesse', (req, res) => {
+  const { userIdInteressado, livroId } = req.body;
+
+  // Verificar se os campos necessários foram fornecidos
+  if (!userIdInteressado || !livroId) {
+    return res.status(400).json({ success: false, message: 'ID do usuário interessado e ID do livro são obrigatórios.' });
+  }
+
+  // Consultar o banco de dados para obter o email do dono do livro
+  const sql = `
+    SELECT u.email, l.titulo
+    FROM users u
+    JOIN livros l ON u.id = l.user_id
+    WHERE l.id = ?
+  `;
+
+  db.query(sql, [livroId], (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar email do dono do livro:', err);
+      return res.status(500).json({ success: false, message: 'Erro no servidor.' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: 'Livro não encontrado.' });
+    }
+
+    const { email, titulo } = results[0];
+
+    // Enviar notificação por email
+    enviarEmailNotificacao(email, titulo);
+
+    res.status(200).json({ success: true, message: 'Interesse registrado e notificação enviada.' });
+  });
+});
