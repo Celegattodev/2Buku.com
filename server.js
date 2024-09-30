@@ -387,41 +387,31 @@ app.post('/update-profile', (req, res) => {
 });
 
 // Rota para deletar a conta
-app.get('/delete-account', (req, res) => {
+app.delete('/delete-account', (req, res) => {
   if (!req.session.userId) {
-    return res.redirect('/login'); // Redireciona para o login se o usuário não estiver logado
+    return res.status(401).json({ success: false, message: 'Usuário não autenticado.' });
   }
 
-  db.query(
-    'DELETE FROM users WHERE id = ?',
-    [req.session.userId],
-    (err, results) => {
+  const userId = req.session.userId;
+
+  // Excluir o usuário e, devido à exclusão em cascata, os livros associados também serão excluídos
+  db.query('DELETE FROM users WHERE id = ?', [userId], (err, results) => {
+    if (err) {
+      console.error('Erro ao excluir conta do usuário:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao excluir conta do usuário.' });
+    }
+
+    // Destruir a sessão do usuário
+    req.session.destroy((err) => {
       if (err) {
-        console.error('Erro ao deletar a conta:', err);
-        return res.status(500).json({
-          success: false,
-          message: 'Erro no servidor.'
-        });
+        console.error('Erro ao destruir sessão:', err);
+        return res.status(500).json({ success: false, message: 'Erro ao destruir sessão.' });
       }
 
-      req.session.destroy((err) => {
-        if (err) {
-          console.error('Erro ao encerrar a sessão:', err);
-          return res.status(500).json({
-            success: false,
-            message: 'Erro no servidor.'
-          });
-        }
-
-        res.json({
-          success: true,
-          message: 'Conta deletada com sucesso!'
-        });
-      });
-    }
-  );
+      res.json({ success: true, message: 'Conta deletada com sucesso.' });
+    });
+  });
 });
-
 // Rota para logout
 app.get('/logout', (req, res) => {
   req.session.destroy((err) => {
@@ -513,7 +503,7 @@ app.listen(PORT, () => {
 
 // Nodemailler 
 
-const { enviarEmailNotificacao } = require('./emailService'); // Importar a função de envio de emails
+const { enviarEmailNotificacao } = require('../2Buku.com/email/emailService'); // Importar a função de envio de emails
 
 app.post('/interesse', (req, res) => {
   const { userIdInteressado, livroId } = req.body;
