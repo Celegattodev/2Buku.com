@@ -8,9 +8,10 @@ const session = require("express-session");
 const fs = require('fs');
 const axios = require("axios");
 const crypto = require('crypto');
-
+const nodemailer = require('nodemailer');
 const app = express();
 const saltRounds = 10; // Número de rounds para bcrypt
+const ejs = require('ejs'); // Adicione esta linha
 
 // Gera uma chave secreta aleatória para a sessão
 const generateSecret = () => {
@@ -495,6 +496,15 @@ app.delete('/delete-book/:id', (req, res) => {
   });
 });
 
+// Rota para a página de esqueci a senha
+app.get('/esqueci-senha', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'esqueci-senha.html'));
+});
+
+app.get('/alterar-senha', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'alterar-senha.html'));
+});
+
 // Configuração da porta do servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
@@ -502,40 +512,124 @@ app.listen(PORT, () => {
 });
 
 // Nodemailler 
-
-const { enviarEmailNotificacao } = require('../2Buku.com/email/emailService'); // Importar a função de envio de emails
-
-app.post('/interesse', (req, res) => {
-  const { userIdInteressado, livroId } = req.body;
-
-  // Verificar se os campos necessários foram fornecidos
-  if (!userIdInteressado || !livroId) {
-    return res.status(400).json({ success: false, message: 'ID do usuário interessado e ID do livro são obrigatórios.' });
+// Configuração do Nodemailer
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'buku.livro@gmail.com',
+    pass: 'sdmj lybh fcrf nqyd'
   }
+});
 
-  // Consultar o banco de dados para obter o email do dono do livro
-  const sql = `
-    SELECT u.email, l.titulo
-    FROM users u
-    JOIN livros l ON u.id = l.user_id
-    WHERE l.id = ?
-  `;
+// Endpoint para lidar com a solicitação de redefinição de senha
+app.post('/esqueci-senha', (req, res) => {
+  const { email } = req.body;
 
-  db.query(sql, [livroId], (err, results) => {
+  const sql = 'SELECT * FROM users WHERE email = ?';
+  db.query(sql, [email], (err, results) => {
     if (err) {
-      console.error('Erro ao buscar email do dono do livro:', err);
+      console.error('Erro ao buscar email:', err);
       return res.status(500).json({ success: false, message: 'Erro no servidor.' });
     }
 
     if (results.length === 0) {
-      return res.status(404).json({ success: false, message: 'Livro não encontrado.' });
+      return res.status(404).json({ success: false, message: 'Email não encontrado.' });
     }
 
-    const { email, titulo } = results[0];
+    // Gerar token de redefinição de senha
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const tokenExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutos a partir de agora
 
-    // Enviar notificação por email
-    enviarEmailNotificacao(email, titulo);
+    console.log('Token gerado:', resetToken); // Log do token gerado
+    console.log('Expiração do token:', tokenExpiry); // Log da expiração do token
 
-    res.status(200).json({ success: true, message: 'Interesse registrado e notificação enviada.' });
+    // Atualizar o usuário com o token e o tempo de expiração
+    const updateSql = 'UPDATE users SET reset_token = ?, token_expiry = ? WHERE email = ?';
+    db.query(updateSql, [resetToken, tokenExpiry, email], (err) => {
+      if (err) {
+        console.error('Erro ao atualizar o token no banco de dados:', err);
+        return res.status(500).json({ success: false, message: 'Erro no servidor.' });
+      }
+
+      // Renderizar o template EJS com o token
+      ejs.renderFile(path.join(__dirname, 'views', 'template.ejs'), { resetToken }, (err, html) => {
+        if (err) {
+          console.error('Erro ao renderizar o template:', err);
+          return res.status(500).json({ success: false, message: 'Erro no servidor.' });
+        }
+
+        // Configuração do e-mail
+        let mailOptions = {
+          from: '"Buku" <buku.livro@gmail.com>',
+          to: email,
+          subject: 'Redefinição de Senha',
+          html: html
+        };
+
+        // Envia o e-mail usando o objeto de transporte definido
+        transporter.sendMail(mailOptions, (err, info) => {
+          if (err) {
+            console.error('Erro ao enviar o e-mail:', err);
+            return res.status(500).json({ success: false, message: 'Erro no servidor.' });
+          }
+          res.status(200).json({ success: true, message: 'E-mail de redefinição de senha enviado com sucesso.' });
+        });
+      });
+    });
   });
 });
+
+// Endpoint para alterar a senha do usuário
+app.post('/alterar-senha', (req, res) => {
+  const { token, newPassword } = req.body;
+
+  console.log('Token recebido:', token); // Log do token recebido
+  console.log('Nova senha recebida:', newPassword); // Log da nova senha recebida
+
+  const sql = 'SELECT * FROM users WHERE reset_token = ?';
+  db.query(sql, [token], (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar token no banco de dados:', err);
+      return res.status(500).json({ success: false, message: 'Erro no servidor.' });
+    }
+
+    console.log('Resultados da consulta:', results); // Log dos resultados da consulta
+
+    if (results.length === 0) {
+      return res.status(400).json({ success: false, message: 'Token inválido.' });
+    }
+
+    const user = results[0];
+
+    // Verificar se o token expirou
+    const currentTime = new Date();
+    const tokenExpiryTime = new Date(user.token_expiry);
+    console.log('Hora atual:', currentTime); // Log da hora atual
+    console.log('Expiração do token:', tokenExpiryTime); // Log da expiração do token
+
+    if (currentTime > tokenExpiryTime) {
+      return res.status(400).json({ success: false, message: 'Link expirado.' });
+    }
+
+    // Criptografar a nova senha antes de armazená-la no banco de dados
+    bcrypt.hash(newPassword, saltRounds, (err, hashedPassword) => {
+      if (err) {
+        console.error('Erro ao criptografar a senha:', err);
+        return res.status(500).json({ success: false, message: 'Erro no servidor.' });
+      }
+
+      const updateSql = 'UPDATE users SET password = ?, reset_token = NULL, token_expiry = NULL WHERE reset_token = ?';
+      db.query(updateSql, [hashedPassword, token], (err) => {
+        if (err) {
+          console.error('Erro ao atualizar a senha no banco de dados:', err);
+          return res.status(500).json({ success: false, message: 'Erro no servidor.' });
+        }
+
+        res.status(200).json({ success: true, message: 'Senha alterada com sucesso' });
+      });
+    });
+  });
+});
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));

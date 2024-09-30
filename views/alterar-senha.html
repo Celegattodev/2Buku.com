@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alterar Senha</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/signin_signup/alterar-senha.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <main>
+        <div class="form-container">
+            <h2 class="form-title">Alterar Senha</h2>
+            <form id="alterar-senha-form">
+                <div class="form-input-container">
+                    <div class="input-group">
+                        <label for="new-password" class="form-label">Nova Senha</label>
+                        <input type="password" class="form-input" id="new-password" name="new-password" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="confirm-password" class="form-label">Confirmar Senha</label>
+                        <input type="password" class="form-input" id="confirm-password" name="confirm-password" required>
+                    </div>
+                </div>
+                <button type="submit" class="form-button">Alterar Senha</button>
+            </form>
+        </div>
+    </main>
+    <script src="/js/alterarSenha/alterarSenha.js"></script>
+</body>
+</html>

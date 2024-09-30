@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 
+// Configura o transportador de email
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -8,21 +9,16 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-const enviarEmailNotificacao = (emailDestinatario, nomeLivro) => {
+// Função para enviar email de notificação
+const enviarEmailNotificacao = (to, subject, text) => {
   const mailOptions = {
     from: 'buku.livro@gmail.com',
-    to: emailDestinatario,
-    subject: 'Interesse no seu livro',
-    text: `Alguém demonstrou interesse no seu livro: ${nomeLivro}. Entre em contato para mais detalhes.`
+    to,
+    subject,
+    text
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log('Erro ao enviar email:', error);
-    } else {
-      console.log('Email enviado:', info.response);
-    }
-  });
+  return transporter.sendMail(mailOptions);
 };
 
 module.exports = { enviarEmailNotificacao };

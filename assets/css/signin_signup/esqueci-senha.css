@@ -1,0 +1,112 @@
+/* css/esqueci-senha.css */
+body {
+    min-height: 100vh; /* Garante que o corpo ocupe pelo menos a altura total da tela */
+    background: url("/img/Buku-fundo.png") no-repeat center center; /* Define a imagem de fundo */
+    background-size: cover; /* Faz a imagem de fundo cobrir toda a área */
+    font-family: "Red Hat Display", sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding-top: 60px; /* Espaço para a navbar */
+}
+
+.form-container {
+    max-width: 400px;
+    width: 100%;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.9); /* Fundo branco com transparência */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra mais pronunciada */
+    text-align: center;
+}
+
+.form-title {
+    margin-bottom: 20px;
+    font-size: 28px; /* Tamanho de fonte maior */
+    font-weight: bold;
+    color: #333;
+}
+
+.form-input-container {
+    margin-bottom: 20px;
+}
+
+.input-group {
+    position: relative;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.form-label {
+    position: absolute;
+    top: -10px;
+    left: 10px;
+    background: #fff;
+    padding: 0 5px;
+    font-size: 14px;
+    color: #666;
+}
+
+.form-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 0.3s, color 0.3s;
+    margin-bottom: 10px;
+}
+
+.form-button:hover {
+    background-color: #0056b3;
+}
+
+/* Estilo para o botão "Enviar" */
+.form-button[type="submit"] {
+    background-color: #FFA500; /* Cor laranja */
+    color: #fff;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.form-button[type="submit"]:hover {
+    background-color: #fff; /* Cor branca ao passar o mouse */
+    color: #FFA500; /* Texto laranja */
+    border: 1px solid #FFA500; /* Adicionar borda laranja */
+}
+
+.mobile-text {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.mobile-text a {
+    color: #6c8bf7;
+    text-decoration: none;
+}
+
+.mobile-text a:hover {
+    text-decoration: underline;
+}
