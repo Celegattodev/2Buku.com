@@ -45,23 +45,55 @@ h1 {
   /* Centraliza os itens */
 }
 
-.swiper-slide {
-  text-align: center;
-  padding: 10px;
+.card {
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  border-radius: 15px;
+  overflow: hidden;
 }
 
-.swiper-slide img {
-  width: 120px;
-  height: 180px;
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card-img-top {
+  height: 250px;
   object-fit: cover;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.swiper-slide p {
-  font-size: 16px;
-  margin: 5px 0;
-  font-weight: bold;
+.card-body {
+  text-align: center;
+}
+
+.btn-success {
+  background-color: #28a745;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
 }
 
 /*-------------- RESPONSIVIDADE --------------*/

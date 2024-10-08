@@ -145,54 +145,73 @@ app.get('/profile', isAuthenticated, (req, res) => {
           return res.status(500).send('Erro ao buscar livros.');
         }
 
-        // Substituição de placeholders no HTML
-        const filePath = path.join(__dirname, 'views', 'UserProfile.html');
-        fs.readFile(filePath, 'utf8', (err, data) => {
+        // Consulta para buscar os livros favoritos do usuário
+        db.query('SELECT id, titulo, autor, imagem FROM favoritos WHERE user_id = ?', [req.session.userId], (err, favorites) => {
           if (err) {
-            console.error(err);
-            return res.status(500).send('Erro interno do servidor');
+            console.error('Erro ao buscar livros favoritos do usuário:', err);
+            return res.status(500).send('Erro ao buscar livros favoritos.');
           }
 
-          // Dados do perfil
-          const profileData = {
-            name: user.name || 'Nome não disponível',
-            email: user.email || 'Email não disponível',
-            state: user.state || 'Estado não disponível',
-            city: cityName || 'Cidade não disponível',
-            phone: user.phone || 'Telefone não disponível',
-            description: user.biography || 'Descrição não disponível',
-            books: books // Livros do usuário
-          };
+          // Substituição de placeholders no HTML
+          const filePath = path.join(__dirname, 'views', 'UserProfile.html');
+          fs.readFile(filePath, 'utf8', (err, data) => {
+            if (err) {
+              console.error(err);
+              return res.status(500).send('Erro interno do servidor');
+            }
 
-          // Renderizar livros com ícone de deletar fixo
-          const bookListHTML = profileData.books.map(book => {
-            return `
-    <div class="swiper-slide book-item" data-book-id="${book.id}" style="position: relative;">
-      <img src="${book.imagem || '/img/default-book-image.jpg'}" alt="${book.titulo}" style="width:120px; height:180px;">
-      <p><strong>${book.titulo}</strong></p>
-      <p>${book.autor}</p>
-      <!-- Ícone de deletar fixo -->
-      <i class="fas fa-trash-alt delete-icon" title="Deletar" style="position: absolute; top: 10px; right: 10px;"></i>
-    </div>`;
-          }).join('');
+            // Dados do perfil
+            const profileData = {
+              name: user.name || 'Nome não disponível',
+              email: user.email || 'Email não disponível',
+              state: user.state || 'Estado não disponível',
+              city: cityName || 'Cidade não disponível',
+              phone: user.phone || 'Telefone não disponível',
+              description: user.biography || 'Descrição não disponível',
+              books: books, // Livros do usuário
+              favorites: favorites // Livros favoritos do usuário
+            };
 
-          // Substituir placeholders no HTML
-          let html = data
-            .replace('{{userName}}', profileData.name)
-            .replace('{{userEmail}}', profileData.email)
-            .replace('{{userState}}', profileData.state)
-            .replace('{{userCity}}', profileData.city)
-            .replace('{{userPhone}}', profileData.phone)
-            .replace('{{userDescription}}', profileData.description)
-            .replace('{{userBooks}}', bookListHTML);
+                        // Renderizar livros com ícone de deletar fixo
+            const bookListHTML = profileData.books.map(book => {
+              return `
+                <div class="swiper-slide book-item" data-book-id="${book.id}" style="position: relative;">
+                  <i class="fas fa-trash-alt delete-icon" title="Deletar" style="position: absolute; top: 10px; right: 10px;"></i>
+                  <img src="${book.imagem || '/img/default-book-image.jpg'}" alt="${book.titulo}" style="width:120px; height:180px;">
+                  <p><strong>${book.titulo}</strong></p>
+                  <p>${book.autor}</p>
+                </div>`;
+            }).join('');
+            
+            // Renderizar livros favoritos com ícone de deletar fixo
+            const favoriteListHTML = profileData.favorites.map(book => {
+              return `
+                <div class="swiper-slide favorite-item" data-book-id="${book.id}" style="position: relative;">
+                  <i class="fas fa-trash-alt delete-favorite-icon" title="Deletar" style="position: absolute; top: 10px; right: 10px;"></i>
+                  <img src="${book.imagem || '/img/default-book-image.jpg'}" alt="${book.titulo}" style="width:120px; height:180px;">
+                  <p><strong>${book.titulo}</strong></p>
+                  <p>${book.autor}</p>
+                </div>`;
+            }).join('');
 
-          res.send(html);
+            // Substituir placeholders no HTML
+            let html = data
+              .replace('{{userName}}', profileData.name)
+              .replace('{{userEmail}}', profileData.email)
+              .replace('{{userState}}', profileData.state)
+              .replace('{{userCity}}', profileData.city)
+              .replace('{{userPhone}}', profileData.phone)
+              .replace('{{userDescription}}', profileData.description)
+              .replace('{{userBooks}}', bookListHTML)
+              .replace('{{userFavorites}}', favoriteListHTML);
+
+            res.send(html);
+          });
         });
       });
     }
   );
 });
-
 
 // Rota para a página de login
 app.get('/login', (req, res) => {
@@ -387,7 +406,7 @@ app.post('/update-profile', (req, res) => {
   );
 });
 
-// Rota para deletar a conta
+// Rota para deletar a conta do usuário
 app.delete('/delete-account', (req, res) => {
   if (!req.session.userId) {
     return res.status(401).json({ success: false, message: 'Usuário não autenticado.' });
@@ -395,24 +414,41 @@ app.delete('/delete-account', (req, res) => {
 
   const userId = req.session.userId;
 
-  // Excluir o usuário e, devido à exclusão em cascata, os livros associados também serão excluídos
-  db.query('DELETE FROM users WHERE id = ?', [userId], (err, results) => {
+  // Excluir os livros favoritos do usuário
+  db.query('DELETE FROM favoritos WHERE user_id = ?', [userId], (err, results) => {
     if (err) {
-      console.error('Erro ao excluir conta do usuário:', err);
-      return res.status(500).json({ success: false, message: 'Erro ao excluir conta do usuário.' });
+      console.error('Erro ao excluir livros favoritos do usuário:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao excluir livros favoritos do usuário.' });
     }
 
-    // Destruir a sessão do usuário
-    req.session.destroy((err) => {
+    // Excluir os livros do usuário
+    db.query('DELETE FROM livros WHERE user_id = ?', [userId], (err, results) => {
       if (err) {
-        console.error('Erro ao destruir sessão:', err);
-        return res.status(500).json({ success: false, message: 'Erro ao destruir sessão.' });
+        console.error('Erro ao excluir livros do usuário:', err);
+        return res.status(500).json({ success: false, message: 'Erro ao excluir livros do usuário.' });
       }
 
-      res.json({ success: true, message: 'Conta deletada com sucesso.' });
+      // Excluir o usuário
+      db.query('DELETE FROM users WHERE id = ?', [userId], (err, results) => {
+        if (err) {
+          console.error('Erro ao excluir conta do usuário:', err);
+          return res.status(500).json({ success: false, message: 'Erro ao excluir conta do usuário.' });
+        }
+
+        // Destruir a sessão do usuário
+        req.session.destroy((err) => {
+          if (err) {
+            console.error('Erro ao destruir sessão:', err);
+            return res.status(500).json({ success: false, message: 'Erro ao destruir sessão.' });
+          }
+
+          res.json({ success: true, message: 'Conta deletada com sucesso.' });
+        });
+      });
     });
   });
 });
+
 // Rota para logout
 app.get('/logout', (req, res) => {
   req.session.destroy((err) => {
@@ -633,3 +669,92 @@ app.post('/alterar-senha', (req, res) => {
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+// Rota para servir a página de favoritos
+app.get('/favorites', (req, res) => {
+  if (!req.session.userId) {
+    return res.redirect('/login'); // Redireciona para a página de login se o usuário não estiver autenticado
+  }
+  res.sendFile(path.join(__dirname, 'views', 'favorites.html'));
+});
+
+// Rota para adicionar um livro aos favoritos
+app.post('/add-favorite', (req, res) => {
+  const { title, author, imageUrl } = req.body;
+  const userId = req.session.userId;
+
+  if (!userId) {
+    return res.status(401).json({ success: false, message: 'Usuário não autenticado.' });
+  }
+
+  if (!title || !author || !imageUrl) {
+    return res.json({ success: false, message: 'Título, autor e imagem são obrigatórios' });
+  }
+
+  // Verifique se o livro já está nos favoritos
+  const checkFavoriteSql = 'SELECT id FROM favoritos WHERE user_id = ? AND titulo = ? AND autor = ? AND imagem = ?';
+  db.query(checkFavoriteSql, [userId, title, author, imageUrl], (err, results) => {
+    if (err) {
+      console.error('Erro ao verificar favoritos:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao verificar favoritos.' });
+    }
+
+    if (results.length > 0) {
+      return res.status(400).json({ success: false, message: 'Livro já está nos favoritos.' });
+    }
+
+    // Adicione o livro diretamente aos favoritos
+    const addFavoriteSql = 'INSERT INTO favoritos (user_id, titulo, autor, imagem) VALUES (?, ?, ?, ?)';
+    db.query(addFavoriteSql, [userId, title, author, imageUrl], (err, results) => {
+      if (err) {
+        console.error('Erro ao adicionar livro aos favoritos:', err);
+        return res.status(500).json({ success: false, message: 'Erro ao adicionar livro aos favoritos.' });
+      }
+
+      res.json({ success: true, message: 'Livro adicionado aos favoritos com sucesso.' });
+    });
+  });
+});
+
+// Rota para obter os livros favoritos do usuário
+app.get('/api/favorites', (req, res) => {
+  const userId = req.session.userId;
+
+  if (!userId) {
+    return res.status(401).json({ success: false, message: 'Usuário não autenticado.' });
+  }
+
+  const sql = 'SELECT id, titulo, autor, imagem FROM favoritos WHERE user_id = ?';
+  db.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error('Erro ao obter livros favoritos:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao obter livros favoritos.' });
+    }
+
+    res.json({ success: true, favoritos: results });
+  });
+});
+
+// Rota para remover um livro dos favoritos
+app.delete('/remove-favorite/:id', (req, res) => {
+  const favoriteId = req.params.id;
+  const userId = req.session.userId;
+
+  if (!userId) {
+    return res.status(401).json({ success: false, message: 'Usuário não autenticado.' });
+  }
+
+  const deleteFavoriteSql = 'DELETE FROM favoritos WHERE id = ? AND user_id = ?';
+  db.query(deleteFavoriteSql, [favoriteId, userId], (err, results) => {
+    if (err) {
+      console.error('Erro ao remover livro dos favoritos:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao remover livro dos favoritos.' });
+    }
+
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Livro não encontrado nos favoritos.' });
+    }
+
+    res.json({ success: true, message: 'Livro removido dos favoritos com sucesso.' });
+  });
+});
