@@ -448,8 +448,10 @@ body {
 
 .delete-icon {
   position: absolute;
-  top: 10px; /* Mantém a mesma posição vertical */
-  right: 10px; /* Posiciona no lado direito */
+  top: 10px;
+  /* Mantém a mesma posição vertical */
+  right: 10px;
+  /* Posiciona no lado direito */
   color: #ff6b6b;
   font-size: 16px;
   cursor: pointer;
@@ -551,11 +553,9 @@ body {
 
 /*  */
 
-
 h3 {
   font-weight: 600;
 }
-
 
 .swiper-button-next,
 .swiper-button-prev {

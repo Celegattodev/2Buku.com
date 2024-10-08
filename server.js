@@ -11,7 +11,8 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const app = express();
 const saltRounds = 10; // Número de rounds para bcrypt
-const ejs = require('ejs'); // Adicione esta linha
+const ejs = require('ejs');
+
 
 // Gera uma chave secreta aleatória para a sessão
 const generateSecret = () => {
@@ -169,25 +170,13 @@ app.get('/profile', isAuthenticated, (req, res) => {
               phone: user.phone || 'Telefone não disponível',
               description: user.biography || 'Descrição não disponível',
               books: books, // Livros do usuário
-              favorites: favorites // Livros favoritos do usuário
             };
 
-                        // Renderizar livros com ícone de deletar fixo
+            // Renderizar livros com ícone de deletar fixo
             const bookListHTML = profileData.books.map(book => {
               return `
                 <div class="swiper-slide book-item" data-book-id="${book.id}" style="position: relative;">
                   <i class="fas fa-trash-alt delete-icon" title="Deletar" style="position: absolute; top: 10px; right: 10px;"></i>
-                  <img src="${book.imagem || '/img/default-book-image.jpg'}" alt="${book.titulo}" style="width:120px; height:180px;">
-                  <p><strong>${book.titulo}</strong></p>
-                  <p>${book.autor}</p>
-                </div>`;
-            }).join('');
-            
-            // Renderizar livros favoritos com ícone de deletar fixo
-            const favoriteListHTML = profileData.favorites.map(book => {
-              return `
-                <div class="swiper-slide favorite-item" data-book-id="${book.id}" style="position: relative;">
-                  <i class="fas fa-trash-alt delete-favorite-icon" title="Deletar" style="position: absolute; top: 10px; right: 10px;"></i>
                   <img src="${book.imagem || '/img/default-book-image.jpg'}" alt="${book.titulo}" style="width:120px; height:180px;">
                   <p><strong>${book.titulo}</strong></p>
                   <p>${book.autor}</p>
@@ -203,7 +192,6 @@ app.get('/profile', isAuthenticated, (req, res) => {
               .replace('{{userPhone}}', profileData.phone)
               .replace('{{userDescription}}', profileData.description)
               .replace('{{userBooks}}', bookListHTML)
-              .replace('{{userFavorites}}', favoriteListHTML);
 
             res.send(html);
           });
@@ -670,40 +658,80 @@ app.post('/alterar-senha', (req, res) => {
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Rota para servir a página de favoritos
-app.get('/favorites', (req, res) => {
+// Rota para exibir os livros favoritos do usuário
+app.get('/favorites', isAuthenticated, (req, res) => {
   if (!req.session.userId) {
-    return res.redirect('/login'); // Redireciona para a página de login se o usuário não estiver autenticado
+    return res.redirect('/login'); // Redireciona para a página de login se o usuário não estiver logado
   }
-  res.sendFile(path.join(__dirname, 'views', 'favorites.html'));
+
+  // Consulta para buscar os livros favoritos do usuário
+  db.query('SELECT id, titulo, autor, imagem FROM favoritos WHERE user_id = ?', [req.session.userId], (err, favorites) => {
+    if (err) {
+      console.error('Erro ao buscar livros favoritos do usuário:', err);
+      return res.status(500).send('Erro ao buscar livros favoritos.');
+    }
+
+    // Substituição de placeholders no HTML
+    const filePath = path.join(__dirname, 'views', 'favorites.html');
+    fs.readFile(filePath, 'utf8', (err, data) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send('Erro interno do servidor');
+      }
+
+      // Renderizar livros favoritos com ícone de deletar fixo
+      const favoriteListHTML = favorites.map(book => {
+        return `
+          <div class="col-md-4 favorite-item" data-book-id="${book.id}">
+            <i class="fas fa-trash-alt delete-favorite-icon" title="Deletar"></i>
+            <img src="${book.imagem || '/img/default-book-image.jpg'}" alt="${book.titulo}">
+            <p><strong>${book.titulo}</strong></p>
+            <p>${book.autor}</p>
+          </div>`;
+      }).join('');
+
+      // Substituir placeholders no HTML
+      let html = data.replace('<!-- Os livros favoritos serão carregados aqui pelo JavaScript -->', favoriteListHTML);
+
+      res.send(html);
+    });
+  });
 });
 
-// Rota para adicionar um livro aos favoritos
-app.post('/add-favorite', (req, res) => {
+// Rota para adicionar um livro à biblioteca
+app.post('/add-book', isAuthenticated, (req, res) => {
   const { title, author, imageUrl } = req.body;
   const userId = req.session.userId;
 
-  if (!userId) {
-    return res.status(401).json({ success: false, message: 'Usuário não autenticado.' });
-  }
-
-  if (!title || !author || !imageUrl) {
-    return res.json({ success: false, message: 'Título, autor e imagem são obrigatórios' });
-  }
-
-  // Verifique se o livro já está nos favoritos
-  const checkFavoriteSql = 'SELECT id FROM favoritos WHERE user_id = ? AND titulo = ? AND autor = ? AND imagem = ?';
-  db.query(checkFavoriteSql, [userId, title, author, imageUrl], (err, results) => {
+  const addBookSql = 'INSERT INTO biblioteca (user_id, titulo, autor, imagem) VALUES (?, ?, ?, ?)';
+  db.query(addBookSql, [userId, title, author, imageUrl], (err, results) => {
     if (err) {
-      console.error('Erro ao verificar favoritos:', err);
-      return res.status(500).json({ success: false, message: 'Erro ao verificar favoritos.' });
+      console.error('Erro ao adicionar livro à biblioteca:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao adicionar livro à biblioteca.' });
+    }
+
+    res.json({ success: true, message: 'Livro adicionado à biblioteca com sucesso.' });
+  });
+});
+
+// Rota para adicionar um livro aos favoritos
+app.post('/add-favorite', isAuthenticated, (req, res) => {
+  const { title, author, imageUrl } = req.body;
+  const userId = req.session.userId;
+
+  // Verificar se o livro já está nos favoritos
+  const checkFavoriteSql = 'SELECT * FROM favoritos WHERE user_id = ? AND titulo = ?';
+  db.query(checkFavoriteSql, [userId, title], (err, results) => {
+    if (err) {
+      console.error('Erro ao verificar livro nos favoritos:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao verificar livro nos favoritos.' });
     }
 
     if (results.length > 0) {
-      return res.status(400).json({ success: false, message: 'Livro já está nos favoritos.' });
+      return res.json({ success: false, message: 'Livro já está nos favoritos' });
     }
 
-    // Adicione o livro diretamente aos favoritos
+    // Adicionar livro aos favoritos
     const addFavoriteSql = 'INSERT INTO favoritos (user_id, titulo, autor, imagem) VALUES (?, ?, ?, ?)';
     db.query(addFavoriteSql, [userId, title, author, imageUrl], (err, results) => {
       if (err) {
@@ -716,33 +744,10 @@ app.post('/add-favorite', (req, res) => {
   });
 });
 
-// Rota para obter os livros favoritos do usuário
-app.get('/api/favorites', (req, res) => {
-  const userId = req.session.userId;
-
-  if (!userId) {
-    return res.status(401).json({ success: false, message: 'Usuário não autenticado.' });
-  }
-
-  const sql = 'SELECT id, titulo, autor, imagem FROM favoritos WHERE user_id = ?';
-  db.query(sql, [userId], (err, results) => {
-    if (err) {
-      console.error('Erro ao obter livros favoritos:', err);
-      return res.status(500).json({ success: false, message: 'Erro ao obter livros favoritos.' });
-    }
-
-    res.json({ success: true, favoritos: results });
-  });
-});
-
 // Rota para remover um livro dos favoritos
-app.delete('/remove-favorite/:id', (req, res) => {
+app.delete('/remove-favorite/:id', isAuthenticated, (req, res) => {
   const favoriteId = req.params.id;
   const userId = req.session.userId;
-
-  if (!userId) {
-    return res.status(401).json({ success: false, message: 'Usuário não autenticado.' });
-  }
 
   const deleteFavoriteSql = 'DELETE FROM favoritos WHERE id = ? AND user_id = ?';
   db.query(deleteFavoriteSql, [favoriteId, userId], (err, results) => {

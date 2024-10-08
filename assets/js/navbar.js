@@ -14,4 +14,9 @@ $(document).ready(function () {
             }, 300);
         }
     });
+
+    // Redirecionar para a tela de inscrição ao clicar no botão "Cadastrar/Entrar"
+    $('#register-btn, #mobile-register-btn').on('click', function () {
+        window.location.href = '/login'; 
+    });
 });

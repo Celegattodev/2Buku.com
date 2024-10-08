@@ -1,0 +1,93 @@
+/* Estilo básico para a página de livros favoritos */
+#favorites-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.favorite-item {
+  position: relative;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: calc(33.333% - 20px);
+  box-sizing: border-box;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.favorite-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.favorite-item img {
+  max-width: 120px;
+  max-height: 180px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  transition: transform 0.3s ease;
+}
+
+.favorite-item img:hover {
+  transform: scale(1.1);
+}
+
+.favorite-item p {
+  font-size: 16px;
+  color: #333;
+  margin: 5px 0;
+}
+
+.delete-favorite-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #d33;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.delete-favorite-icon:hover {
+  color: #ff0000;
+}
+
+@media (max-width: 768px) {
+  .favorite-item {
+    width: calc(50% - 20px);
+  }
+}
+
+@media (max-width: 480px) {
+  .favorite-item {
+    width: 100%;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilo para o botão de voltar ao perfil */
+.btn-secondary {
+  background-color: #6c757d;
+  border: none;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  transform: scale(1.05);
+}
