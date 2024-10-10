@@ -464,39 +464,43 @@ app.get('/some-route', (req, res) => {
 });
 
 // API Google Books
-app.post('/add-book', (req, res) => {
-  const { title, author, imageUrl } = req.body;
+app.post('/add-book', isAuthenticated, (req, res) => {
+  const { googleBooksId, title, author, imageUrl } = req.body;
   const userId = req.session.userId;
 
   if (!userId) {
+    console.error('Erro: Usuário não autenticado');
     return res.status(401).json({ success: false, message: 'Usuário não autenticado' });
   }
 
-  if (!title || !author || !imageUrl) {
-    return res.json({ success: false, message: 'Título, autor e imagem são obrigatórios' });
+  if (!googleBooksId || !title || !author || !imageUrl) {
+    console.error('Erro: ID do Google Books, título, autor e imagem são obrigatórios');
+    return res.status(400).json({ success: false, message: 'ID do Google Books, título, autor e imagem são obrigatórios' });
   }
 
   // Verificar se o livro já existe na biblioteca do usuário
-  const checkSql = 'SELECT * FROM livros WHERE titulo = ? AND autor = ? AND user_id = ?';
-  db.query(checkSql, [title, author, userId], (err, results) => {
+  const checkSql = 'SELECT * FROM livros WHERE google_books_id = ? AND user_id = ?';
+  db.query(checkSql, [googleBooksId, userId], (err, results) => {
     if (err) {
-      console.error(err);
-      return res.json({ success: false, message: 'Erro ao verificar a duplicidade do livro' });
+      console.error('Erro ao verificar a duplicidade do livro:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao verificar a duplicidade do livro' });
     }
 
     if (results.length > 0) {
       // Se o livro já existe, retorna uma mensagem de erro
-      return res.json({ success: false, message: 'Livro já existe na biblioteca' });
+      console.error('Erro: Livro já existe na biblioteca');
+      return res.status(409).json({ success: false, message: 'Livro já existe na biblioteca' });
     }
 
     // Caso contrário, insere o livro
-    const sql = 'INSERT INTO livros (titulo, autor, imagem, user_id) VALUES (?, ?, ?, ?)';
-    db.query(sql, [title, author, imageUrl, userId], (err, result) => {
+    const sql = 'INSERT INTO livros (google_books_id, titulo, autor, imagem, user_id, data_adicao) VALUES (?, ?, ?, ?, ?, NOW())';
+    db.query(sql, [googleBooksId, title, author, imageUrl, userId], (err, result) => {
       if (err) {
-        console.error(err);
-        return res.json({ success: false, message: 'Erro ao adicionar o livro' });
+        console.error('Erro ao adicionar o livro:', err);
+        return res.status(500).json({ success: false, message: 'Erro ao adicionar o livro' });
       }
-      res.json({ success: true, message: 'Livro adicionado com sucesso' });
+      console.log('Livro adicionado com sucesso:', result);
+      res.status(201).json({ success: true, message: 'Livro adicionado com sucesso' });
     });
   });
 });
@@ -699,20 +703,20 @@ app.get('/favorites', isAuthenticated, (req, res) => {
 });
 
 // Rota para adicionar um livro à biblioteca
-app.post('/add-book', isAuthenticated, (req, res) => {
-  const { title, author, imageUrl } = req.body;
-  const userId = req.session.userId;
+// app.post('/add-book', isAuthenticated, (req, res) => {
+//   const { title, author, imageUrl } = req.body;
+//   const userId = req.session.userId;
 
-  const addBookSql = 'INSERT INTO biblioteca (user_id, titulo, autor, imagem) VALUES (?, ?, ?, ?)';
-  db.query(addBookSql, [userId, title, author, imageUrl], (err, results) => {
-    if (err) {
-      console.error('Erro ao adicionar livro à biblioteca:', err);
-      return res.status(500).json({ success: false, message: 'Erro ao adicionar livro à biblioteca.' });
-    }
+//   const addBookSql = 'INSERT INTO biblioteca (user_id, titulo, autor, imagem) VALUES (?, ?, ?, ?)';
+//   db.query(addBookSql, [userId, title, author, imageUrl], (err, results) => {
+//     if (err) {
+//       console.error('Erro ao adicionar livro à biblioteca:', err);
+//       return res.status(500).json({ success: false, message: 'Erro ao adicionar livro à biblioteca.' });
+//     }
 
-    res.json({ success: true, message: 'Livro adicionado à biblioteca com sucesso.' });
-  });
-});
+//     res.json({ success: true, message: 'Livro adicionado à biblioteca com sucesso.' });
+//   });
+// });
 
 // Rota para adicionar um livro aos favoritos
 app.post('/add-favorite', isAuthenticated, (req, res) => {
@@ -761,5 +765,93 @@ app.delete('/remove-favorite/:id', isAuthenticated, (req, res) => {
     }
 
     res.json({ success: true, message: 'Livro removido dos favoritos com sucesso.' });
+  });
+});
+
+app.get('/catalog', isAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'Catalog.html'));
+});
+
+// Rota para redirecionar para a página de catálogo
+app.get('/catalog-data', (req, res) => {
+  // Consulta para buscar os livros mais populares
+  const popularBooksSql = `
+    SELECT google_books_id, COUNT(*) as count
+    FROM livros
+    GROUP BY google_books_id
+    ORDER BY count DESC
+    LIMIT 10
+  `;
+
+  // Consulta para buscar os últimos livros adicionados
+  const latestBooksSql = `
+    SELECT google_books_id
+    FROM livros
+    ORDER BY data_adicao DESC
+    LIMIT 10
+  `;
+
+  db.query(popularBooksSql, (err, popularBooks) => {
+    if (err) {
+      console.error('Erro ao buscar livros mais populares:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao buscar livros mais populares.' });
+    }
+
+    db.query(latestBooksSql, (err, latestBooks) => {
+      if (err) {
+        console.error('Erro ao buscar últimos livros adicionados:', err);
+        return res.status(500).json({ success: false, message: 'Erro ao buscar últimos livros adicionados.' });
+      }
+
+      // Buscar detalhes dos livros na API do Google Books
+      const googleBooksApiUrl = 'https://www.googleapis.com/books/v1/volumes';
+      const popularBooksPromises = popularBooks.map(book => {
+        if (book.google_books_id) {
+          return axios.get(`${googleBooksApiUrl}/${book.google_books_id}`).then(response => response.data);
+        }
+        return Promise.resolve(null);
+      });
+      const latestBooksPromises = latestBooks.map(book => {
+        if (book.google_books_id) {
+          return axios.get(`${googleBooksApiUrl}/${book.google_books_id}`).then(response => response.data);
+        }
+        return Promise.resolve(null);
+      });
+
+      Promise.all([...popularBooksPromises, ...latestBooksPromises])
+        .then(results => {
+          const popularBooksDetails = results.slice(0, popularBooks.length).map((result, index) => {
+            if (result) {
+              return {
+                googleBooksId: popularBooks[index].google_books_id,
+                title: result.volumeInfo.title,
+                author: result.volumeInfo.authors.join(', '),
+                imageUrl: result.volumeInfo.imageLinks.thumbnail,
+                genres: result.volumeInfo.categories
+              };
+            }
+            return null;
+          }).filter(book => book !== null);
+
+          const latestBooksDetails = results.slice(popularBooks.length).map((result, index) => {
+            if (result) {
+              return {
+                googleBooksId: latestBooks[index].google_books_id,
+                title: result.volumeInfo.title,
+                author: result.volumeInfo.authors.join(', '),
+                imageUrl: result.volumeInfo.imageLinks.thumbnail,
+                genres: result.volumeInfo.categories
+              };
+            }
+            return null;
+          }).filter(book => book !== null);
+
+          res.json({ popularBooks: popularBooksDetails, latestBooks: latestBooksDetails });
+        })
+        .catch(error => {
+          console.error('Erro ao buscar detalhes dos livros na API do Google Books:', error);
+          res.status(500).json({ success: false, message: 'Erro ao buscar detalhes dos livros na API do Google Books.' });
+        });
+    });
   });
 });

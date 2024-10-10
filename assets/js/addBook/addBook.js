@@ -36,8 +36,8 @@ function displayBooks(books) {
                         <h5 class="card-title">${bookInfo.title}</h5>
                         <p class="card-text">Autor: ${bookInfo.authors?.join(', ') || 'Desconhecido'}</p>
                         <button class="btn btn-info" onclick="showBookDetails('${book.id}')">Ver Detalhes</button>
-                        <button class="btn btn-success" onclick="addToLibrary('${bookInfo.title}', '${bookInfo.authors?.join(', ')}', '${imageUrl}')">Adicionar à Biblioteca</button>
-                        <button class="btn btn-warning text-white" onclick="addToFavorites('${bookInfo.title}', '${bookInfo.authors?.join(', ')}', '${imageUrl}')">Adicionar aos Favoritos</button>
+                        <button class="btn btn-success" onclick="addToLibrary('${book.id}', '${bookInfo.title}', '${bookInfo.authors?.join(', ')}', '${imageUrl}')">Adicionar à Biblioteca</button>
+                        <button class="btn btn-warning text-white" onclick="addToFavorites('${book.id}', '${bookInfo.title}', '${bookInfo.authors?.join(', ')}', '${imageUrl}')">Adicionar aos Favoritos</button>
                     </div>
                 </div>
             </div>
@@ -140,7 +140,7 @@ function displayBookDetails(bookInfo) {
 
 function translateGenres(genres) {
     if (!genres) return Promise.resolve(['Desconhecido']);
-    const apiKey = 'AIzaSyCvKVY6ptNvOngJl4KgOSIEQPrTXafOQ_k'; // Substitua pela sua chave de API do Google Translate
+    const apiKey = 'SUA_CHAVE_DE_API_DO_GOOGLE_TRANSLATE'; // Substitua pela sua chave de API do Google Translate
     const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
     const requests = genres.map(genre => {
         return fetch(url, {
@@ -166,7 +166,7 @@ function translateGenres(genres) {
 
 function translateText(text) {
     if (!text) return Promise.resolve('Não disponível');
-    const apiKey = 'AIzaSyCvKVY6ptNvOngJl4KgOSIEQPrTXafOQ_k'; // Substitua pela sua chave de API do Google Translate
+    const apiKey = 'SUA_CHAVE_DE_API_DO_GOOGLE_TRANSLATE'; // Substitua pela sua chave de API do Google Translate
     const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
     return fetch(url, {
         method: 'POST',
@@ -193,13 +193,13 @@ function formatDate(date) {
     return `${day || '01'}/${month || '01'}/${year}`;
 }
 
-function addToLibrary(title, author, imageUrl) {
+function addToLibrary(googleBooksId, title, author, imageUrl) {
     fetch('/add-book', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ title, author, imageUrl })
+        body: JSON.stringify({ googleBooksId, title, author, imageUrl })
     })
         .then(response => response.json())
         .then(data => {
@@ -237,13 +237,13 @@ function addToLibrary(title, author, imageUrl) {
         });
 }
 
-function addToFavorites(title, author, imageUrl) {
+function addToFavorites(googleBooksId, title, author, imageUrl) {
     fetch('/add-favorite', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ title, author, imageUrl })
+        body: JSON.stringify({ googleBooksId, title, author, imageUrl })
     })
         .then(response => response.json())
         .then(data => {
