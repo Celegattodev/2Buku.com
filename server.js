@@ -12,6 +12,7 @@ const nodemailer = require('nodemailer');
 const app = express();
 const saltRounds = 10; // Número de rounds para bcrypt
 const ejs = require('ejs');
+const { enviarEmailComTemplate } = require("./email/emailService");
 
 
 // Gera uma chave secreta aleatória para a sessão
@@ -319,11 +320,14 @@ app.post("/register", (req, res) => {
               message: "Erro no servidor."
             });
           }
+          // Envia o email de confirmação
+          enviarEmailComTemplate(email, 'Conta criada na Buku', 'templateContaCriada', { name });
 
           res.status(201).json({
             success: true,
             message: "Usuário registrado com sucesso!"
           });
+          
         }
       );
     });
@@ -402,41 +406,57 @@ app.delete('/delete-account', (req, res) => {
 
   const userId = req.session.userId;
 
-  // Excluir os livros favoritos do usuário
-  db.query('DELETE FROM favoritos WHERE user_id = ?', [userId], (err, results) => {
+  // Obter o email e nome do usuário antes de deletar
+  db.query('SELECT email, name FROM users WHERE id = ?', [userId], (err, results) => {
     if (err) {
-      console.error('Erro ao excluir livros favoritos do usuário:', err);
-      return res.status(500).json({ success: false, message: 'Erro ao excluir livros favoritos do usuário.' });
+      console.error('Erro ao buscar usuário:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao buscar usuário.' });
     }
 
-    // Excluir os livros do usuário
-    db.query('DELETE FROM livros WHERE user_id = ?', [userId], (err, results) => {
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
+    }
+
+    const { email, name } = results[0];
+
+    // Excluir os livros favoritos do usuário
+    db.query('DELETE FROM favoritos WHERE user_id = ?', [userId], (err, results) => {
       if (err) {
-        console.error('Erro ao excluir livros do usuário:', err);
-        return res.status(500).json({ success: false, message: 'Erro ao excluir livros do usuário.' });
+        console.error('Erro ao excluir livros favoritos do usuário:', err);
+        return res.status(500).json({ success: false, message: 'Erro ao excluir livros favoritos do usuário.' });
       }
 
-      // Excluir o usuário
-      db.query('DELETE FROM users WHERE id = ?', [userId], (err, results) => {
+      // Excluir os livros do usuário
+      db.query('DELETE FROM livros WHERE user_id = ?', [userId], (err, results) => {
         if (err) {
-          console.error('Erro ao excluir conta do usuário:', err);
-          return res.status(500).json({ success: false, message: 'Erro ao excluir conta do usuário.' });
+          console.error('Erro ao excluir livros do usuário:', err);
+          return res.status(500).json({ success: false, message: 'Erro ao excluir livros do usuário.' });
         }
 
-        // Destruir a sessão do usuário
-        req.session.destroy((err) => {
+        // Excluir o usuário
+        db.query('DELETE FROM users WHERE id = ?', [userId], (err, results) => {
           if (err) {
-            console.error('Erro ao destruir sessão:', err);
-            return res.status(500).json({ success: false, message: 'Erro ao destruir sessão.' });
+            console.error('Erro ao excluir conta do usuário:', err);
+            return res.status(500).json({ success: false, message: 'Erro ao excluir conta do usuário.' });
           }
 
-          res.json({ success: true, message: 'Conta deletada com sucesso.' });
+          // Enviar email de confirmação
+          enviarEmailComTemplate(email, 'Sua conta foi deletada', 'templateContaDeletada', { nome: name });
+
+          // Destruir a sessão do usuário
+          req.session.destroy((err) => {
+            if (err) {
+              console.error('Erro ao destruir sessão:', err);
+              return res.status(500).json({ success: false, message: 'Erro ao destruir sessão.' });
+            }
+
+            res.status(200).json({ success: true, message: 'Conta deletada com sucesso.' });
+          });
         });
       });
     });
   });
 });
-
 // Rota para logout
 app.get('/logout', (req, res) => {
   req.session.destroy((err) => {
@@ -580,7 +600,7 @@ app.post('/esqueci-senha', (req, res) => {
       }
 
       // Renderizar o template EJS com o token
-      ejs.renderFile(path.join(__dirname, 'views', 'template.ejs'), { resetToken }, (err, html) => {
+      ejs.renderFile(path.join(__dirname, 'views', 'templateAlterarSenha.ejs'), { resetToken }, (err, html) => {
         if (err) {
           console.error('Erro ao renderizar o template:', err);
           return res.status(500).json({ success: false, message: 'Erro no servidor.' });
@@ -588,7 +608,7 @@ app.post('/esqueci-senha', (req, res) => {
 
         // Configuração do e-mail
         let mailOptions = {
-          from: '"Buku" <buku.livro@gmail.com>',
+          from: '"Buku 📚" <buku.livro@gmail.com>',
           to: email,
           subject: 'Redefinição de Senha',
           html: html
@@ -656,10 +676,13 @@ app.post('/alterar-senha', (req, res) => {
         res.status(200).json({ success: true, message: 'Senha alterada com sucesso' });
       });
     });
+    const { email, name } = user;
+    enviarEmailComTemplate(email,'Senha alterada com sucesso', 'templateSenhaAlterada', { name });
   });
 });
 
 app.set('view engine', 'ejs');
+// Envia o email de confirmação
 app.set('views', path.join(__dirname, 'views'));
 
 // Rota para exibir os livros favoritos do usuário
@@ -701,22 +724,6 @@ app.get('/favorites', isAuthenticated, (req, res) => {
     });
   });
 });
-
-// Rota para adicionar um livro à biblioteca
-// app.post('/add-book', isAuthenticated, (req, res) => {
-//   const { title, author, imageUrl } = req.body;
-//   const userId = req.session.userId;
-
-//   const addBookSql = 'INSERT INTO biblioteca (user_id, titulo, autor, imagem) VALUES (?, ?, ?, ?)';
-//   db.query(addBookSql, [userId, title, author, imageUrl], (err, results) => {
-//     if (err) {
-//       console.error('Erro ao adicionar livro à biblioteca:', err);
-//       return res.status(500).json({ success: false, message: 'Erro ao adicionar livro à biblioteca.' });
-//     }
-
-//     res.json({ success: true, message: 'Livro adicionado à biblioteca com sucesso.' });
-//   });
-// });
 
 // Rota para adicionar um livro aos favoritos
 app.post('/add-favorite', isAuthenticated, (req, res) => {
