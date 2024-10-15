@@ -720,52 +720,49 @@ app.get('/favorites', isAuthenticated, (req, res) => {
 
 // Rota para adicionar um livro aos favoritos
 app.post('/add-favorite', isAuthenticated, (req, res) => {
-  const { title, author, imageUrl } = req.body;
-  const userId = req.session.userId;
+    const { title, author, imageUrl } = req.body;
+    const userId = req.session.userId;
 
-  // Verificar se o livro já está nos favoritos
-  const checkFavoriteSql = 'SELECT * FROM favoritos WHERE user_id = ? AND titulo = ?';
-  db.query(checkFavoriteSql, [userId, title], (err, results) => {
-    if (err) {
-      console.error('Erro ao verificar livro nos favoritos:', err);
-      return res.status(500).json({ success: false, message: 'Erro ao verificar livro nos favoritos.' });
-    }
+    // Verificar se o livro já está nos favoritos
+    const checkFavoriteSql = 'SELECT * FROM favoritos WHERE user_id = ? AND titulo = ?';
+    db.query(checkFavoriteSql, [userId, title], (err, results) => {
+        if (err) {
+            console.error('Erro ao verificar livro nos favoritos:', err);
+            return res.status(500).json({ success: false, message: 'Erro ao verificar livro nos favoritos.' });
+        }
 
-    if (results.length > 0) {
-      return res.json({ success: false, message: 'Livro já está nos favoritos' });
-    }
+        if (results.length > 0) {
+            return res.json({ success: false, message: 'Livro já está nos favoritos' });
+        }
 
-    // Adicionar livro aos favoritos
-    const addFavoriteSql = 'INSERT INTO favoritos (user_id, titulo, autor, imagem) VALUES (?, ?, ?, ?)';
-    db.query(addFavoriteSql, [userId, title, author, imageUrl], (err, results) => {
-      if (err) {
-        console.error('Erro ao adicionar livro aos favoritos:', err);
-        return res.status(500).json({ success: false, message: 'Erro ao adicionar livro aos favoritos.' });
-      }
+        // Verificar se o livro já está na biblioteca
+        const checkLibrarySql = 'SELECT * FROM livros WHERE user_id = ? AND titulo = ?';
+        db.query(checkLibrarySql, [userId, title], (err, results) => {
+            if (err) {
+                if (err.code === 'ER_NO_SUCH_TABLE') {
+                    console.error('Erro ao verificar livro na biblioteca:', err);
+                    return res.status(500).json({ success: false, message: 'A tabela de biblioteca não existe. Por favor, contate o suporte.' });
+                }
+                console.error('Erro ao verificar livro na biblioteca:', err);
+                return res.status(500).json({ success: false, message: 'Erro ao verificar livro na biblioteca.' });
+            }
 
-      res.json({ success: true, message: 'Livro adicionado aos favoritos com sucesso.' });
+            if (results.length > 0) {
+                return res.json({ success: false, message: 'Livro já está na biblioteca' });
+            }
+
+            // Adicionar livro aos favoritos
+            const addFavoriteSql = 'INSERT INTO favoritos (user_id, titulo, autor, imagem) VALUES (?, ?, ?, ?)';
+            db.query(addFavoriteSql, [userId, title, author, imageUrl], (err, results) => {
+                if (err) {
+                    console.error('Erro ao adicionar livro aos favoritos:', err);
+                    return res.status(500).json({ success: false, message: 'Erro ao adicionar livro aos favoritos.' });
+                }
+
+                res.json({ success: true, message: 'Livro adicionado aos favoritos com sucesso.' });
+            });
+        });
     });
-  });
-});
-
-// Rota para remover um livro dos favoritos
-app.delete('/remove-favorite/:id', isAuthenticated, (req, res) => {
-  const favoriteId = req.params.id;
-  const userId = req.session.userId;
-
-  const deleteFavoriteSql = 'DELETE FROM favoritos WHERE id = ? AND user_id = ?';
-  db.query(deleteFavoriteSql, [favoriteId, userId], (err, results) => {
-    if (err) {
-      console.error('Erro ao remover livro dos favoritos:', err);
-      return res.status(500).json({ success: false, message: 'Erro ao remover livro dos favoritos.' });
-    }
-
-    if (results.affectedRows === 0) {
-      return res.status(404).json({ success: false, message: 'Livro não encontrado nos favoritos.' });
-    }
-
-    res.json({ success: true, message: 'Livro removido dos favoritos com sucesso.' });
-  });
 });
 
 app.get('/catalog', isAuthenticated, (req, res) => {
