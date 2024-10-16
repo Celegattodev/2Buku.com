@@ -217,6 +217,13 @@ function addToLibrary(googleBooksId, title, author, imageUrl) {
                     icon: 'info',
                     confirmButtonText: 'Ok'
                 });
+            } else if (data.message === 'Livro já está nos favoritos') {
+                Swal.fire({
+                    title: 'Atenção!',
+                    text: 'Este livro já está nos seus favoritos. Remova-o dos favoritos antes de adicioná-lo à biblioteca.',
+                    icon: 'info',
+                    confirmButtonText: 'Ok'
+                });
             } else {
                 Swal.fire({
                     title: 'Erro!',
@@ -258,6 +265,13 @@ function addToFavorites(googleBooksId, title, author, imageUrl) {
                 Swal.fire({
                     title: 'Atenção!',
                     text: 'Este livro já está nos seus favoritos.',
+                    icon: 'info',
+                    confirmButtonText: 'Ok'
+                });
+            } else if (data.message === 'Livro já está na biblioteca') {
+                Swal.fire({
+                    title: 'Atenção!',
+                    text: 'Este livro já está na sua biblioteca. Remova-o da biblioteca antes de adicioná-lo aos favoritos.',
                     icon: 'info',
                     confirmButtonText: 'Ok'
                 });

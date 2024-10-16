@@ -327,7 +327,7 @@ app.post("/register", (req, res) => {
             success: true,
             message: "Usuário registrado com sucesso!"
           });
-          
+
         }
       );
     });
@@ -358,12 +358,10 @@ app.get('/update-profile', (req, res) => {
   });
 });
 
-
-
 // Rota para processar a atualização do perfil
 app.post('/update-profile', (req, res) => {
   const { name, phone, biography } = req.body;
-  const userId = req.session.userId; // Obtemos o ID do usuário da sessão
+  const userId = req.session.userId;
 
   // Verifica se o userId e o nome foram passados corretamente
   if (!userId || !name) {
@@ -405,9 +403,10 @@ app.delete('/delete-account', (req, res) => {
   }
 
   const userId = req.session.userId;
+  const { password } = req.body;
 
-  // Obter o email e nome do usuário antes de deletar
-  db.query('SELECT email, name FROM users WHERE id = ?', [userId], (err, results) => {
+  // Obter a senha do usuário antes de deletar
+  db.query('SELECT email, name, password FROM users WHERE id = ?', [userId], (err, results) => {
     if (err) {
       console.error('Erro ao buscar usuário:', err);
       return res.status(500).json({ success: false, message: 'Erro ao buscar usuário.' });
@@ -417,46 +416,59 @@ app.delete('/delete-account', (req, res) => {
       return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
     }
 
-    const { email, name } = results[0];
+    const { email, name, password: hashedPassword } = results[0];
 
-    // Excluir os livros favoritos do usuário
-    db.query('DELETE FROM favoritos WHERE user_id = ?', [userId], (err, results) => {
+    // Verificar a senha
+    bcrypt.compare(password, hashedPassword, (err, isMatch) => {
       if (err) {
-        console.error('Erro ao excluir livros favoritos do usuário:', err);
-        return res.status(500).json({ success: false, message: 'Erro ao excluir livros favoritos do usuário.' });
+        console.error('Erro ao comparar senhas:', err);
+        return res.status(500).json({ success: false, message: 'Erro ao verificar senha.' });
       }
 
-      // Excluir os livros do usuário
-      db.query('DELETE FROM livros WHERE user_id = ?', [userId], (err, results) => {
+      if (!isMatch) {
+        return res.status(401).json({ success: false, message: 'Senha incorreta.' });
+      }
+
+      // Excluir os livros favoritos do usuário
+      db.query('DELETE FROM favoritos WHERE user_id = ?', [userId], (err, results) => {
         if (err) {
-          console.error('Erro ao excluir livros do usuário:', err);
-          return res.status(500).json({ success: false, message: 'Erro ao excluir livros do usuário.' });
+          console.error('Erro ao excluir livros favoritos do usuário:', err);
+          return res.status(500).json({ success: false, message: 'Erro ao excluir livros favoritos do usuário.' });
         }
 
-        // Excluir o usuário
-        db.query('DELETE FROM users WHERE id = ?', [userId], (err, results) => {
+        // Excluir os livros do usuário
+        db.query('DELETE FROM livros WHERE user_id = ?', [userId], (err, results) => {
           if (err) {
-            console.error('Erro ao excluir conta do usuário:', err);
-            return res.status(500).json({ success: false, message: 'Erro ao excluir conta do usuário.' });
+            console.error('Erro ao excluir livros do usuário:', err);
+            return res.status(500).json({ success: false, message: 'Erro ao excluir livros do usuário.' });
           }
 
-          // Enviar email de confirmação
-          enviarEmailComTemplate(email, 'Sua conta foi deletada', 'templateContaDeletada', { nome: name });
-
-          // Destruir a sessão do usuário
-          req.session.destroy((err) => {
+          // Excluir o usuário
+          db.query('DELETE FROM users WHERE id = ?', [userId], (err, results) => {
             if (err) {
-              console.error('Erro ao destruir sessão:', err);
-              return res.status(500).json({ success: false, message: 'Erro ao destruir sessão.' });
+              console.error('Erro ao excluir conta do usuário:', err);
+              return res.status(500).json({ success: false, message: 'Erro ao excluir conta do usuário.' });
             }
 
-            res.status(200).json({ success: true, message: 'Conta deletada com sucesso.' });
+            // Enviar email de confirmação
+            enviarEmailComTemplate(email, 'Sua conta foi deletada', 'templateContaDeletada', { nome: name });
+
+            // Destruir a sessão do usuário
+            req.session.destroy((err) => {
+              if (err) {
+                console.error('Erro ao destruir sessão:', err);
+                return res.status(500).json({ success: false, message: 'Erro ao destruir sessão.' });
+              }
+
+              res.status(200).json({ success: true, message: 'Conta deletada com sucesso.' });
+            });
           });
         });
       });
     });
   });
 });
+
 // Rota para logout
 app.get('/logout', (req, res) => {
   req.session.destroy((err) => {
@@ -483,7 +495,7 @@ app.get('/some-route', (req, res) => {
   res.redirect('/privacy-policy');
 });
 
-// API Google Books
+// Rota para adicionar um livro à biblioteca
 app.post('/add-book', isAuthenticated, (req, res) => {
   const { googleBooksId, title, author, imageUrl } = req.body;
   const userId = req.session.userId;
@@ -498,29 +510,42 @@ app.post('/add-book', isAuthenticated, (req, res) => {
     return res.status(400).json({ success: false, message: 'ID do Google Books, título, autor e imagem são obrigatórios' });
   }
 
-  // Verificar se o livro já existe na biblioteca do usuário
-  const checkSql = 'SELECT * FROM livros WHERE google_books_id = ? AND user_id = ?';
-  db.query(checkSql, [googleBooksId, userId], (err, results) => {
+  // Verificar se o livro já está nos favoritos
+  const checkFavoriteSql = 'SELECT * FROM favoritos WHERE user_id = ? AND google_books_id = ?';
+  db.query(checkFavoriteSql, [userId, googleBooksId], (err, results) => {
     if (err) {
-      console.error('Erro ao verificar a duplicidade do livro:', err);
-      return res.status(500).json({ success: false, message: 'Erro ao verificar a duplicidade do livro' });
+      console.error('Erro ao verificar os favoritos:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao verificar os favoritos' });
     }
 
     if (results.length > 0) {
-      // Se o livro já existe, retorna uma mensagem de erro
-      console.error('Erro: Livro já existe na biblioteca');
-      return res.status(409).json({ success: false, message: 'Livro já existe na biblioteca' });
+      return res.status(409).json({ success: false, message: 'Livro já está nos favoritos' });
     }
 
-    // Caso contrário, insere o livro
-    const sql = 'INSERT INTO livros (google_books_id, titulo, autor, imagem, user_id, data_adicao) VALUES (?, ?, ?, ?, ?, NOW())';
-    db.query(sql, [googleBooksId, title, author, imageUrl, userId], (err, result) => {
+    // Verificar se o livro já está na biblioteca
+    const checkLibrarySql = 'SELECT * FROM livros WHERE google_books_id = ? AND user_id = ?';
+    db.query(checkLibrarySql, [googleBooksId, userId], (err, results) => {
       if (err) {
-        console.error('Erro ao adicionar o livro:', err);
-        return res.status(500).json({ success: false, message: 'Erro ao adicionar o livro' });
+        console.error('Erro ao verificar a duplicidade do livro:', err);
+        return res.status(500).json({ success: false, message: 'Erro ao verificar a duplicidade do livro' });
       }
-      console.log('Livro adicionado com sucesso:', result);
-      res.status(201).json({ success: true, message: 'Livro adicionado com sucesso' });
+
+      if (results.length > 0) {
+        // Se o livro já existe, retorna uma mensagem de erro
+        console.error('Erro: Livro já existe na biblioteca');
+        return res.status(409).json({ success: false, message: 'Livro já existe na biblioteca' });
+      }
+
+      // Caso contrário, insere o livro
+      const sql = 'INSERT INTO livros (google_books_id, titulo, autor, imagem, user_id, data_adicao) VALUES (?, ?, ?, ?, ?, NOW())';
+      db.query(sql, [googleBooksId, title, author, imageUrl, userId], (err, result) => {
+        if (err) {
+          console.error('Erro ao adicionar o livro:', err);
+          return res.status(500).json({ success: false, message: 'Erro ao adicionar o livro' });
+        }
+        console.log('Livro adicionado com sucesso:', result);
+        res.status(201).json({ success: true, message: 'Livro adicionado com sucesso' });
+      });
     });
   });
 });
@@ -677,7 +702,7 @@ app.post('/alterar-senha', (req, res) => {
       });
     });
     const { email, name } = user;
-    enviarEmailComTemplate(email,'Senha alterada com sucesso', 'templateSenhaAlterada', { name });
+    enviarEmailComTemplate(email, 'Senha alterada com sucesso', 'templateSenhaAlterada', { name });
   });
 });
 
@@ -727,49 +752,65 @@ app.get('/favorites', isAuthenticated, (req, res) => {
 
 // Rota para adicionar um livro aos favoritos
 app.post('/add-favorite', isAuthenticated, (req, res) => {
-    const { title, author, imageUrl } = req.body;
-    const userId = req.session.userId;
+  const { googleBooksId, title, author, imageUrl } = req.body;
+  const userId = req.session.userId;
+
+  // Verificar se o livro já está na biblioteca
+  const checkLibrarySql = 'SELECT * FROM livros WHERE user_id = ? AND google_books_id = ?';
+  db.query(checkLibrarySql, [userId, googleBooksId], (err, results) => {
+    if (err) {
+      console.error('Erro ao verificar a biblioteca:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao verificar a biblioteca' });
+    }
+
+    if (results.length > 0) {
+      return res.status(409).json({ success: false, message: 'Livro já está na biblioteca' });
+    }
 
     // Verificar se o livro já está nos favoritos
-    const checkFavoriteSql = 'SELECT * FROM favoritos WHERE user_id = ? AND titulo = ?';
-    db.query(checkFavoriteSql, [userId, title], (err, results) => {
+    const checkFavoriteSql = 'SELECT * FROM favoritos WHERE user_id = ? AND google_books_id = ?';
+    db.query(checkFavoriteSql, [userId, googleBooksId], (err, results) => {
+      if (err) {
+        console.error('Erro ao verificar os favoritos:', err);
+        return res.status(500).json({ success: false, message: 'Erro ao verificar os favoritos' });
+      }
+
+      if (results.length > 0) {
+        return res.status(409).json({ success: false, message: 'Livro já está nos favoritos' });
+      }
+
+      // Adicionar o livro aos favoritos
+      const addFavoriteSql = 'INSERT INTO favoritos (google_books_id, titulo, autor, imagem, user_id) VALUES (?, ?, ?, ?, ?)';
+      db.query(addFavoriteSql, [googleBooksId, title, author, imageUrl, userId], (err, result) => {
         if (err) {
-            console.error('Erro ao verificar livro nos favoritos:', err);
-            return res.status(500).json({ success: false, message: 'Erro ao verificar livro nos favoritos.' });
+          console.error('Erro ao adicionar o livro aos favoritos:', err);
+          return res.status(500).json({ success: false, message: 'Erro ao adicionar o livro aos favoritos' });
         }
 
-        if (results.length > 0) {
-            return res.json({ success: false, message: 'Livro já está nos favoritos' });
-        }
-
-        // Verificar se o livro já está na biblioteca
-        const checkLibrarySql = 'SELECT * FROM livros WHERE user_id = ? AND titulo = ?';
-        db.query(checkLibrarySql, [userId, title], (err, results) => {
-            if (err) {
-                if (err.code === 'ER_NO_SUCH_TABLE') {
-                    console.error('Erro ao verificar livro na biblioteca:', err);
-                    return res.status(500).json({ success: false, message: 'A tabela de biblioteca não existe. Por favor, contate o suporte.' });
-                }
-                console.error('Erro ao verificar livro na biblioteca:', err);
-                return res.status(500).json({ success: false, message: 'Erro ao verificar livro na biblioteca.' });
-            }
-
-            if (results.length > 0) {
-                return res.json({ success: false, message: 'Livro já está na biblioteca' });
-            }
-
-            // Adicionar livro aos favoritos
-            const addFavoriteSql = 'INSERT INTO favoritos (user_id, titulo, autor, imagem) VALUES (?, ?, ?, ?)';
-            db.query(addFavoriteSql, [userId, title, author, imageUrl], (err, results) => {
-                if (err) {
-                    console.error('Erro ao adicionar livro aos favoritos:', err);
-                    return res.status(500).json({ success: false, message: 'Erro ao adicionar livro aos favoritos.' });
-                }
-
-                res.json({ success: true, message: 'Livro adicionado aos favoritos com sucesso.' });
-            });
-        });
+        res.status(201).json({ success: true, message: 'Livro adicionado aos favoritos com sucesso' });
+      });
     });
+  });
+});
+
+// Rota para remover um livro dos favoritos
+app.delete('/remove-favorite/:id', isAuthenticated, (req, res) => {
+  const bookId = req.params.id;
+  const userId = req.session.userId;
+
+  const deleteFavoriteSql = 'DELETE FROM favoritos WHERE id = ? AND user_id = ?';
+  db.query(deleteFavoriteSql, [bookId, userId], (err, results) => {
+    if (err) {
+      console.error('Erro ao deletar livro dos favoritos:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao deletar livro dos favoritos.' });
+    }
+
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Livro não encontrado nos favoritos.' });
+    }
+
+    res.json({ success: true, message: 'Livro deletado dos favoritos com sucesso.' });
+  });
 });
 
 app.get('/catalog', isAuthenticated, (req, res) => {

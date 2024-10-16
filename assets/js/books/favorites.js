@@ -40,7 +40,7 @@ function deleteFavorite(bookId, bookElement) {
             } else {
                 Swal.fire(
                     'Erro!',
-                    'Erro ao deletar o livro favorito.',
+                    data.message || 'Erro ao deletar o livro favorito.',
                     'error'
                 );
             }
