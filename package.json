@@ -20,7 +20,7 @@
     "express": "^4.21.0",
     "express-handlebars": "^8.0.1",
     "express-mysql-session": "^3.0.3",
-    "express-session": "^1.18.0",
+    "express-session": "^1.18.1",
     "googleapis": "^144.0.0",
     "hbs": "^4.2.0",
     "morgan": "^1.10.0",
