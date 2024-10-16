@@ -1,13 +1,22 @@
-// updateProfile.js
-
 document.addEventListener('DOMContentLoaded', function () {
   const form = document.getElementById('form');
-  const saveButton = document.getElementById('save-edit');
+  const phoneInput = document.getElementById('phone');
 
   // Adiciona um listener de evento de submit ao formulário
   form.addEventListener('submit', function (e) {
     e.preventDefault(); // Evita o envio padrão do formulário
 
+    // Valida o número de telefone
+    const phoneValue = phoneInput.value;
+    if (phoneValue.length < 9 || phoneValue.length > 11) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Número de telefone inválido',
+        text: 'O número de telefone deve ter entre 9 e 11 dígitos.',
+        confirmButtonText: 'OK'
+      });
+      return; // Impede o envio do formulário
+    }
     // Obtém os dados do formulário
     const formData = new FormData(form);
 
@@ -75,6 +84,11 @@ document.addEventListener('DOMContentLoaded', function () {
     .catch(error => {
       console.error('Erro ao carregar os dados do usuário:', error);
     });
+
+  // Adiciona um listener de evento de input ao campo de telefone para aceitar somente números
+  phoneInput.addEventListener('input', function () {
+    phoneInput.value = phoneInput.value.replace(/\D/g, '');
+  });
 });
 
 function cancelEdit() {
