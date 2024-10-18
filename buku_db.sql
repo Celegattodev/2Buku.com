@@ -8,7 +8,7 @@ CREATE TABLE `favoritos` (
   `autor` varchar(255) NOT NULL,
   `imagem` varchar(255) NOT NULL,
   `google_books_id` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) 
 
 CREATE TABLE `livros` (
   `id` int(11) NOT NULL,
@@ -18,7 +18,28 @@ CREATE TABLE `livros` (
   `imagem` varchar(255) DEFAULT NULL,
   `google_books_id` varchar(255) DEFAULT NULL,
   `data_adicao` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) 
+
+CREATE TABLE `livro_imagens` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `livro_id` int(11) NOT NULL,
+  `imagem_url` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `livro_id` (`livro_id`),
+  CONSTRAINT `livro_imagens_ibfk_1` FOREIGN KEY (`livro_id`) REFERENCES `livros` (`id`) ON DELETE CASCADE
+);
+
+CREATE TABLE `livro_imagens` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `livro_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `imagem_url` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `livro_id` (`livro_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `livro_imagens_ibfk_1` FOREIGN KEY (`livro_id`) REFERENCES `livros` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `livro_imagens_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+);
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
@@ -31,7 +52,7 @@ CREATE TABLE `users` (
   `biography` text DEFAULT NULL,
   `reset_token` varchar(255) DEFAULT NULL,
   `token_expiry` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) 
 
 ALTER TABLE `favoritos`
   ADD PRIMARY KEY (`id`),
@@ -44,6 +65,7 @@ ALTER TABLE `livros`
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`);
+
 
 ALTER TABLE `favoritos`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
@@ -59,5 +81,3 @@ ALTER TABLE `favoritos`
 
 ALTER TABLE `livros`
   ADD CONSTRAINT `livros_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
-COMMIT;

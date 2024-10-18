@@ -36,7 +36,7 @@ function displayBooks(books) {
                         <h5 class="card-title">${bookInfo.title}</h5>
                         <p class="card-text">Autor: ${bookInfo.authors?.join(', ') || 'Desconhecido'}</p>
                         <button class="btn btn-info" onclick="showBookDetails('${book.id}')">Ver Detalhes</button>
-                        <button class="btn btn-success" onclick="addToLibrary('${book.id}', '${bookInfo.title}', '${bookInfo.authors?.join(', ')}', '${imageUrl}')">Adicionar à Biblioteca</button>
+                        <button class="btn btn-success" onclick="promptForImages('${book.id}', '${bookInfo.title}', '${bookInfo.authors?.join(', ')}', '${imageUrl}')">Adicionar à Biblioteca</button>
                         <button class="btn btn-warning text-white" onclick="addToFavorites('${book.id}', '${bookInfo.title}', '${bookInfo.authors?.join(', ')}', '${imageUrl}')">Adicionar aos Favoritos</button>
                     </div>
                 </div>
@@ -58,15 +58,15 @@ function showBookDetails(bookId) {
                     translateGenres(bookInfo.categories),
                     translateText(bookInfo.description)
                 ])
-                .then(([translatedGenres, translatedDescription]) => {
-                    bookInfo.categories = translatedGenres;
-                    bookInfo.description = translatedDescription;
-                    displayBookDetails(bookInfo);
-                })
-                .catch(error => {
-                    console.error('Erro ao traduzir gêneros ou sinopse:', error);
-                    displayBookDetails(bookInfo);
-                });
+                    .then(([translatedGenres, translatedDescription]) => {
+                        bookInfo.categories = translatedGenres;
+                        bookInfo.description = translatedDescription;
+                        displayBookDetails(bookInfo);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao traduzir gêneros ou sinopse:', error);
+                        displayBookDetails(bookInfo);
+                    });
             }
         })
         .catch(error => console.error('Erro ao buscar detalhes do livro:', error));
@@ -93,15 +93,15 @@ function fetchOpenLibraryDetails(title) {
                     translateGenres(bookDetails.categories),
                     translateText(bookDetails.description)
                 ])
-                .then(([translatedGenres, translatedDescription]) => {
-                    bookDetails.categories = translatedGenres;
-                    bookDetails.description = translatedDescription;
-                    displayBookDetails(bookDetails);
-                })
-                .catch(error => {
-                    console.error('Erro ao traduzir gêneros ou sinopse:', error);
-                    displayBookDetails(bookDetails);
-                });
+                    .then(([translatedGenres, translatedDescription]) => {
+                        bookDetails.categories = translatedGenres;
+                        bookDetails.description = translatedDescription;
+                        displayBookDetails(bookDetails);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao traduzir gêneros ou sinopse:', error);
+                        displayBookDetails(bookDetails);
+                    });
             } else {
                 alert('Informações adicionais não encontradas.');
             }
@@ -193,51 +193,105 @@ function formatDate(date) {
     return `${day || '01'}/${month || '01'}/${year}`;
 }
 
-function addToLibrary(googleBooksId, title, author, imageUrl) {
-    fetch('/add-book', {
+function promptForImages(googleBooksId, title, author, imageUrl) {
+    Swal.fire({
+        title: 'Anexar imagens do estado do livro',
+        html: `
+            <input type="file" id="bookImages" name="bookImages" class="form-control" accept="image/*" multiple required>
+            <p class="mt-2">Mínimo 3, máximo 8 imagens.</p>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Adicionar à Biblioteca',
+        preConfirm: () => {
+            const bookImages = document.getElementById('bookImages').files;
+            if (bookImages.length < 3 || bookImages.length > 8) {
+                Swal.showValidationMessage('Você deve anexar entre 3 e 8 imagens do estado do livro.');
+                return false;
+            }
+            return bookImages;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            addToLibrary(googleBooksId, title, author, imageUrl, result.value);
+        }
+    });
+}
+
+function addToLibrary(googleBooksId, title, author, imageUrl, bookImages) {
+    const formData = new FormData();
+    formData.append('googleBooksId', googleBooksId);
+    formData.append('title', title);
+    formData.append('author', author);
+    formData.append('imageUrl', imageUrl);
+
+    for (let i = 0; i < bookImages.length; i++) {
+        formData.append('bookImages', bookImages[i]);
+    }
+
+    // Primeiro, verificar se o livro já existe na biblioteca ou nos favoritos
+    fetch('/check-book', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ googleBooksId, title, author, imageUrl })
+        body: JSON.stringify({ googleBooksId })
     })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                Swal.fire({
-                    title: 'Sucesso!',
-                    text: 'Livro adicionado com sucesso!',
-                    icon: 'success',
-                    confirmButtonText: 'Ok'
-                });
-            } else if (data.message === 'Livro já existe na biblioteca') {
+                // Se o livro não existir, prosseguir com o upload das imagens e adicionar o livro
+                fetch('/add-book', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Sucesso!',
+                                text: 'Livro adicionado com sucesso!',
+                                icon: 'success',
+                                confirmButtonText: 'Ok'
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Erro!',
+                                text: data.message || 'Erro ao adicionar o livro.',
+                                icon: 'error',
+                                confirmButtonText: 'Ok'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao adicionar o livro:', error);
+                        Swal.fire({
+                            title: 'Erro!',
+                            text: 'Erro ao adicionar o livro.',
+                            icon: 'error',
+                            confirmButtonText: 'Ok'
+                        });
+                    });
+            } else if (data.message === 'Livro já existe na biblioteca' || data.message === 'Livro já está nos favoritos') {
                 Swal.fire({
                     title: 'Atenção!',
-                    text: 'Este livro já está na sua biblioteca.',
-                    icon: 'info',
-                    confirmButtonText: 'Ok'
-                });
-            } else if (data.message === 'Livro já está nos favoritos') {
-                Swal.fire({
-                    title: 'Atenção!',
-                    text: 'Este livro já está nos seus favoritos. Remova-o dos favoritos antes de adicioná-lo à biblioteca.',
+                    text: 'Este livro já existe na sua biblioteca ou nos seus favoritos.',
                     icon: 'info',
                     confirmButtonText: 'Ok'
                 });
             } else {
                 Swal.fire({
                     title: 'Erro!',
-                    text: 'Erro ao adicionar o livro.',
+                    text: data.message || 'Erro ao verificar a duplicidade do livro.',
                     icon: 'error',
                     confirmButtonText: 'Ok'
                 });
             }
         })
         .catch(error => {
-            console.error('Erro ao adicionar o livro:', error);
+            console.error('Erro ao verificar a duplicidade do livro:', error);
             Swal.fire({
                 title: 'Erro!',
-                text: 'Erro ao adicionar o livro.',
+                text: 'Erro ao verificar a duplicidade do livro.',
                 icon: 'error',
                 confirmButtonText: 'Ok'
             });
@@ -261,24 +315,17 @@ function addToFavorites(googleBooksId, title, author, imageUrl) {
                     icon: 'success',
                     confirmButtonText: 'Ok'
                 });
-            } else if (data.message === 'Livro já está nos favoritos') {
+            } else if (data.message === 'Livro já está nos favoritos' || data.message === 'Livro já está na biblioteca') {
                 Swal.fire({
                     title: 'Atenção!',
-                    text: 'Este livro já está nos seus favoritos.',
-                    icon: 'info',
-                    confirmButtonText: 'Ok'
-                });
-            } else if (data.message === 'Livro já está na biblioteca') {
-                Swal.fire({
-                    title: 'Atenção!',
-                    text: 'Este livro já está na sua biblioteca. Remova-o da biblioteca antes de adicioná-lo aos favoritos.',
+                    text: 'Este livro já está na sua biblioteca ou nos seus favoritos.',
                     icon: 'info',
                     confirmButtonText: 'Ok'
                 });
             } else {
                 Swal.fire({
                     title: 'Erro!',
-                    text: 'Erro ao adicionar o livro aos favoritos.',
+                    text: data.message || 'Erro ao adicionar o livro aos favoritos.',
                     icon: 'error',
                     confirmButtonText: 'Ok'
                 });

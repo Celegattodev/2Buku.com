@@ -13,7 +13,16 @@ const app = express();
 const saltRounds = 10; // Número de rounds para bcrypt
 const ejs = require('ejs');
 const { enviarEmailComTemplate } = require("./email/emailService");
+const multer = require('multer');
+const sharp = require('sharp');
+const cloudinary = require('cloudinary').v2;
 
+// Configuração do Cloudinary
+cloudinary.config({
+  cloud_name: 'deyhmso1q',
+  api_key: '381135375669254',
+  api_secret: 'uK5-DsaLjd5AfIH3w4_VdjyuBl0'
+});
 
 // Gera uma chave secreta aleatória para a sessão
 const generateSecret = () => {
@@ -490,61 +499,139 @@ app.get('/privacy-policy', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'privacy-policy.html'));
 });
 
-// Exemplo de redirecionamento para a página de política de privacidade
 app.get('/some-route', (req, res) => {
   res.redirect('/privacy-policy');
 });
 
-// Rota para adicionar um livro à biblioteca
-app.post('/add-book', isAuthenticated, (req, res) => {
-  const { googleBooksId, title, author, imageUrl } = req.body;
+// Verificar se o livro já existe na biblioteca
+app.post('/check-book', isAuthenticated, (req, res) => {
+  const { googleBooksId } = req.body;
   const userId = req.session.userId;
 
   if (!userId) {
-    console.error('Erro: Usuário não autenticado');
     return res.status(401).json({ success: false, message: 'Usuário não autenticado' });
   }
 
-  if (!googleBooksId || !title || !author || !imageUrl) {
-    console.error('Erro: ID do Google Books, título, autor e imagem são obrigatórios');
-    return res.status(400).json({ success: false, message: 'ID do Google Books, título, autor e imagem são obrigatórios' });
-  }
-
-  // Verificar se o livro já está nos favoritos
-  const checkFavoriteSql = 'SELECT * FROM favoritos WHERE user_id = ? AND google_books_id = ?';
-  db.query(checkFavoriteSql, [userId, googleBooksId], (err, results) => {
+  const checkLibrarySql = 'SELECT * FROM livros WHERE google_books_id = ? AND user_id = ?';
+  db.query(checkLibrarySql, [googleBooksId, userId], (err, results) => {
     if (err) {
-      console.error('Erro ao verificar os favoritos:', err);
-      return res.status(500).json({ success: false, message: 'Erro ao verificar os favoritos' });
+      return res.status(500).json({ success: false, message: 'Erro ao verificar a duplicidade do livro' });
     }
 
     if (results.length > 0) {
-      return res.status(409).json({ success: false, message: 'Livro já está nos favoritos' });
+      return res.status(409).json({ success: false, message: 'Livro já existe na biblioteca' });
     }
 
-    // Verificar se o livro já está na biblioteca
-    const checkLibrarySql = 'SELECT * FROM livros WHERE google_books_id = ? AND user_id = ?';
-    db.query(checkLibrarySql, [googleBooksId, userId], (err, results) => {
+    res.status(200).json({ success: true, message: 'Livro não existe na biblioteca' });
+  });
+});
+
+// Configuração do multer para armazenar as imagens
+const storage = multer.memoryStorage(); // Armazenar as imagens na memória temporariamente
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // Limite de 5MB por arquivo
+  fileFilter: (req, file, cb) => {
+    const filetypes = /jpeg|jpg|png/;
+    const mimetype = filetypes.test(file.mimetype);
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Apenas arquivos de imagem são permitidos!'));
+    }
+  }
+}).array('bookImages', 8); // Limite de 8 imagens
+
+// Rota para adicionar um livro à biblioteca
+app.post('/add-book', isAuthenticated, (req, res) => {
+  upload(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ success: false, message: err.message });
+    }
+
+    const { googleBooksId, title, author, imageUrl } = req.body;
+    const userId = req.session.userId;
+
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Usuário não autenticado' });
+    }
+
+    if (!googleBooksId || !title || !author || !imageUrl) {
+      return res.status(400).json({ success: false, message: 'ID do Google Books, título, autor e imagem são obrigatórios' });
+    }
+
+    if (!req.files || req.files.length < 3) {
+      return res.status(400).json({ success: false, message: 'É necessário anexar pelo menos 3 imagens do estado do livro' });
+    }
+
+    // Verificar se o livro já está nos favoritos
+    const checkFavoriteSql = 'SELECT * FROM favoritos WHERE google_books_id = ? AND user_id = ?';
+    db.query(checkFavoriteSql, [googleBooksId, userId], (err, results) => {
       if (err) {
-        console.error('Erro ao verificar a duplicidade do livro:', err);
-        return res.status(500).json({ success: false, message: 'Erro ao verificar a duplicidade do livro' });
+        return res.status(500).json({ success: false, message: 'Erro ao verificar os favoritos' });
       }
 
       if (results.length > 0) {
-        // Se o livro já existe, retorna uma mensagem de erro
-        console.error('Erro: Livro já existe na biblioteca');
-        return res.status(409).json({ success: false, message: 'Livro já existe na biblioteca' });
+        return res.status(409).json({ success: false, message: 'Livro já está nos favoritos' });
       }
 
-      // Caso contrário, insere o livro
-      const sql = 'INSERT INTO livros (google_books_id, titulo, autor, imagem, user_id, data_adicao) VALUES (?, ?, ?, ?, ?, NOW())';
-      db.query(sql, [googleBooksId, title, author, imageUrl, userId], (err, result) => {
+      // Verificar se o livro já está na biblioteca
+      const checkLibrarySql = 'SELECT * FROM livros WHERE google_books_id = ? AND user_id = ?';
+      db.query(checkLibrarySql, [googleBooksId, userId], async (err, results) => {
         if (err) {
-          console.error('Erro ao adicionar o livro:', err);
-          return res.status(500).json({ success: false, message: 'Erro ao adicionar o livro' });
+          return res.status(500).json({ success: false, message: 'Erro ao verificar a duplicidade do livro' });
         }
-        console.log('Livro adicionado com sucesso:', result);
-        res.status(201).json({ success: true, message: 'Livro adicionado com sucesso' });
+
+        if (results.length > 0) {
+          return res.status(409).json({ success: false, message: 'Livro já existe na biblioteca' });
+        }
+
+        const sql = 'INSERT INTO livros (google_books_id, titulo, autor, imagem, user_id, data_adicao) VALUES (?, ?, ?, ?, ?, NOW())';
+        db.query(sql, [googleBooksId, title, author, imageUrl, userId], async (err, result) => {
+          if (err) {
+            return res.status(500).json({ success: false, message: 'Erro ao adicionar o livro' });
+          }
+
+          const livroId = result.insertId;
+          const imageUrls = [];
+
+          try {
+            for (const file of req.files) {
+              // Redimensionar a imagem usando sharp
+              const buffer = await sharp(file.buffer)
+                .resize(800, 800, { fit: 'inside' }) // Redimensionar para 800x800 sem perder a qualidade
+                .toBuffer();
+
+              const uploadResult = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
+                  if (error) {
+                    reject(error);
+                  } else {
+                    resolve(result);
+                  }
+                });
+                uploadStream.end(buffer);
+              });
+              imageUrls.push(uploadResult.secure_url);
+            }
+          } catch (error) {
+            return res.status(500).json({ success: false, message: 'Erro ao fazer upload das imagens' });
+          }
+
+          const imageSql = 'INSERT INTO livro_imagens (livro_id, user_id, imagem_url) VALUES ?';
+          const imageValues = imageUrls.map(url => [livroId, userId, url]);
+
+          db.query(imageSql, [imageValues], (err) => {
+            if (err) {
+              return res.status(500).json({ success: false, message: 'Erro ao salvar as imagens do livro' });
+            }
+
+            res.status(201).json({ success: true, message: 'Livro adicionado com sucesso' });
+          });
+        });
       });
     });
   });
@@ -567,6 +654,46 @@ app.delete('/delete-book/:id', (req, res) => {
 
     res.status(200).json({ success: true, message: 'Livro deletado com sucesso.' });
   });
+});
+
+// Detalhes do livro com a descrição e imagens
+app.get('/book-details/:bookId', isAuthenticated, async (req, res) => {
+  const bookId = req.params.bookId;
+  const userId = req.session.userId;
+
+  try {
+    const bookSql = 'SELECT * FROM livros WHERE id = ? AND user_id = ?';
+    const [bookResults] = await db.promise().query(bookSql, [bookId, userId]);
+
+    if (bookResults.length === 0) {
+      return res.status(404).json({ success: false, message: 'Livro não encontrado' });
+    }
+
+    const book = bookResults[0];
+
+    // Buscar a descrição do livro usando a Google Books API
+    const googleBooksId = book.google_books_id;
+    const googleBooksUrl = `https://www.googleapis.com/books/v1/volumes/${googleBooksId}`;
+    const googleBooksResponse = await axios.get(googleBooksUrl);
+    const bookDescription = googleBooksResponse.data.volumeInfo.description || 'Descrição não disponível';
+
+    const imagesSql = 'SELECT imagem_url FROM livro_imagens WHERE livro_id = ?';
+    const [imageResults] = await db.promise().query(imagesSql, [bookId]);
+
+    const images = imageResults.map(row => row.imagem_url);
+
+    res.status(200).json({
+      success: true,
+      book: {
+        description: bookDescription,
+        coverImage: book.imagem, // Imagem de capa separada
+        images: images // Apenas imagens adicionais
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Erro ao carregar os detalhes do livro' });
+  }
 });
 
 // Rota para a página de esqueci a senha
