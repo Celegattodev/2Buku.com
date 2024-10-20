@@ -1,24 +1,37 @@
+const ejs = require('ejs');
+const path = require('path');
 const nodemailer = require('nodemailer');
 
-// Configura o transportador de email
-const transporter = nodemailer.createTransport({
+let transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'buku.livro@gmail.com',
-    pass: 'Buku@2024'
+    pass: 'sdmj lybh fcrf nqyd'
   }
 });
 
-// Função para enviar email de notificação
-const enviarEmailNotificacao = (to, subject, text) => {
-  const mailOptions = {
-    from: 'buku.livro@gmail.com',
-    to,
-    subject,
-    text
-  };
+const enviarEmailComTemplate = (to, subject, templateName, templateData) => {
+  ejs.renderFile(path.join(__dirname, '..', 'views', `${templateName}.ejs`), templateData, (err, html) => {
+    if (err) {
+      console.error('Erro ao renderizar o template EJS:', err);
+      return;
+    }
 
-  return transporter.sendMail(mailOptions);
+    const mailOptions = {
+      from: '"Buku 📚"<buku.livro@gmail.com>',
+      to: to,
+      subject: subject,
+      html: html
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Erro ao enviar email:', error);
+      } else {
+        console.log('Email enviado:', info.response);
+      }
+    });
+  });
 };
 
-module.exports = { enviarEmailNotificacao };
+module.exports = { enviarEmailComTemplate };

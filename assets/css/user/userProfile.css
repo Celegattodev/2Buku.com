@@ -54,7 +54,7 @@ body {
 /*--------------BOTÕES-------------*/
 #buttons-div {
   margin-top: 20px;
-  
+
 }
 
 .btn {
@@ -442,14 +442,16 @@ body {
 
 .book-item {
   position: relative;
-  width: 100px; 
-  height: 10px; 
+  width: 100px;
+  height: 10px;
 }
 
 .delete-icon {
   position: absolute;
-  top: 8px; /* Mantém a mesma posição vertical */
-  left: 220px;
+  top: 10px;
+  /* Mantém a mesma posição vertical */
+  right: 10px;
+  /* Posiciona no lado direito */
   color: #ff6b6b;
   font-size: 16px;
   cursor: pointer;
@@ -516,25 +518,24 @@ body {
 .swiper-container {
   width: 100%;
   height: auto;
-  padding: 20px 0;
+  padding: 20px;
   margin-bottom: 20px;
 }
 
+/* Adicione este CSS ao seu arquivo de estilos */
 .swiper-slide {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #f8f9fa;
-  border-radius: 10px;
-  margin: 0 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Garantir que o slide ocupe toda a altura do container */
 }
 
 .swiper-slide img {
-  max-width: 120px;
-  max-height: 180px;
-  margin-bottom: 10px;
-  border-radius: 5px;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Manter a proporção da imagem */
+    width: auto; /* Garantir que a imagem ocupe toda a largura do slide */
+    height: 100%; /* Manter a proporção da imagem */
 }
 
 .swiper-slide p {
@@ -544,13 +545,16 @@ body {
   text-align: center;
 }
 
-/*  */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #000;
+}
 
+/*  */
 
 h3 {
   font-weight: 600;
 }
-
 
 .swiper-button-next,
 .swiper-button-prev {
