@@ -435,7 +435,7 @@ app.delete('/delete-account', (req, res) => {
       }
 
       if (!isMatch) {
-        return res.status(401).json({ success: false, message: 'Senha incorreta.' });
+        return res.status(401).json({ success: false, message: 'A senha fornecida está incorreta. Por favor, tente novamente.' });
       }
 
       // Excluir os livros favoritos do usuário

@@ -188,12 +188,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         })
                             .then(response => {
                                 if (!response.ok) {
-                                    throw new Error(response.statusText);
+                                    throw new Error('Senha incorreta, tente novamente.');
                                 }
                                 return response.json();
                             })
                             .catch(error => {
-                                Swal.showValidationMessage(`Erro: ${error}`);
+                                Swal.showValidationMessage(`${error}`);
                             });
                     },
                     allowOutsideClick: () => !Swal.isLoading()
