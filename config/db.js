@@ -2,10 +2,10 @@ const mysql = require('mysql2');
 
 // Configuração do banco de dados
 const dbOptions = {
-    host: 'localhost',
-    user: 'root',
-    password: '', // Senha do MySQL (deixe em branco se não houver)
-    database: 'buku_db' // Nome do seu banco de dados
+    host: '35.247.214.162', // O IP ou nome do domínio do seu banco de dados no Google Cloud
+    user: 'enzo',      // Seu nome de usuário do banco de dados
+    password: 'Buku@2024',  // Sua senha do banco de dados
+    database: 'buku_db'        // Nome do seu banco de dados
 };
 
 const connection = mysql.createConnection(dbOptions);
