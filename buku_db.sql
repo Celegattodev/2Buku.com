@@ -19,28 +19,7 @@ CREATE TABLE `livros` (
   `google_books_id` varchar(255) DEFAULT NULL,
   `data_adicao` datetime DEFAULT current_timestamp()
 ) 
-
-CREATE TABLE `livro_imagens` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `livro_id` int(11) NOT NULL,
-  `imagem_url` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `livro_id` (`livro_id`),
-  CONSTRAINT `livro_imagens_ibfk_1` FOREIGN KEY (`livro_id`) REFERENCES `livros` (`id`) ON DELETE CASCADE
-);
-
-CREATE TABLE `livro_imagens` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `livro_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `imagem_url` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `livro_id` (`livro_id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `livro_imagens_ibfk_1` FOREIGN KEY (`livro_id`) REFERENCES `livros` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `livro_imagens_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-);
-
+  
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
@@ -81,3 +60,17 @@ ALTER TABLE `favoritos`
 
 ALTER TABLE `livros`
   ADD CONSTRAINT `livros_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+CREATE TABLE `livro_imagens` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `livro_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `imagem_url` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `livro_id` (`livro_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `livro_imagens_ibfk_1` FOREIGN KEY (`livro_id`) REFERENCES `livros` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `livro_imagens_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+);
+
+
