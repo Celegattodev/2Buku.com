@@ -3,8 +3,8 @@ const mysql = require('mysql2');
 // Configuração do banco de dados
 const dbOptions = {
     host: '35.247.214.162', // O IP ou nome do domínio do seu banco de dados no Google Cloud
-    user: 'enzo',      // Seu nome de usuário do banco de dados
-    password: 'Buku@2024',  // Sua senha do banco de dados
+    user: 'conexaoBanco',      // Seu nome de usuário do banco de dados
+    password: 'H]4zk#lf?>X9JTtM',  // Sua senha do banco de dados
     database: 'buku_db',   // Nome do seu banco de dados        
     connectTimeout: 10000 // 10 segundos
 };
