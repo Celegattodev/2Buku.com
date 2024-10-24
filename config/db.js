@@ -1,22 +1,12 @@
+require('dotenv').config();
+
 const mysql = require('mysql2');
 
-// Configuração do banco de dados
-const dbOptions = {
-    host: '35.247.214.162', // O IP ou nome do domínio do seu banco de dados no Google Cloud
-    user: 'conexaoBanco',      // Seu nome de usuário do banco de dados
-    password: 'H]4zk#lf?>X9JTtM',  // Sua senha do banco de dados
-    database: 'buku_db',   // Nome do seu banco de dados        
-    connectTimeout: 10000 // 10 segundos
-};
-
-const connection = mysql.createConnection(dbOptions);
-
-connection.connect(err => {
-    if (err) {
-        console.error('Erro ao conectar com o banco de dados:', err);
-        process.exit(1);
-    }
-    console.log('Conectado ao banco de dados MySQL.');
+const pool = mysql.createPool({
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE
 });
 
-module.exports = connection;
+module.exports = pool;
