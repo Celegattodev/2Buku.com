@@ -164,7 +164,7 @@ app.get('/profile', isAuthenticated, (req, res) => {
           }
 
           // Substituição de placeholders no HTML
-          const filePath = path.join(__dirname, 'views', 'UserProfile.html');
+          const filePath = path.join(__dirname, 'views', 'userProfile.html');
           fs.readFile(filePath, 'utf8', (err, data) => {
             if (err) {
               console.error(err);
