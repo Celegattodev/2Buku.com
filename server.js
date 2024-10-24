@@ -706,9 +706,8 @@ app.get('/alterar-senha', (req, res) => {
 });
 
 // Configuração da porta do servidor
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor ouvindo na porta http://localhost:${PORT}`);
+app.listen(3000, '0.0.0.0', () => {
+    console.log(`Servidor ouvindo na porta 3000`);
 });
 
 // Nodemailler 
