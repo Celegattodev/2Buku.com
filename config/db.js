@@ -1,22 +1,20 @@
 const mysql = require('mysql2');
 
-// Configuração do banco de dados
-const dbOptions = {
-    host: '35.247.214.162', // O IP ou nome do domínio do seu banco de dados no Google Cloud
-    user: 'conexaoBanco',      // Seu nome de usuário do banco de dados
-    password: 'H]4zk#lf?>X9JTtM',  // Sua senha do banco de dados
-    database: 'buku_db',   // Nome do seu banco de dados        
-    connectTimeout: 10000 // 10 segundos
-};
+// Crie a conexão
+const connection = mysql.createConnection({
+  host: 'localhost',       // ou o endereço do seu servidor
+  user: 'root',            // seu usuário do MySQL
+  password: 'Buku@2024',   // sua senha do MySQL
+  database: 'buku_db'      // o nome do seu banco de dados
+});
 
-const connection = mysql.createConnection(dbOptions);
-
-connection.connect(err => {
-    if (err) {
-        console.error('Erro ao conectar com o banco de dados:', err);
-        process.exit(1);
-    }
-    console.log('Conectado ao banco de dados MySQL.');
+// Conecte-se ao banco de dados
+connection.connect((err) => {
+  if (err) {
+    console.error('Erro ao conectar ao MySQL:', err);
+    return;
+  }
+  console.log('Conectado ao MySQL!');
 });
 
 module.exports = connection;
