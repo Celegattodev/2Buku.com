@@ -54,7 +54,7 @@ app.use(
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "", // Senha do MySQL
+  password: "Buku@2024", // Senha do MySQL
   database: "buku_db", // Nome do banco de dados
 });
 
