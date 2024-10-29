@@ -34,7 +34,10 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // Configura o diretório de arquivos estáticos
-app.use(express.static(path.join(__dirname, 'assets')));
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
+app.use('/js', express.static(path.join(__dirname, 'assets/js')));
+app.use('/img', express.static(path.join(__dirname, 'assets/img')));
+
 
 // Configura o middleware para parsing de corpo das requisições
 app.use(express.urlencoded({ extended: true }));
