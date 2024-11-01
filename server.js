@@ -34,7 +34,11 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // Configura o diretório de arquivos estáticos
-app.use(express.static(path.join(__dirname, "assets")));
+app.use(express.static(path.join(__dirname, 'assets')));
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
+app.use('/js', express.static(path.join(__dirname, 'assets/js')));
+app.use('/img', express.static(path.join(__dirname, 'assets/img')));
+
 
 // Configura o middleware para parsing de corpo das requisições
 app.use(express.urlencoded({ extended: true }));
@@ -54,7 +58,7 @@ app.use(
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "", // Senha do MySQL
+  password: "Buku@2024", // Senha do MySQL
   database: "buku_db", // Nome do banco de dados
 });
 
@@ -164,7 +168,7 @@ app.get('/profile', isAuthenticated, (req, res) => {
           }
 
           // Substituição de placeholders no HTML
-          const filePath = path.join(__dirname, 'views', 'UserProfile.html');
+          const filePath = path.join(__dirname, 'views', 'userProfile.html');
           fs.readFile(filePath, 'utf8', (err, data) => {
             if (err) {
               console.error(err);
