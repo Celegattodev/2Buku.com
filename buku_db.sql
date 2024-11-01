@@ -8,7 +8,7 @@ CREATE TABLE `favoritos` (
   `autor` varchar(255) NOT NULL,
   `imagem` varchar(255) NOT NULL,
   `google_books_id` varchar(255) NOT NULL
-) 
+); 
 
 CREATE TABLE `livros` (
   `id` int(11) NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE `livros` (
   `imagem` varchar(255) DEFAULT NULL,
   `google_books_id` varchar(255) DEFAULT NULL,
   `data_adicao` datetime DEFAULT current_timestamp()
-) 
+); 
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE `users` (
   `biography` text DEFAULT NULL,
   `reset_token` varchar(255) DEFAULT NULL,
   `token_expiry` datetime DEFAULT NULL
-) 
+); 
 
 ALTER TABLE `favoritos`
   ADD PRIMARY KEY (`id`),
