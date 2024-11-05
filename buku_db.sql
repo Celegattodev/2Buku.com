@@ -18,8 +18,8 @@ CREATE TABLE `livros` (
   `imagem` varchar(255) DEFAULT NULL,
   `google_books_id` varchar(255) DEFAULT NULL,
   `data_adicao` datetime DEFAULT current_timestamp()
-); 
-
+) 
+  
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
@@ -72,3 +72,5 @@ CREATE TABLE `livro_imagens` (
   CONSTRAINT `livro_imagens_ibfk_1` FOREIGN KEY (`livro_id`) REFERENCES `livros` (`id`) ON DELETE CASCADE,
   CONSTRAINT `livro_imagens_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 );
+
+
