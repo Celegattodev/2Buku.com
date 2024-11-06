@@ -373,3 +373,37 @@ function addToFavorites(book) {
             });
         });
 }
+async function searchBooks(event) {
+    event.preventDefault();
+  
+    const searchInput = document.getElementById('searchInput').value;
+    const bookResults = document.getElementById('bookResults');
+    bookResults.innerHTML = ''; // Limpa os resultados anteriores
+  
+    try {
+      const response = await fetch(`/search-books?q=${encodeURIComponent(searchInput)}`);
+      const data = await response.json();
+  
+      if (data.success) {
+        data.books.forEach(book => {
+          const bookElement = document.createElement('div');
+          bookElement.classList.add('col-md-4', 'mb-3');
+          bookElement.innerHTML = `
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">${book.titulo}</h5>
+                <p class="card-text">Autor: ${book.autor}</p>
+                <p class="card-text">Gênero: ${book.genero}</p>
+              </div>
+            </div>
+          `;
+          bookResults.appendChild(bookElement);
+        });
+      } else {
+        bookResults.innerHTML = '<p>Nenhum livro encontrado.</p>';
+      }
+    } catch (error) {
+      console.error('Erro ao buscar livros:', error);
+      bookResults.innerHTML = '<p>Erro ao buscar livros.</p>';
+    }
+  }

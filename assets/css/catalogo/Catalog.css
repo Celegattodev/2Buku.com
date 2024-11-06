@@ -22,6 +22,7 @@ h1, h2 {
   justify-content: center;
   align-items: center;
   position: relative;
+  margin-bottom: -80px;
 }
 
 .header-banner h1 {
@@ -262,47 +263,42 @@ h1, h2 {
   margin-bottom: 10px;
 }
 
-/*------------ Search bar ---------------*/
-/*------------ Search bar ---------------*/
-.search-bar {
-  width: 100%;
-  max-width: 600px;
-  margin: 20px auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
+/*------------ SEARCH ---------------*/
+.input-group {
+  border: 1px solid #ddd;
+  border-radius: 25px;
+  overflow: hidden;
+  /* Para evitar bordas em destaque */
 }
 
-.search-input {
-  width: 100%;
-  padding: 10px 20px;
-  border: 2px solid #fd9323;
-  border-radius: 20px;
-  font-size: 16px;
-  color: #343a40;
-  outline: none;
-  transition: border-color 0.3s ease;
-}
-
-.search-input:focus {
-  border-color: #ff6f61;
-}
-
-.search-button {
-  position: absolute;
-  right: 10px;
-  background-color: #ff6f61;
+.input-group .form-control {
   border: none;
-  padding: 10px 15px;
-  border-radius: 20px;
-  color: #fff;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  border-radius: 25px 0 0 25px;
 }
 
-.search-button:hover {
-  background-color: rgb(241, 80, 59);
+.input-group .form-control:focus {
+  box-shadow: none;
+}
+
+.btn-primary {
+  border-radius: 0 25px 25px 0;
+  background-color: #fd9323;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #e57e1f;
+}
+.search-container {
+  max-width: 800px; /* Ajuste a largura conforme necessário */
+  margin: 20px auto 0 auto; /* Ajuste a margem superior conforme necessário */
+}
+.card {
+  margin-bottom: 20px;
+}
+
+.card-body {
+  padding: 15px;
 }
 
 .button-container {

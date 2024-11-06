@@ -58,11 +58,17 @@
     <h1>Bem-vindo ao Catálogo Buku</h1>
   </div>
 
-  <!-- SEARCH BAR-->
-  <div class="search-bar">
-    <input type="text" class="search-input" placeholder="Pesquisar...">
-    <button class="search-button">Buscar</button>
-  </div>
+<!--SEARCH BAR-->
+<div class="container mt-5 search-container">
+  <form id="searchForm" class="mb-4" onsubmit="searchBooks(event)">
+      <div class="input-group">
+          <input type="text" id="searchInput" class="form-control" placeholder="Digite o nome do livro" required>
+          <button type="submit" class="btn btn-primary">Pesquisar</button>
+      </div>
+  </form>
+
+  <div id="bookResults" class="row"></div>
+</div>
 
   <!-- PRODUCT SLIDER 1 -->
   <section class="product">

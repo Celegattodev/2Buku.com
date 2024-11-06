@@ -1107,3 +1107,34 @@ app.post('/api/request-exchange', isAuthenticated, (req, res) => {
         });
     });
 });
+// Rota para buscar livros
+app.get('/search-books', async (req, res) => {
+  const searchQuery = req.query.q;
+
+  if (!searchQuery) {
+    return res.status(400).json({ success: false, message: 'Query de busca é obrigatória' });
+  }
+
+  try {
+    const response = await axios.get('https://www.googleapis.com/books/v1/volumes', {
+      params: {
+        q: searchQuery,
+        key: 'SUA_CHAVE_API_GOOGLE_BOOKS' // Substitua pela sua chave da API do Google Books
+      }
+    });
+
+    const books = response.data.items.map(item => {
+      const volumeInfo = item.volumeInfo;
+      return {
+        titulo: volumeInfo.title,
+        autor: volumeInfo.authors ? volumeInfo.authors.join(', ') : 'Autor desconhecido',
+        genero: volumeInfo.categories ? volumeInfo.categories.join(', ') : 'Gênero desconhecido'
+      };
+    });
+
+    res.json({ success: true, books });
+  } catch (error) {
+    console.error('Erro ao buscar livros:', error);
+    res.status(500).json({ success: false, message: 'Erro ao buscar livros' });
+  }
+});
