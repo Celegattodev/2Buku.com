@@ -261,3 +261,46 @@ h1, h2 {
   grid-column: span 2;
   margin-bottom: 10px;
 }
+
+/*------------ Search bar ---------------*/
+/*------------ Search bar ---------------*/
+.search-bar {
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 20px;
+  border: 2px solid #fd9323;
+  border-radius: 20px;
+  font-size: 16px;
+  color: #343a40;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #ff6f61;
+}
+
+.search-button {
+  position: absolute;
+  right: 10px;
+  background-color: #ff6f61;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 20px;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.search-button:hover {
+  background-color: rgb(241, 80, 59);
+}
