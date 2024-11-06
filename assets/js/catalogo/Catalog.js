@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
 async function createBookCard(book) {
     const bookCard = document.createElement('div');
     bookCard.classList.add('product-card');
+    bookCard.setAttribute('data-book-id', book.id); // Adiciona o ID do livro como atributo de dados
 
     const bookImage = document.createElement('div');
     bookImage.classList.add('product-image');
@@ -49,15 +50,6 @@ async function createBookCard(book) {
     img.src = book.imageUrl || '/img/default-book-image.jpg';
     img.classList.add('product-thumb');
     bookImage.appendChild(img);
-
-    const addButton = document.createElement('button');
-    addButton.classList.add('card-btn');
-    addButton.textContent = 'Adicionar aos Favoritos ♥';
-    addButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        addToFavorites(book);
-    });
-    bookImage.appendChild(addButton);
 
     bookCard.appendChild(bookImage);
 
@@ -85,11 +77,133 @@ async function createBookCard(book) {
         bookInfo.appendChild(genresContainer);
     }
 
-    bookCard.addEventListener('click', () => showBookDetails(book));
+    // Adicionar os botões abaixo dos gêneros
+    const buttonContainer = document.createElement('div');
+    buttonContainer.classList.add('button-container');
+
+    const addToFavoritesButton = document.createElement('button');
+    addToFavoritesButton.classList.add('btn', 'btn-primary', 'btn-sm');
+    addToFavoritesButton.textContent = 'Adicionar aos Favoritos ♥';
+    addToFavoritesButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        addToFavorites(book);
+    });
+
+    const viewDetailsButton = document.createElement('button');
+    viewDetailsButton.classList.add('btn', 'btn-secondary', 'btn-sm');
+    viewDetailsButton.textContent = 'Ver Detalhes';
+    viewDetailsButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        showBookDetails(book);
+    });
+
+    const requestExchangeButton = document.createElement('button');
+    requestExchangeButton.classList.add('btn', 'btn-success', 'btn-sm');
+    requestExchangeButton.textContent = 'Solicitar Troca';
+    requestExchangeButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        requestExchange(book);
+    });
+
+    buttonContainer.appendChild(addToFavoritesButton);
+    buttonContainer.appendChild(viewDetailsButton);
+    buttonContainer.appendChild(requestExchangeButton);
+
+    bookInfo.appendChild(buttonContainer);
 
     bookCard.appendChild(bookInfo);
 
     return bookCard;
+}
+
+function requestExchange(book) {
+    fetch('/api/user-books')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const userBooks = data.books;
+                let bookOptions = '';
+                userBooks.forEach(userBook => {
+                    bookOptions += `
+                        <div class="user-book-option" data-book-id="${userBook.id}">
+                            <img src="${userBook.imageUrl || '/img/default-book-image.jpg'}" alt="${userBook.titulo}" class="user-book-image">
+                            <div class="user-book-info">
+                                <p class="user-book-title">${userBook.titulo}</p>
+                                <p class="user-book-author">${userBook.autor}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                Swal.fire({
+                    title: 'Solicitar Troca',
+                    html: `
+                        <p>Selecione um livro da sua biblioteca para trocar:</p>
+                        <div class="user-books-container">
+                            ${bookOptions}
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Enviar Solicitação',
+                    cancelButtonText: 'Cancelar',
+                    preConfirm: () => {
+                        const selectedBookElement = Swal.getPopup().querySelector('.user-book-option.selected');
+                        if (!selectedBookElement) {
+                            Swal.showValidationMessage('Por favor, selecione um livro para troca.');
+                        }
+                        return selectedBookElement ? selectedBookElement.getAttribute('data-book-id') : null;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const selectedBookId = result.value;
+                        console.log(`Livro Recebedor ID: ${book.id}, Livro Solicitante ID: ${selectedBookId}`);
+                        sendExchangeRequest(book.id, selectedBookId);
+                    }
+                });
+
+                // Adicionar evento de clique para selecionar o livro
+                document.querySelectorAll('.user-book-option').forEach(option => {
+                    option.addEventListener('click', function () {
+                        document.querySelectorAll('.user-book-option').forEach(opt => opt.classList.remove('selected'));
+                        this.classList.add('selected');
+                    });
+                });
+            } else {
+                console.error('Erro ao carregar os livros do usuário:', data.message);
+                Swal.fire('Erro', 'Erro ao carregar seus livros. Por favor, tente novamente.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar os livros do usuário:', error);
+            Swal.fire('Erro', 'Erro ao carregar seus livros. Por favor, tente novamente.', 'error');
+        });
+}
+
+function sendExchangeRequest(receivingBookId, sendingBookId) {
+    console.log(`Enviando solicitação de troca: Livro Recebedor ID ${receivingBookId}, Livro Solicitante ID ${sendingBookId}`);
+    fetch('/api/request-exchange', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            receivingBookId: receivingBookId,
+            sendingBookId: sendingBookId
+        })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire('Sucesso', 'Solicitação de troca enviada com sucesso!', 'success');
+            } else {
+                console.error('Erro ao enviar a solicitação de troca:', data.message);
+                Swal.fire('Erro', 'Erro ao enviar a solicitação de troca. Por favor, tente novamente.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao enviar a solicitação de troca:', error);
+            Swal.fire('Erro', 'Erro ao enviar a solicitação de troca. Por favor, tente novamente.', 'error');
+        });
 }
 
 function showBookDetails(book) {

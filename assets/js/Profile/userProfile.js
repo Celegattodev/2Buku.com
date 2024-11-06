@@ -221,45 +221,33 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(data => {
                     if (data.success) {
                         document.getElementById('bookDescription').innerText = data.book.description;
-                        const bookImagesWrapper = document.getElementById('bookImagesWrapper');
-                        bookImagesWrapper.innerHTML = ''; // Limpa as imagens anteriores
+                        const bookImagesGrid = document.getElementById('bookImagesGrid');
+                        bookImagesGrid.innerHTML = ''; // Limpa as imagens anteriores
 
-                        // Adicionar a imagem de capa como o primeiro slide
-                        const coverSlide = document.createElement('div');
-                        coverSlide.classList.add('swiper-slide');
+                        // Adicionar a imagem de capa como o primeiro item
+                        const coverItem = document.createElement('div');
+                        coverItem.classList.add('image-item');
                         const coverImg = document.createElement('img');
                         coverImg.src = data.book.coverImage;
                         coverImg.classList.add('img-fluid');
-                        coverSlide.appendChild(coverImg);
-                        bookImagesWrapper.appendChild(coverSlide);
+                        const coverLabel = document.createElement('p');
+                        coverLabel.innerText = 'Imagem da Capa';
+                        coverItem.appendChild(coverImg);
+                        coverItem.appendChild(coverLabel);
+                        bookImagesGrid.appendChild(coverItem);
 
                         // Adicionar as imagens adicionais
-                        data.book.images.forEach(imageUrl => {
-                            const slide = document.createElement('div');
-                            slide.classList.add('swiper-slide');
+                        data.book.images.forEach((imageUrl, index) => {
+                            const imageItem = document.createElement('div');
+                            imageItem.classList.add('image-item');
                             const img = document.createElement('img');
                             img.src = imageUrl;
                             img.classList.add('img-fluid');
-                            slide.appendChild(img);
-                            bookImagesWrapper.appendChild(slide);
-                        });
-
-                        var bookImagesSwiper = new Swiper('#bookImagesSwiper', {
-                            slidesPerView: 1,
-                            spaceBetween: 10,
-                            navigation: {
-                                nextEl: '.book-images-next',
-                                prevEl: '.book-images-prev',
-                            },
-                            loop: true,
-                            autoplay: {
-                                delay: 5000, // Troca de imagem a cada 5 segundos
-                                disableOnInteraction: false,
-                            },
-                            effect: 'fade',
-                            fadeEffect: {
-                                crossFade: true
-                            }
+                            const imgLabel = document.createElement('p');
+                            imgLabel.innerText = `Imagem ${index + 1}`;
+                            imageItem.appendChild(img);
+                            imageItem.appendChild(imgLabel);
+                            bookImagesGrid.appendChild(imageItem);
                         });
 
                         // Exibir o modal

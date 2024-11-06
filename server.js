@@ -1027,3 +1027,83 @@ app.get('/catalog-data', (req, res) => {
     });
   });
 });
+
+// Rota para obter os livros do usuário logado
+app.get('/api/user-books', isAuthenticated, (req, res) => {
+    const userId = req.session.userId;
+
+    db.query('SELECT id, titulo, autor, imagem AS imageUrl FROM livros WHERE user_id = ?', [userId], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar livros do usuário:', err);
+            return res.status(500).json({ success: false, message: 'Erro ao buscar livros do usuário.' });
+        }
+
+        if (results.length === 0) {
+            console.log(`Nenhum livro encontrado para o usuário com ID ${userId}.`);
+        } else {
+            console.log(`Livros encontrados para o usuário com ID ${userId}:`, results);
+        }
+
+        res.json({ success: true, books: results });
+    });
+});
+
+// Rota para solicitar troca
+app.post('/api/request-exchange', isAuthenticated, (req, res) => {
+    const { receivingBookId, sendingBookId } = req.body;
+    const userId = req.session.userId;
+
+    // Verificar se os IDs dos livros foram fornecidos
+    if (!receivingBookId || !sendingBookId) {
+        console.error('IDs dos livros são obrigatórios.');
+        console.log(`Recebido: Livro Recebedor ID ${receivingBookId}, Livro Solicitante ID ${sendingBookId}`);
+        return res.status(400).json({ success: false, message: 'IDs dos livros são obrigatórios.' });
+    }
+
+    console.log(`Recebendo solicitação de troca: Usuario ID ${userId}, Livro Recebedor ID ${receivingBookId}, Livro Solicitante ID ${sendingBookId}`);
+
+    // Obter o ID do usuário dono do livro que está recebendo a solicitação
+    db.query('SELECT user_id FROM livros WHERE id = ?', [receivingBookId], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar dono do livro:', err);
+            return res.status(500).json({ success: false, message: 'Erro ao buscar dono do livro.' });
+        }
+
+        if (results.length === 0) {
+            console.error('Livro não encontrado.');
+            return res.status(404).json({ success: false, message: 'Livro não encontrado.' });
+        }
+
+        const receivingUserId = results[0].user_id;
+
+        // Obter o ID do usuário dono do livro que está solicitando a troca
+        db.query('SELECT user_id FROM livros WHERE id = ?', [sendingBookId], (err, results) => {
+            if (err) {
+                console.error('Erro ao buscar dono do livro solicitante:', err);
+                return res.status(500).json({ success: false, message: 'Erro ao buscar dono do livro solicitante.' });
+            }
+
+            if (results.length === 0) {
+                console.error('Livro solicitante não encontrado.');
+                return res.status(404).json({ success: false, message: 'Livro solicitante não encontrado.' });
+            }
+
+            const sendingUserId = results[0].user_id;
+
+            // Inserir a solicitação de troca na tabela de trocas
+            const sql = `
+                INSERT INTO trocas (usuario_solicitante_id, usuario_recebedor_id, livro_solicitante_id, livro_recebedor_id)
+                VALUES (?, ?, ?, ?)
+            `;
+            db.query(sql, [sendingUserId, receivingUserId, sendingBookId, receivingBookId], (err, results) => {
+                if (err) {
+                    console.error('Erro ao inserir solicitação de troca:', err);
+                    return res.status(500).json({ success: false, message: 'Erro ao inserir solicitação de troca.' });
+                }
+
+                console.log(`Solicitação de troca enviada com sucesso: Usuario Solicitante ID ${sendingUserId}, Usuario Recebedor ID ${receivingUserId}, Livro Solicitante ID ${sendingBookId}, Livro Recebedor ID ${receivingBookId}`);
+                res.json({ success: true, message: 'Solicitação de troca enviada com sucesso.' });
+            });
+        });
+    });
+});
