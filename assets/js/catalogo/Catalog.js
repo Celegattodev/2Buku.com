@@ -14,10 +14,8 @@ document.addEventListener("DOMContentLoaded", function () {
             item.scrollLeft -= scrollAmount;
         });
     });
-});
 
-// Pegar os livros do banco de dados
-document.addEventListener('DOMContentLoaded', function () {
+    // Pegar os livros do banco de dados
     fetch('/catalog-data')
         .then(response => response.json())
         .then(data => {
@@ -42,7 +40,8 @@ document.addEventListener('DOMContentLoaded', function () {
 async function createBookCard(book) {
     const bookCard = document.createElement('div');
     bookCard.classList.add('product-card');
-    bookCard.setAttribute('data-book-id', book.id); // Adiciona o ID do livro como atributo de dados
+    bookCard.setAttribute('data-google-books-id', book.googleBooksId);
+    bookCard.setAttribute('data-user-id', book.userId); // Adiciona o ID do usuário detentor do livro
 
     const bookImage = document.createElement('div');
     bookImage.classList.add('product-image');
@@ -156,8 +155,10 @@ function requestExchange(book) {
                 }).then((result) => {
                     if (result.isConfirmed) {
                         const selectedBookId = result.value;
-                        console.log(`Livro Recebedor ID: ${book.id}, Livro Solicitante ID: ${selectedBookId}`);
-                        sendExchangeRequest(book.id, selectedBookId);
+                        const receivingUserId = book.userId; // ID do usuário detentor do livro
+                        const googleBooksId = book.googleBooksId; // ID do livro no Google Books
+                        console.log(`Livro Recebedor Google Books ID: ${googleBooksId}, Livro Solicitante ID: ${selectedBookId}, Usuário Recebedor ID: ${receivingUserId}`);
+                        sendExchangeRequest(receivingUserId, googleBooksId, selectedBookId);
                     }
                 });
 
@@ -179,15 +180,16 @@ function requestExchange(book) {
         });
 }
 
-function sendExchangeRequest(receivingBookId, sendingBookId) {
-    console.log(`Enviando solicitação de troca: Livro Recebedor ID ${receivingBookId}, Livro Solicitante ID ${sendingBookId}`);
+function sendExchangeRequest(receivingUserId, googleBooksId, sendingBookId) {
+    console.log(`Enviando solicitação de troca: Usuário Recebedor ID ${receivingUserId}, Livro Recebedor Google Books ID ${googleBooksId}, Livro Solicitante ID ${sendingBookId}`);
     fetch('/api/request-exchange', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            receivingBookId: receivingBookId,
+            receivingUserId: receivingUserId,
+            googleBooksId: googleBooksId,
             sendingBookId: sendingBookId
         })
     })
@@ -375,20 +377,20 @@ function addToFavorites(book) {
 }
 async function searchBooks(event) {
     event.preventDefault();
-  
+
     const searchInput = document.getElementById('searchInput').value;
     const bookResults = document.getElementById('bookResults');
     bookResults.innerHTML = ''; // Limpa os resultados anteriores
-  
+
     try {
-      const response = await fetch(`/search-books?q=${encodeURIComponent(searchInput)}`);
-      const data = await response.json();
-  
-      if (data.success) {
-        data.books.forEach(book => {
-          const bookElement = document.createElement('div');
-          bookElement.classList.add('col-md-4', 'mb-3');
-          bookElement.innerHTML = `
+        const response = await fetch(`/search-books?q=${encodeURIComponent(searchInput)}`);
+        const data = await response.json();
+
+        if (data.success) {
+            data.books.forEach(book => {
+                const bookElement = document.createElement('div');
+                bookElement.classList.add('col-md-4', 'mb-3');
+                bookElement.innerHTML = `
             <div class="card">
               <div class="card-body">
                 <h5 class="card-title">${book.titulo}</h5>
@@ -397,13 +399,13 @@ async function searchBooks(event) {
               </div>
             </div>
           `;
-          bookResults.appendChild(bookElement);
-        });
-      } else {
-        bookResults.innerHTML = '<p>Nenhum livro encontrado.</p>';
-      }
+                bookResults.appendChild(bookElement);
+            });
+        } else {
+            bookResults.innerHTML = '<p>Nenhum livro encontrado.</p>';
+        }
     } catch (error) {
-      console.error('Erro ao buscar livros:', error);
-      bookResults.innerHTML = '<p>Erro ao buscar livros.</p>';
+        console.error('Erro ao buscar livros:', error);
+        bookResults.innerHTML = '<p>Erro ao buscar livros.</p>';
     }
-  }
+}

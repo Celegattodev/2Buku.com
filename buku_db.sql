@@ -79,16 +79,14 @@ CREATE TABLE `trocas` (
   `usuario_solicitante_id` int(11) NOT NULL,
   `usuario_recebedor_id` int(11) NOT NULL,
   `livro_solicitante_id` int(11) NOT NULL,
-  `livro_recebedor_id` int(11) NOT NULL,
+  `livro_recebedor_google_books_id` varchar(255) NOT NULL,
   `status` varchar(50) NOT NULL DEFAULT 'Pendente',
   `data_solicitacao` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `usuario_solicitante_id` (`usuario_solicitante_id`),
   KEY `usuario_recebedor_id` (`usuario_recebedor_id`),
   KEY `livro_solicitante_id` (`livro_solicitante_id`),
-  KEY `livro_recebedor_id` (`livro_recebedor_id`),
   CONSTRAINT `trocas_ibfk_1` FOREIGN KEY (`usuario_solicitante_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `trocas_ibfk_2` FOREIGN KEY (`usuario_recebedor_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `trocas_ibfk_3` FOREIGN KEY (`livro_solicitante_id`) REFERENCES `livros` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `trocas_ibfk_4` FOREIGN KEY (`livro_recebedor_id`) REFERENCES `livros` (`id`) ON DELETE CASCADE
+  CONSTRAINT `trocas_ibfk_3` FOREIGN KEY (`livro_solicitante_id`) REFERENCES `livros` (`id`) ON DELETE CASCADE
 );
