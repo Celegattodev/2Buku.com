@@ -80,7 +80,6 @@ CREATE TABLE `trocas` (
   `usuario_recebedor_id` int(11) NOT NULL,
   `livro_solicitante_id` int(11) NOT NULL,
   `livro_recebedor_google_books_id` varchar(255) NOT NULL,
-  `status` varchar(50) NOT NULL DEFAULT 'Pendente',
   `data_solicitacao` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `usuario_solicitante_id` (`usuario_solicitante_id`),
@@ -90,3 +89,9 @@ CREATE TABLE `trocas` (
   CONSTRAINT `trocas_ibfk_2` FOREIGN KEY (`usuario_recebedor_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `trocas_ibfk_3` FOREIGN KEY (`livro_solicitante_id`) REFERENCES `livros` (`id`) ON DELETE CASCADE
 );
+
+ALTER TABLE `trocas`
+ADD COLUMN `token` VARCHAR(255) DEFAULT NULL,
+ADD COLUMN `token_expiry` DATETIME DEFAULT NULL;
+ADD COLUMN `livro_recebedor_id` INT NOT NULL;
+ADD COLUMN `status` ENUM('Pendente', 'Aceito', 'Recusado') DEFAULT 'Pendente';

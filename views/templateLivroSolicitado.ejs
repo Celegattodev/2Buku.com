@@ -64,22 +64,14 @@
             margin-top: 10px;
             display: flex;
             justify-content: center;
-            gap: 50px; /* Aumente o valor de gap para mais espaçamento */
+            align-items: center;
         }
 
-        .btn-accept {
+        .btn {
             padding: 12px 24px;
-            background-color: #4CAF50; /* Cor verde */
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 18px;
-        }
-
-        .btn-reject {
-            padding: 12px 24px;
-            background-color: #f44336; /* Cor vermelha */
+            background-color: #fd9323;
+            margin-left: auto;
+            margin-right: auto;
             color: #fff;
             border: none;
             border-radius: 4px;
@@ -96,20 +88,17 @@
 
 <body>
     <div class="email-container">
-        <h1>Livro solicitado</h1>
-        <p>Olá,</p>
-        <p>O livro <nomedoLivro> , da sua estante foi solicitado por <nomeDoSolicitante>, que ofertou o livro <nomeDoLivroOfertado> em troca. selecione a opção abaixo para aceitar ou recusar a solicitação.</p>
-        </p>
-        <div class="button-container">
-            <button class="btn-accept">Aceitar</button>
-            <button class="btn-reject">Recusar</button>
+        <div class="email-header">
+            <img src="https://via.placeholder.com/100" alt="Logo">
         </div>
-        <p>Atenciosamente,<br>A equipe de suporte.</p>
-        <div class="footer">
-            <a href="http://localhost:3000/">
-                <img src="https://i.imgur.com/epnUq6o.png" alt="Logo Buku">
-            </a>
-            <p>© 2024 Buku.com</p>
+        <div class="email-body">
+            <p>Olá <%= nomeDoSolicitante %>,</p>
+            <p>Você recebeu uma solicitação de troca para o livro <%= nomeDoLivro %>.</p>
+            <p>O livro oferecido em troca é <%= nomeDoLivroOfertado %>.</p>
+            <p>Para ver os detalhes da troca e aceitar ou recusar a solicitação, clique no link abaixo:</p>
+        </div>
+        <div class="email-footer">
+            <a href="<%= link %>">Ver Detalhes da Troca</a>
         </div>
     </div>
 </body>

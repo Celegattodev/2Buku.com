@@ -1,0 +1,138 @@
+body {
+    background-image: url('/img/Buku-fundo.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.card {
+    width: 100vh;
+}
+
+.books {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    margin-bottom: 40px;
+}
+
+.book {
+    width: 30vh;
+    min-width: 200px;
+    height: 45vh;
+    min-height: 300px;
+}
+
+.img-book {
+    width: 100%;
+    height: 100%;
+    border: 1px solid #ccc;
+    object-fit: cover;
+}
+
+.desc {
+    background-color: #fd9323;
+    color: white;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.desc>h4 {
+    margin-top: 7px;
+}
+
+.desc>p {
+    margin: 5px 0;
+}
+
+.author {
+    font-size: 0.9em;
+    color: #ddd;
+}
+
+.btn {
+    margin: 20px;
+    width: 30vh;
+    min-height: 50px;
+}
+
+#button-details-book {
+    background-color: #007bff;
+    border: none;
+}
+
+#button-details-book:hover {
+    background-color: #1b89ff;
+    border: none;
+}
+
+.buttons-enchange {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#confirm-button {
+    background-color: #00a30e;
+    border: none;
+}
+
+#confirm-button:hover {
+    background-color: #00b10f;
+}
+
+#alter-button {
+    background-color: #fd9323;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#alter-button:hover {
+    background-color: #ff9d34;
+}
+
+#deny-button {
+    background-color: #dc3545;
+    border: none;
+}
+
+#deny-button:hover {
+    background-color: #d84352;
+}
+
+@media screen and (max-height: 500px) {
+    .buttons-enchange {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .btn {
+        width: 40vh;
+    }
+}
+
+@media screen and (min-width: 600px) and (max-width: 1400px) and (min-height: 1000px) and (max-height: 1400px) {
+    p {
+        font-size: 25px;
+    }
+
+    h3 {
+        font-size: 40px;
+    }
+
+    h4 {
+        font-size: 40px;
+    }
+
+    .desc {
+        height: 70px;
+    }
+
+    .btn {
+        font-size: 30px;
+    }
+}

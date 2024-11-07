@@ -228,6 +228,16 @@ function addToLibrary(googleBooksId, title, author, imageUrl, bookImages) {
         formData.append('bookImages', bookImages[i]);
     }
 
+    // Exibir alerta de carregamento
+    Swal.fire({
+        title: 'Adicionando livro...',
+        text: 'Por favor, aguarde enquanto adicionamos o livro à sua biblioteca.',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
     // Primeiro, verificar se o livro já existe na biblioteca ou nos favoritos
     fetch('/check-book', {
         method: 'POST',
@@ -246,6 +256,7 @@ function addToLibrary(googleBooksId, title, author, imageUrl, bookImages) {
                 })
                     .then(response => response.json())
                     .then(data => {
+                        Swal.close(); // Fechar o alerta de carregamento
                         if (data.success) {
                             Swal.fire({
                                 title: 'Sucesso!',
@@ -263,6 +274,7 @@ function addToLibrary(googleBooksId, title, author, imageUrl, bookImages) {
                         }
                     })
                     .catch(error => {
+                        Swal.close(); // Fechar o alerta de carregamento
                         console.error('Erro ao adicionar o livro:', error);
                         Swal.fire({
                             title: 'Erro!',
@@ -272,6 +284,7 @@ function addToLibrary(googleBooksId, title, author, imageUrl, bookImages) {
                         });
                     });
             } else if (data.message === 'Livro já existe na biblioteca' || data.message === 'Livro já está nos favoritos') {
+                Swal.close(); // Fechar o alerta de carregamento
                 Swal.fire({
                     title: 'Atenção!',
                     text: 'Este livro já existe na sua biblioteca ou nos seus favoritos.',
@@ -279,6 +292,7 @@ function addToLibrary(googleBooksId, title, author, imageUrl, bookImages) {
                     confirmButtonText: 'Ok'
                 });
             } else {
+                Swal.close(); // Fechar o alerta de carregamento
                 Swal.fire({
                     title: 'Erro!',
                     text: data.message || 'Erro ao verificar a duplicidade do livro.',
@@ -288,6 +302,7 @@ function addToLibrary(googleBooksId, title, author, imageUrl, bookImages) {
             }
         })
         .catch(error => {
+            Swal.close(); // Fechar o alerta de carregamento
             console.error('Erro ao verificar a duplicidade do livro:', error);
             Swal.fire({
                 title: 'Erro!',

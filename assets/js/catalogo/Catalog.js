@@ -182,6 +182,17 @@ function requestExchange(book) {
 
 function sendExchangeRequest(receivingUserId, googleBooksId, sendingBookId) {
     console.log(`Enviando solicitação de troca: Usuário Recebedor ID ${receivingUserId}, Livro Recebedor Google Books ID ${googleBooksId}, Livro Solicitante ID ${sendingBookId}`);
+    
+    // Mostrar alerta de carregamento
+    Swal.fire({
+        title: 'Enviando solicitação...',
+        text: 'Por favor, aguarde enquanto enviamos sua solicitação de troca.',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
     fetch('/api/request-exchange', {
         method: 'POST',
         headers: {
@@ -195,6 +206,9 @@ function sendExchangeRequest(receivingUserId, googleBooksId, sendingBookId) {
     })
         .then(response => response.json())
         .then(data => {
+            // Fechar alerta de carregamento
+            Swal.close();
+
             if (data.success) {
                 Swal.fire('Sucesso', 'Solicitação de troca enviada com sucesso!', 'success');
             } else {
@@ -203,6 +217,9 @@ function sendExchangeRequest(receivingUserId, googleBooksId, sendingBookId) {
             }
         })
         .catch(error => {
+            // Fechar alerta de carregamento
+            Swal.close();
+
             console.error('Erro ao enviar a solicitação de troca:', error);
             Swal.fire('Erro', 'Erro ao enviar a solicitação de troca. Por favor, tente novamente.', 'error');
         });
