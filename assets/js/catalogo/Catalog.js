@@ -103,15 +103,22 @@ async function createBookCard(book) {
         event.stopPropagation();
         requestExchange(book);
     });
-    
-    // Adicionar o nome do proprietário abaixo do botão de solicitar troca (NAO FUNCIONANDO)
+
+    // Adicionar o botão "Usuário Proprietário"
     const ownerUserButton = document.createElement('button');
-    ownerUserButton.classList.add('btn', 'btn-success', 'btn-sm');
+    ownerUserButton.classList.add('btn', 'btn-info', 'btn-sm');
     ownerUserButton.textContent = 'Usuário Proprietário';
-    ownerUserButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        showBookDetails(book);
-    });
+
+    // Verifique se o book.userId está definido antes de definir o evento de clique
+    if (book.userId) {
+        ownerUserButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            window.location.href = `/ownerUser?userId=${book.userId}`;
+        });
+    } else {
+        console.error('User ID não encontrado para este livro');
+    }
+
 
     buttonContainer.appendChild(addToFavoritesButton);
     buttonContainer.appendChild(viewDetailsButton);
@@ -200,7 +207,7 @@ function requestExchange(book) {
 
 function sendExchangeRequest(receivingUserId, googleBooksId, sendingBookId) {
     console.log(`Enviando solicitação de troca: Usuário Recebedor ID ${receivingUserId}, Livro Recebedor Google Books ID ${googleBooksId}, Livro Solicitante ID ${sendingBookId}`);
-    
+
     // Mostrar alerta de carregamento
     Swal.fire({
         title: 'Enviando solicitação...',
@@ -386,12 +393,6 @@ function addToFavorites(book) {
                     title: 'Informação',
                     text: 'Este livro já está na sua biblioteca.',
                 });
-            } else if (data.message === 'A tabela de biblioteca não existe. Por favor, contate o suporte.') {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Erro',
-                    text: 'A tabela de biblioteca não existe. Por favor, contate o suporte.',
-                });
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -409,6 +410,7 @@ function addToFavorites(book) {
             });
         });
 }
+
 async function searchBooks(event) {
     event.preventDefault();
 

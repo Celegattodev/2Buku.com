@@ -332,7 +332,7 @@ app.post("/register", (req, res) => {
               message: "Erro no servidor."
             });
           }
-         // Envia o email de confirmação
+          // Envia o email de confirmação
           const userName = name; // ou qualquer variável que contenha o nome do usuário
           enviarEmailComTemplate(email, 'Conta criada na Buku', 'templateContaCriada', { userName });
 
@@ -683,41 +683,41 @@ app.delete('/delete-book/:id', (req, res) => {
 
 // Rota para obter os detalhes do livro
 app.get('/api/book-details/:bookId', isAuthenticated, async (req, res) => {
-    const bookId = req.params.bookId;
+  const bookId = req.params.bookId;
 
-    try {
-        const bookSql = 'SELECT * FROM livros WHERE id = ?';
-        const [bookResults] = await db.promise().query(bookSql, [bookId]);
+  try {
+      const bookSql = 'SELECT * FROM livros WHERE id = ?';
+      const [bookResults] = await db.promise().query(bookSql, [bookId]);
 
-        if (bookResults.length === 0) {
-            return res.status(404).json({ success: false, message: 'Livro não encontrado.' });
-        }
+      if (bookResults.length === 0) {
+          return res.status(404).json({ success: false, message: 'Livro não encontrado.' });
+      }
 
-        const book = bookResults[0];
+      const book = bookResults[0];
 
-        // Buscar a descrição do livro usando a Google Books API
-        const googleBooksId = book.google_books_id;
-        const googleBooksUrl = `https://www.googleapis.com/books/v1/volumes/${googleBooksId}`;
-        const googleBooksResponse = await axios.get(googleBooksUrl);
-        const bookDescription = googleBooksResponse.data.volumeInfo.description || 'Descrição não disponível';
+      // Buscar a descrição do livro usando a Google Books API
+      const googleBooksId = book.google_books_id;
+      const googleBooksUrl = `https://www.googleapis.com/books/v1/volumes/${googleBooksId}`;
+      const googleBooksResponse = await axios.get(googleBooksUrl);
+      const bookDescription = googleBooksResponse.data.volumeInfo.description || 'Descrição não disponível';
 
-        const imagesSql = 'SELECT imagem_url FROM livro_imagens WHERE livro_id = ?';
-        const [imageResults] = await db.promise().query(imagesSql, [bookId]);
+      const imagesSql = 'SELECT imagem_url FROM livro_imagens WHERE livro_id = ?';
+      const [imageResults] = await db.promise().query(imagesSql, [bookId]);
 
-        const images = imageResults.map(row => row.imagem_url);
+      const images = imageResults.map(row => row.imagem_url);
 
-        res.status(200).json({
-            success: true,
-            book: {
-                description: bookDescription,
-                coverImage: book.imagem,
-                images: images
-            }
-        });
-    } catch (err) {
-        console.error('Erro ao carregar os detalhes do livro:', err);
-        res.status(500).json({ success: false, message: 'Erro ao carregar os detalhes do livro.' });
-    }
+      res.status(200).json({
+          success: true,
+          book: {
+              description: bookDescription,
+              coverImage: book.imagem,
+              images: images
+          }
+      });
+  } catch (err) {
+      console.error('Erro ao carregar os detalhes do livro:', err);
+      res.status(500).json({ success: false, message: 'Erro ao carregar os detalhes do livro.' });
+  }
 });
 
 // Rota para a página de esqueci a senha
@@ -1081,147 +1081,147 @@ app.get('/api/user-books', isAuthenticated, (req, res) => {
 
 // Rota para solicitar troca
 app.post('/api/request-exchange', isAuthenticated, (req, res) => {
-    const { googleBooksId, sendingBookId } = req.body;
-    const userId = req.session.userId;
+  const { googleBooksId, sendingBookId } = req.body;
+  const userId = req.session.userId;
 
-    // Verificar se os IDs foram fornecidos
-    if (!googleBooksId || !sendingBookId) {
-        console.error('IDs são obrigatórios.');
-        console.log(`Recebido: Livro Recebedor Google Books ID ${googleBooksId}, Livro Solicitante ID ${sendingBookId}`);
-        return res.status(400).json({ success: false, message: 'IDs são obrigatórios.' });
+  // Verificar se os IDs foram fornecidos
+  if (!googleBooksId || !sendingBookId) {
+    console.error('IDs são obrigatórios.');
+    console.log(`Recebido: Livro Recebedor Google Books ID ${googleBooksId}, Livro Solicitante ID ${sendingBookId}`);
+    return res.status(400).json({ success: false, message: 'IDs são obrigatórios.' });
+  }
+
+  console.log(`Recebendo solicitação de troca: Usuario Solicitante ID ${userId}, Livro Recebedor Google Books ID ${googleBooksId}, Livro Solicitante ID ${sendingBookId}`);
+
+  // Obter o ID do usuário dono do livro que está recebendo a solicitação
+  const getUserSql = 'SELECT user_id, id, titulo, imagem FROM livros WHERE google_books_id = ?';
+  db.query(getUserSql, [googleBooksId], (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar dono do livro:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao buscar dono do livro.' });
     }
 
-    console.log(`Recebendo solicitação de troca: Usuario Solicitante ID ${userId}, Livro Recebedor Google Books ID ${googleBooksId}, Livro Solicitante ID ${sendingBookId}`);
+    if (results.length === 0) {
+      console.error('Livro não encontrado.');
+      return res.status(404).json({ success: false, message: 'Livro não encontrado.' });
+    }
 
-    // Obter o ID do usuário dono do livro que está recebendo a solicitação
-    const getUserSql = 'SELECT user_id, id, titulo, imagem FROM livros WHERE google_books_id = ?';
-    db.query(getUserSql, [googleBooksId], (err, results) => {
-        if (err) {
-            console.error('Erro ao buscar dono do livro:', err);
-            return res.status(500).json({ success: false, message: 'Erro ao buscar dono do livro.' });
-        }
+    const receivingUserId = results[0].user_id;
 
-        if (results.length === 0) {
-            console.error('Livro não encontrado.');
-            return res.status(404).json({ success: false, message: 'Livro não encontrado.' });
-        }
+    // Verificar se o livro pertence ao usuário logado
+    if (receivingUserId === userId) {
+      console.error('Usuário tentando solicitar troca para seu próprio livro.');
+      return res.status(400).json({ success: false, message: 'Você não pode solicitar troca para seu próprio livro.' });
+    }
 
-        const receivingUserId = results[0].user_id;
+    const receivingBookId = results[0].id;
+    const receivingBookTitle = results[0].titulo;
+    const receivingBookImage = results[0].imagem;
 
-        // Verificar se o livro pertence ao usuário logado
-        if (receivingUserId === userId) {
-            console.error('Usuário tentando solicitar troca para seu próprio livro.');
-            return res.status(400).json({ success: false, message: 'Você não pode solicitar troca para seu próprio livro.' });
-        }
-
-        const receivingBookId = results[0].id;
-        const receivingBookTitle = results[0].titulo;
-        const receivingBookImage = results[0].imagem;
-
-        // Verificar se já existe uma solicitação de troca recente (menos de 24 horas) para o mesmo livro
-        const checkRecentExchangeSql = `
+    // Verificar se já existe uma solicitação de troca recente (menos de 24 horas) para o mesmo livro
+    const checkRecentExchangeSql = `
             SELECT * FROM trocas 
             WHERE usuario_solicitante_id = ? 
             AND livro_recebedor_id = ? 
             AND timestampdiff(HOUR, data_solicitacao, NOW()) < 24
         `;
-        db.query(checkRecentExchangeSql, [userId, receivingBookId], (err, recentExchanges) => {
-            if (err) {
-                console.error('Erro ao verificar trocas recentes:', err);
-                return res.status(500).json({ success: false, message: 'Erro ao verificar trocas recentes.' });
-            }
+    db.query(checkRecentExchangeSql, [userId, receivingBookId], (err, recentExchanges) => {
+      if (err) {
+        console.error('Erro ao verificar trocas recentes:', err);
+        return res.status(500).json({ success: false, message: 'Erro ao verificar trocas recentes.' });
+      }
 
-            if (recentExchanges.length > 0) {
-                console.error('Já existe uma solicitação de troca recente para este livro.');
-                return res.status(400).json({ success: false, message: 'Você já enviou uma solicitação de troca para este livro nas últimas 24 horas. Por favor, aguarde a resposta do outro usuário.' });
-            }
+      if (recentExchanges.length > 0) {
+        console.error('Já existe uma solicitação de troca recente para este livro.');
+        return res.status(400).json({ success: false, message: 'Você já enviou uma solicitação de troca para este livro nas últimas 24 horas. Por favor, aguarde a resposta do outro usuário.' });
+      }
 
-            // Gerar token único e data de expiração
-            const token = crypto.randomBytes(32).toString('hex');
-            const tokenExpiry = new Date(Date.now() + 48 * 60 * 60 * 1000); // 48 horas a partir de agora
+      // Gerar token único e data de expiração
+      const token = crypto.randomBytes(32).toString('hex');
+      const tokenExpiry = new Date(Date.now() + 48 * 60 * 60 * 1000); // 48 horas a partir de agora
 
-            // Obter informações do livro solicitado e do livro ofertado
-            const getBookDetailsSql = 'SELECT titulo, autor, imagem FROM livros WHERE id = ?';
-            db.query(getBookDetailsSql, [sendingBookId], (err, bookResults) => {
-                if (err) {
-                    console.error('Erro ao buscar informações do livro ofertado:', err);
-                    return res.status(500).json({ success: false, message: 'Erro ao buscar informações do livro ofertado.' });
-                }
+      // Obter informações do livro solicitado e do livro ofertado
+      const getBookDetailsSql = 'SELECT titulo, autor, imagem FROM livros WHERE id = ?';
+      db.query(getBookDetailsSql, [sendingBookId], (err, bookResults) => {
+        if (err) {
+          console.error('Erro ao buscar informações do livro ofertado:', err);
+          return res.status(500).json({ success: false, message: 'Erro ao buscar informações do livro ofertado.' });
+        }
 
-                if (bookResults.length === 0) {
-                    console.error('Livro ofertado não encontrado.');
-                    return res.status(404).json({ success: false, message: 'Livro ofertado não encontrado.' });
-                }
+        if (bookResults.length === 0) {
+          console.error('Livro ofertado não encontrado.');
+          return res.status(404).json({ success: false, message: 'Livro ofertado não encontrado.' });
+        }
 
-                const bookOffered = bookResults[0].titulo;
-                const bookOfferedAuthor = bookResults[0].autor;
-                const bookOfferedImage = bookResults[0].imagem;
+        const bookOffered = bookResults[0].titulo;
+        const bookOfferedAuthor = bookResults[0].autor;
+        const bookOfferedImage = bookResults[0].imagem;
 
-                // Inserir a solicitação de troca na tabela de trocas
-                const sql = `
+        // Inserir a solicitação de troca na tabela de trocas
+        const sql = `
                     INSERT INTO trocas (usuario_solicitante_id, usuario_recebedor_id, livro_solicitante_id, livro_recebedor_id, token, token_expiry, data_solicitacao)
                     VALUES (?, ?, ?, ?, ?, ?, NOW())
                 `;
-                db.query(sql, [userId, receivingUserId, sendingBookId, receivingBookId, token, tokenExpiry], (err, results) => {
-                    if (err) {
-                        console.error('Erro ao inserir solicitação de troca:', err);
-                        return res.status(500).json({ success: false, message: 'Erro ao inserir solicitação de troca.' });
-                    }
+        db.query(sql, [userId, receivingUserId, sendingBookId, receivingBookId, token, tokenExpiry], (err, results) => {
+          if (err) {
+            console.error('Erro ao inserir solicitação de troca:', err);
+            return res.status(500).json({ success: false, message: 'Erro ao inserir solicitação de troca.' });
+          }
 
-                    console.log(`Solicitação de troca enviada com sucesso: Usuario Solicitante ID ${userId}, Usuário Recebedor ID ${receivingUserId}, Livro Solicitante ID ${sendingBookId}, Livro Recebedor ID ${receivingBookId}`);
+          console.log(`Solicitação de troca enviada com sucesso: Usuario Solicitante ID ${userId}, Usuário Recebedor ID ${receivingUserId}, Livro Solicitante ID ${sendingBookId}, Livro Recebedor ID ${receivingBookId}`);
 
-                    // Obter as informações de contato do usuário recebedor
-                    const getUserContactSql = 'SELECT email, name FROM users WHERE id = ?';
-                    db.query(getUserContactSql, [receivingUserId], (err, userResults) => {
-                        if (err) {
-                            console.error('Erro ao buscar informações de contato do usuário:', err);
-                            return res.status(500).json({ success: false, message: 'Erro ao buscar informações de contato do usuário.' });
-                        }
+          // Obter as informações de contato do usuário recebedor
+          const getUserContactSql = 'SELECT email, name FROM users WHERE id = ?';
+          db.query(getUserContactSql, [receivingUserId], (err, userResults) => {
+            if (err) {
+              console.error('Erro ao buscar informações de contato do usuário:', err);
+              return res.status(500).json({ success: false, message: 'Erro ao buscar informações de contato do usuário.' });
+            }
 
-                        if (userResults.length === 0) {
-                            console.error('Usuário não encontrado.');
-                            return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
-                        }
+            if (userResults.length === 0) {
+              console.error('Usuário não encontrado.');
+              return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
+            }
 
-                        const userContact = userResults[0];
-                        const email = userContact.email;
-                        const name = userContact.name;
+            const userContact = userResults[0];
+            const email = userContact.email;
+            const name = userContact.name;
 
-                        // Renderizar o template e enviar o e-mail
-                        ejs.renderFile(path.join(__dirname, 'views', 'templateLivroSolicitado.ejs'), {
-                            nomeDoSolicitante: name,
-                            nomeDoLivro: receivingBookTitle,
-                            nomeDoLivroOfertado: bookOffered,
-                            autorDoLivroOfertado: bookOfferedAuthor,
-                            link: `http://localhost:3000/troca?token=${token}`
-                        }, (err, html) => {
-                            if (err) {
-                                console.error('Erro ao renderizar o template:', err);
-                                return res.status(500).json({ success: false, message: 'Erro ao renderizar o template.' });
-                            }
+            // Renderizar o template e enviar o e-mail
+            ejs.renderFile(path.join(__dirname, 'views', 'templateLivroSolicitado.ejs'), {
+              nomeDoSolicitante: name,
+              nomeDoLivro: receivingBookTitle,
+              nomeDoLivroOfertado: bookOffered,
+              autorDoLivroOfertado: bookOfferedAuthor,
+              link: `http://localhost:3000/troca?token=${token}`
+            }, (err, html) => {
+              if (err) {
+                console.error('Erro ao renderizar o template:', err);
+                return res.status(500).json({ success: false, message: 'Erro ao renderizar o template.' });
+              }
 
-                            const mailOptions = {
-                                from: '"Buku 📚" <buku.livro@gmail.com>',
-                                to: email,
-                                subject: 'Solicitação de Troca de Livro',
-                                html: html
-                            };
+              const mailOptions = {
+                from: '"Buku 📚" <buku.livro@gmail.com>',
+                to: email,
+                subject: 'Solicitação de Troca de Livro',
+                html: html
+              };
 
-                            transporter.sendMail(mailOptions, (err, info) => {
-                                if (err) {
-                                    console.error('Erro ao enviar o e-mail:', err);
-                                    return res.status(500).json({ success: false, message: 'Erro ao enviar o e-mail.' });
-                                }
+              transporter.sendMail(mailOptions, (err, info) => {
+                if (err) {
+                  console.error('Erro ao enviar o e-mail:', err);
+                  return res.status(500).json({ success: false, message: 'Erro ao enviar o e-mail.' });
+                }
 
-                                console.log('E-mail enviado:', info.response);
-                                res.json({ success: true, message: 'Solicitação de troca enviada com sucesso.' });
-                            });
-                        });
-                    });
-                });
+                console.log('E-mail enviado:', info.response);
+                res.json({ success: true, message: 'Solicitação de troca enviada com sucesso.' });
+              });
             });
+          });
         });
+      });
     });
+  });
 });
 
 // Rota para obter os detalhes da troca
@@ -1265,11 +1265,13 @@ app.get('/api/exchange-details/:token', async (req, res) => {
         state: exchangeDetails.state
       },
       book: { // Livro ofertado
+        id: exchangeDetails.livro_solicitante_id, // Adicione o ID do livro ofertado
         title: exchangeDetails.titulo_solicitante,
         author: exchangeDetails.autor_solicitante,
         imageUrl: exchangeDetails.imagem_solicitante
       },
       requestedBook: { // Livro solicitado
+        id: exchangeDetails.livro_recebedor_id, // Adicione o ID do livro solicitado
         title: exchangeDetails.titulo_recebedor,
         author: exchangeDetails.autor_recebedor,
         imageUrl: exchangeDetails.imagem_recebedor
@@ -1280,6 +1282,7 @@ app.get('/api/exchange-details/:token', async (req, res) => {
     res.status(500).json({ success: false, message: 'Erro ao buscar detalhes da troca.' });
   }
 });
+
 
 
 // Rota para acessar a página de troca
@@ -1386,16 +1389,16 @@ app.post('/api/exchange-action', isAuthenticated, async (req, res) => {
 });
 // Rota para remover trocas pendentes com tokens expirados
 app.delete('/api/remove-expired-exchanges', async (req, res) => {
-    const currentTime = new Date();
+  const currentTime = new Date();
 
-    const deleteExpiredExchangesSql = 'DELETE FROM trocas WHERE status = "Pendente" AND token_expiry < ?';
-    try {
-        await db.promise().query(deleteExpiredExchangesSql, [currentTime]);
-        res.json({ success: true, message: 'Trocas expiradas removidas com sucesso.' });
-    } catch (err) {
-        console.error('Erro ao remover trocas expiradas:', err);
-        res.status(500).json({ success: false, message: 'Erro ao remover trocas expiradas.' });
-    }
+  const deleteExpiredExchangesSql = 'DELETE FROM trocas WHERE status = "Pendente" AND token_expiry < ?';
+  try {
+    await db.promise().query(deleteExpiredExchangesSql, [currentTime]);
+    res.json({ success: true, message: 'Trocas expiradas removidas com sucesso.' });
+  } catch (err) {
+    console.error('Erro ao remover trocas expiradas:', err);
+    res.status(500).json({ success: false, message: 'Erro ao remover trocas expiradas.' });
+  }
 });
 
 // Rota para buscar livros
@@ -1428,4 +1431,42 @@ app.get('/search-books', async (req, res) => {
     console.error('Erro ao buscar livros:', error);
     res.status(500).json({ success: false, message: 'Erro ao buscar livros' });
   }
+});
+
+app.get('/ownerUser/:userId', (req, res) => {
+  const userId = req.params.userId;
+
+  // Consulta SQL para buscar informações do usuário
+  const userSql = `SELECT name, email, city, state, phone, biography, profileImage FROM users WHERE id = ?`;
+  db.query(userSql, [userId], (err, userResults) => {
+    if (err || userResults.length === 0) {
+      return res.json({ success: false, message: 'Usuário não encontrado.' });
+    }
+
+    const user = userResults[0];
+
+    // Consulta para buscar os livros do usuário
+    const booksSql = `SELECT titulo AS title, autor AS author, imagem AS imageUrl FROM livros WHERE user_id = ?`;
+    db.query(booksSql, [userId], (err, books) => {
+      if (err) {
+        return res.json({ success: false, message: 'Erro ao buscar livros do usuário.' });
+      }
+
+      // Consulta para buscar os livros favoritos do usuário
+      const favoritesSql = `SELECT titulo AS title, autor AS author, imagem AS imageUrl FROM favoritos WHERE user_id = ?`;
+      db.query(favoritesSql, [userId], (err, favorites) => {
+        if (err) {
+          return res.json({ success: false, message: 'Erro ao buscar livros favoritos do usuário.' });
+        }
+
+        // Enviar os dados do perfil, estante e favoritos do usuário
+        res.json({
+          success: true,
+          user: user,
+          books: books,
+          favorites: favorites
+        });
+      });
+    });
+  });
 });

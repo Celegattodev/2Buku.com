@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.book-item').forEach(item => {
         item.addEventListener('click', function () {
             const bookId = this.getAttribute('data-book-id');
-            fetch(`/book-details/${bookId}`)
+            fetch(`/api/book-details/${bookId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
