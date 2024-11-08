@@ -1,0 +1,127 @@
+body{
+    background-image: url('/img/Buku-fundo.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.card {
+    width: 150vh;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(179, 16, 16, 0.1);
+    overflow: hidden;
+    position: relative;
+    text-align: center; /* centraliza o texto */
+}
+
+
+.image-profile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 150px;
+    margin-top: 300px;
+    padding: 0;
+    position: relative;
+}
+  
+.profile-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+    position: relative;
+    margin-top: 0;
+}
+.details-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    margin-top: 0;
+}
+
+.container-fluid>.col{
+    display: flex;
+    justify-content: center;
+}
+.profile-image-container {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #ddd;
+    margin: 20px auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+.profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+h3 {
+    font-weight: 600;
+}
+h2 {
+    font-weight: 600;
+}
+
+.actions{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+.actions>a{
+    margin: 20px;
+    text-decoration: none;
+    transition: transform 0.3s;
+}
+.actions>a:hover{
+    transform: scale(1.05);
+}
+
+.actions>a>.card{
+    background-color: #fff;
+    width: 400px;
+    height: min-content;
+    text-align: start;
+    border: 1px solid #ccc;
+}
+
+.img-icone{
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+}
+
+
+.img-icone>img{
+    height: 20vh;
+    width: 20vh;
+}
+#manage-card>.img-icone>.img,
+#relatorio-card>.img-icone>.img{
+    margin-left: 25px;
+}
+
+#alert-card>.img-icone>.img{
+    margin-left: 15px;
+}
+
+.action-text{
+    padding: 10px;
+    color: #fff;
+}
+
+#manage-card>.action-text{
+    background-color: #6c8bf7;
+}
+#alert-card>.action-text{
+    background-color: #dc3545;
+}
+#relatorio-card>.action-text{
+    background-color: #00a30e;
+}

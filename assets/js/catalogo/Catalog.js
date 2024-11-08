@@ -103,10 +103,20 @@ async function createBookCard(book) {
         event.stopPropagation();
         requestExchange(book);
     });
+    
+    // Adicionar o nome do proprietário abaixo do botão de solicitar troca (NAO FUNCIONANDO)
+    const ownerUserButton = document.createElement('button');
+    ownerUserButton.classList.add('btn', 'btn-success', 'btn-sm');
+    ownerUserButton.textContent = 'Usuário Proprietário';
+    ownerUserButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        showBookDetails(book);
+    });
 
     buttonContainer.appendChild(addToFavoritesButton);
     buttonContainer.appendChild(viewDetailsButton);
     buttonContainer.appendChild(requestExchangeButton);
+    buttonContainer.appendChild(ownerUserButton);
 
     bookInfo.appendChild(buttonContainer);
 
@@ -121,6 +131,14 @@ function requestExchange(book) {
         .then(data => {
             if (data.success) {
                 const userBooks = data.books;
+                const userId = data.userId; // Supondo que o ID do usuário logado seja retornado na resposta
+
+                // Verificar se o livro pertence ao usuário logado
+                if (book.userId === userId) {
+                    Swal.fire('Erro', 'Este livro pertence a você. Não é possível solicitar troca.', 'error');
+                    return;
+                }
+
                 let bookOptions = '';
                 userBooks.forEach(userBook => {
                     bookOptions += `
@@ -199,7 +217,6 @@ function sendExchangeRequest(receivingUserId, googleBooksId, sendingBookId) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            receivingUserId: receivingUserId,
             googleBooksId: googleBooksId,
             sendingBookId: sendingBookId
         })
@@ -213,7 +230,7 @@ function sendExchangeRequest(receivingUserId, googleBooksId, sendingBookId) {
                 Swal.fire('Sucesso', 'Solicitação de troca enviada com sucesso!', 'success');
             } else {
                 console.error('Erro ao enviar a solicitação de troca:', data.message);
-                Swal.fire('Erro', 'Erro ao enviar a solicitação de troca. Por favor, tente novamente.', 'error');
+                Swal.fire('Erro', data.message, 'error');
             }
         })
         .catch(error => {

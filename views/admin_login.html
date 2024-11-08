@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Administrador</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/admin/admin_login.css">
+</head>
+<body>
+    <header>
+        <nav id="navbar">
+            <img id="navbar_logo" src="/img/Logo-Buku-branco.png" alt="Logo" />
+            <ul id="nav_list">
+                <li class="nav-item active"><a href="#">Sobre Nós</a></li>
+                <li class="nav-item"><a href="#">Funcionamento</a></li>
+                <li class="nav-item"><a href="#">Perguntas Frequentes</a></li>
+            </ul>
+            <button class="btn-default">Cadastrar/Entrar</button>
+            <button id="mobile_btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </nav>
+        <div id="mobile_menu">
+            <ul id="mobile_nav_list">
+                <li class="nav-item"><a href="#">Sobre Nós</a></li>
+                <li class="nav-item"><a href="#">Funcionamento</a></li>
+                <li class="nav-item"><a href="#">Perguntas Frequentes</a></li>
+            </ul>
+            <button class="btn-default">Cadastrar/Entrar</button>
+        </div>
+    </header>
+    <div class="container-fluid">
+        <div class="col">
+            <div class="card mt-4 mb-5">
+                <div class="card-body">
+                    <h3>Login do administrador</h3>
+                    <form action="" method="POST">
+                        <div class="mb-3">
+                            <label for="">Email: </label>
+                            <input type="text" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="">Senha: </label>
+                            <input type="password" class="form-control">
+                        </div>
+                        <div class="mb-3 mt-4">
+                            <button type="submit" class="form-control" id="login-button"><b>Entrar</b></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

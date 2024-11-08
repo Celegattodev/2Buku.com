@@ -58,12 +58,12 @@ body {
     min-height: 50px;
 }
 
-#button-details-book {
+#view-offered-book-details {
     background-color: #007bff;
     border: none;
 }
 
-#button-details-book:hover {
+#view-offered-book-details:hover {
     background-color: #1b89ff;
     border: none;
 }

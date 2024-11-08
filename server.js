@@ -332,14 +332,14 @@ app.post("/register", (req, res) => {
               message: "Erro no servidor."
             });
           }
-          // Envia o email de confirmação
-          enviarEmailComTemplate(email, 'Conta criada na Buku', 'templateContaCriada', { name });
+         // Envia o email de confirmação
+          const userName = name; // ou qualquer variável que contenha o nome do usuário
+          enviarEmailComTemplate(email, 'Conta criada na Buku', 'templateContaCriada', { userName });
 
           res.status(201).json({
             success: true,
             message: "Usuário registrado com sucesso!"
           });
-
         }
       );
     });
@@ -400,14 +400,35 @@ app.post('/update-profile', (req, res) => {
         });
       }
 
-      res.status(200).json({
-        success: true,
-        message: 'Perfil atualizado com sucesso!'
+      // Obter o email e o nome do usuário para enviar o email de confirmação
+      db.query('SELECT email, name FROM users WHERE id = ?', [userId], (err, results) => {
+        if (err) {
+          console.error('Erro ao buscar dados do usuário:', err);
+          return res.status(500).json({
+            success: false,
+            message: 'Erro ao buscar dados do usuário.'
+          });
+        }
+
+        if (results.length === 0) {
+          return res.status(404).json({
+            success: false,
+            message: 'Usuário não encontrado.'
+          });
+        }
+
+        const { email, name: userName } = results[0];
+
+        enviarEmailComTemplate(email, 'Dados alterados', 'templateDadosAlterados', { userName });
+
+        res.status(200).json({
+          success: true,
+          message: 'Perfil atualizado com sucesso!'
+        });
       });
     }
   );
 });
-
 // Rota para deletar a conta do usuário
 app.delete('/delete-account', (req, res) => {
   if (!req.session.userId) {
@@ -463,7 +484,8 @@ app.delete('/delete-account', (req, res) => {
             }
 
             // Enviar email de confirmação
-            enviarEmailComTemplate(email, 'Sua conta foi deletada', 'templateContaDeletada', { nome: name });
+            const userName = name;
+            enviarEmailComTemplate(email, 'Sua conta foi deletada', 'templateContaDeletada', { userName });
 
             // Destruir a sessão do usuário
             req.session.destroy((err) => {
@@ -659,44 +681,43 @@ app.delete('/delete-book/:id', (req, res) => {
   });
 });
 
-// Detalhes do livro com a descrição e imagens
-app.get('/book-details/:bookId', isAuthenticated, async (req, res) => {
-  const bookId = req.params.bookId;
-  const userId = req.session.userId;
+// Rota para obter os detalhes do livro
+app.get('/api/book-details/:bookId', isAuthenticated, async (req, res) => {
+    const bookId = req.params.bookId;
 
-  try {
-    const bookSql = 'SELECT * FROM livros WHERE id = ? AND user_id = ?';
-    const [bookResults] = await db.promise().query(bookSql, [bookId, userId]);
+    try {
+        const bookSql = 'SELECT * FROM livros WHERE id = ?';
+        const [bookResults] = await db.promise().query(bookSql, [bookId]);
 
-    if (bookResults.length === 0) {
-      return res.status(404).json({ success: false, message: 'Livro não encontrado' });
+        if (bookResults.length === 0) {
+            return res.status(404).json({ success: false, message: 'Livro não encontrado.' });
+        }
+
+        const book = bookResults[0];
+
+        // Buscar a descrição do livro usando a Google Books API
+        const googleBooksId = book.google_books_id;
+        const googleBooksUrl = `https://www.googleapis.com/books/v1/volumes/${googleBooksId}`;
+        const googleBooksResponse = await axios.get(googleBooksUrl);
+        const bookDescription = googleBooksResponse.data.volumeInfo.description || 'Descrição não disponível';
+
+        const imagesSql = 'SELECT imagem_url FROM livro_imagens WHERE livro_id = ?';
+        const [imageResults] = await db.promise().query(imagesSql, [bookId]);
+
+        const images = imageResults.map(row => row.imagem_url);
+
+        res.status(200).json({
+            success: true,
+            book: {
+                description: bookDescription,
+                coverImage: book.imagem,
+                images: images
+            }
+        });
+    } catch (err) {
+        console.error('Erro ao carregar os detalhes do livro:', err);
+        res.status(500).json({ success: false, message: 'Erro ao carregar os detalhes do livro.' });
     }
-
-    const book = bookResults[0];
-
-    // Buscar a descrição do livro usando a Google Books API
-    const googleBooksId = book.google_books_id;
-    const googleBooksUrl = `https://www.googleapis.com/books/v1/volumes/${googleBooksId}`;
-    const googleBooksResponse = await axios.get(googleBooksUrl);
-    const bookDescription = googleBooksResponse.data.volumeInfo.description || 'Descrição não disponível';
-
-    const imagesSql = 'SELECT imagem_url FROM livro_imagens WHERE livro_id = ?';
-    const [imageResults] = await db.promise().query(imagesSql, [bookId]);
-
-    const images = imageResults.map(row => row.imagem_url);
-
-    res.status(200).json({
-      success: true,
-      book: {
-        description: bookDescription,
-        coverImage: book.imagem, // Imagem de capa separada
-        images: images // Apenas imagens adicionais
-      }
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: 'Erro ao carregar os detalhes do livro' });
-  }
 });
 
 // Rota para a página de esqueci a senha
@@ -754,8 +775,12 @@ app.post('/esqueci-senha', (req, res) => {
         return res.status(500).json({ success: false, message: 'Erro no servidor.' });
       }
 
-      // Renderizar o template EJS com o token
-      ejs.renderFile(path.join(__dirname, 'views', 'templateAlterarSenha.ejs'), { resetToken }, (err, html) => {
+      // Obter o nome do usuário
+      const user = results[0];
+      const userName = user.name;
+
+      // Renderizar o template EJS com o token e o nome do usuário
+      ejs.renderFile(path.join(__dirname, 'views', 'templateAlterarSenha.ejs'), { userName, resetToken }, (err, html) => {
         if (err) {
           console.error('Erro ao renderizar o template:', err);
           return res.status(500).json({ success: false, message: 'Erro no servidor.' });
@@ -832,7 +857,8 @@ app.post('/alterar-senha', (req, res) => {
       });
     });
     const { email, name } = user;
-    enviarEmailComTemplate(email, 'Senha alterada com sucesso', 'templateSenhaAlterada', { name });
+    const userName = name;
+    enviarEmailComTemplate(email, 'Senha alterada com sucesso', 'templateSenhaAlterada', { userName });
   });
 });
 
@@ -1002,7 +1028,8 @@ app.get('/catalog-data', (req, res) => {
                 title: result.volumeInfo.title,
                 author: result.volumeInfo.authors.join(', '),
                 imageUrl: result.volumeInfo.imageLinks.thumbnail,
-                genres: result.volumeInfo.categories
+                genres: result.volumeInfo.categories,
+                ownerUser: result.volumeInfo.user_id // MEXIDO
               };
             }
             return null;
@@ -1015,7 +1042,8 @@ app.get('/catalog-data', (req, res) => {
                 title: result.volumeInfo.title,
                 author: result.volumeInfo.authors.join(', '),
                 imageUrl: result.volumeInfo.imageLinks.thumbnail,
-                genres: result.volumeInfo.categories
+                genres: result.volumeInfo.categories,
+                ownerUser: result.volumeInfo.user_id // MEXIDO
               };
             }
             return null;
@@ -1035,7 +1063,7 @@ app.get('/catalog-data', (req, res) => {
 app.get('/api/user-books', isAuthenticated, (req, res) => {
   const userId = req.session.userId;
 
-  db.query('SELECT id, titulo, autor, imagem AS imageUrl FROM livros WHERE user_id = ?', [userId], (err, results) => {
+  db.query('SELECT id, titulo, autor, imagem AS imageUrl, google_books_id FROM livros WHERE user_id = ?', [userId], (err, results) => {
     if (err) {
       console.error('Erro ao buscar livros do usuário:', err);
       return res.status(500).json({ success: false, message: 'Erro ao buscar livros do usuário.' });
@@ -1047,7 +1075,7 @@ app.get('/api/user-books', isAuthenticated, (req, res) => {
       console.log(`Livros encontrados para o usuário com ID ${userId}:`, results);
     }
 
-    res.json({ success: true, books: results });
+    res.json({ success: true, userId: userId, books: results });
   });
 });
 
@@ -1079,89 +1107,115 @@ app.post('/api/request-exchange', isAuthenticated, (req, res) => {
         }
 
         const receivingUserId = results[0].user_id;
+
+        // Verificar se o livro pertence ao usuário logado
+        if (receivingUserId === userId) {
+            console.error('Usuário tentando solicitar troca para seu próprio livro.');
+            return res.status(400).json({ success: false, message: 'Você não pode solicitar troca para seu próprio livro.' });
+        }
+
         const receivingBookId = results[0].id;
         const receivingBookTitle = results[0].titulo;
         const receivingBookImage = results[0].imagem;
 
-        // Gerar token único e data de expiração
-        const token = crypto.randomBytes(32).toString('hex');
-        const tokenExpiry = new Date(Date.now() + 48 * 60 * 60 * 1000); // 48 horas a partir de agora
-
-        // Obter informações do livro solicitado e do livro ofertado
-        const getBookDetailsSql = 'SELECT titulo, autor, imagem FROM livros WHERE id = ?';
-        db.query(getBookDetailsSql, [sendingBookId], (err, bookResults) => {
+        // Verificar se já existe uma solicitação de troca recente (menos de 24 horas) para o mesmo livro
+        const checkRecentExchangeSql = `
+            SELECT * FROM trocas 
+            WHERE usuario_solicitante_id = ? 
+            AND livro_recebedor_id = ? 
+            AND timestampdiff(HOUR, data_solicitacao, NOW()) < 24
+        `;
+        db.query(checkRecentExchangeSql, [userId, receivingBookId], (err, recentExchanges) => {
             if (err) {
-                console.error('Erro ao buscar informações do livro ofertado:', err);
-                return res.status(500).json({ success: false, message: 'Erro ao buscar informações do livro ofertado.' });
+                console.error('Erro ao verificar trocas recentes:', err);
+                return res.status(500).json({ success: false, message: 'Erro ao verificar trocas recentes.' });
             }
 
-            if (bookResults.length === 0) {
-                console.error('Livro ofertado não encontrado.');
-                return res.status(404).json({ success: false, message: 'Livro ofertado não encontrado.' });
+            if (recentExchanges.length > 0) {
+                console.error('Já existe uma solicitação de troca recente para este livro.');
+                return res.status(400).json({ success: false, message: 'Você já enviou uma solicitação de troca para este livro nas últimas 24 horas. Por favor, aguarde a resposta do outro usuário.' });
             }
 
-            const bookOffered = bookResults[0].titulo;
-            const bookOfferedAuthor = bookResults[0].autor;
-            const bookOfferedImage = bookResults[0].imagem;
+            // Gerar token único e data de expiração
+            const token = crypto.randomBytes(32).toString('hex');
+            const tokenExpiry = new Date(Date.now() + 48 * 60 * 60 * 1000); // 48 horas a partir de agora
 
-            // Inserir a solicitação de troca na tabela de trocas
-            const sql = `
-                INSERT INTO trocas (usuario_solicitante_id, usuario_recebedor_id, livro_solicitante_id, livro_recebedor_id, token, token_expiry)
-                VALUES (?, ?, ?, ?, ?, ?)
-            `;
-            db.query(sql, [userId, receivingUserId, sendingBookId, receivingBookId, token, tokenExpiry], (err, results) => {
+            // Obter informações do livro solicitado e do livro ofertado
+            const getBookDetailsSql = 'SELECT titulo, autor, imagem FROM livros WHERE id = ?';
+            db.query(getBookDetailsSql, [sendingBookId], (err, bookResults) => {
                 if (err) {
-                    console.error('Erro ao inserir solicitação de troca:', err);
-                    return res.status(500).json({ success: false, message: 'Erro ao inserir solicitação de troca.' });
+                    console.error('Erro ao buscar informações do livro ofertado:', err);
+                    return res.status(500).json({ success: false, message: 'Erro ao buscar informações do livro ofertado.' });
                 }
 
-                console.log(`Solicitação de troca enviada com sucesso: Usuario Solicitante ID ${userId}, Usuário Recebedor ID ${receivingUserId}, Livro Solicitante ID ${sendingBookId}, Livro Recebedor ID ${receivingBookId}`);
+                if (bookResults.length === 0) {
+                    console.error('Livro ofertado não encontrado.');
+                    return res.status(404).json({ success: false, message: 'Livro ofertado não encontrado.' });
+                }
 
-                // Obter as informações de contato do usuário recebedor
-                const getUserContactSql = 'SELECT email, name FROM users WHERE id = ?';
-                db.query(getUserContactSql, [receivingUserId], (err, userResults) => {
+                const bookOffered = bookResults[0].titulo;
+                const bookOfferedAuthor = bookResults[0].autor;
+                const bookOfferedImage = bookResults[0].imagem;
+
+                // Inserir a solicitação de troca na tabela de trocas
+                const sql = `
+                    INSERT INTO trocas (usuario_solicitante_id, usuario_recebedor_id, livro_solicitante_id, livro_recebedor_id, token, token_expiry, data_solicitacao)
+                    VALUES (?, ?, ?, ?, ?, ?, NOW())
+                `;
+                db.query(sql, [userId, receivingUserId, sendingBookId, receivingBookId, token, tokenExpiry], (err, results) => {
                     if (err) {
-                        console.error('Erro ao buscar informações de contato do usuário:', err);
-                        return res.status(500).json({ success: false, message: 'Erro ao buscar informações de contato do usuário.' });
+                        console.error('Erro ao inserir solicitação de troca:', err);
+                        return res.status(500).json({ success: false, message: 'Erro ao inserir solicitação de troca.' });
                     }
 
-                    if (userResults.length === 0) {
-                        console.error('Usuário não encontrado.');
-                        return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
-                    }
+                    console.log(`Solicitação de troca enviada com sucesso: Usuario Solicitante ID ${userId}, Usuário Recebedor ID ${receivingUserId}, Livro Solicitante ID ${sendingBookId}, Livro Recebedor ID ${receivingBookId}`);
 
-                    const userContact = userResults[0];
-                    const email = userContact.email;
-                    const name = userContact.name;
-
-                    // Renderizar o template e enviar o e-mail
-                    ejs.renderFile(path.join(__dirname, 'views', 'templateLivroSolicitado.ejs'), {
-                        nomeDoSolicitante: name,
-                        nomeDoLivro: receivingBookTitle,
-                        nomeDoLivroOfertado: bookOffered,
-                        autorDoLivroOfertado: bookOfferedAuthor,
-                        link: `http://localhost:3000/troca?token=${token}`
-                    }, (err, html) => {
+                    // Obter as informações de contato do usuário recebedor
+                    const getUserContactSql = 'SELECT email, name FROM users WHERE id = ?';
+                    db.query(getUserContactSql, [receivingUserId], (err, userResults) => {
                         if (err) {
-                            console.error('Erro ao renderizar o template:', err);
-                            return res.status(500).json({ success: false, message: 'Erro ao renderizar o template.' });
+                            console.error('Erro ao buscar informações de contato do usuário:', err);
+                            return res.status(500).json({ success: false, message: 'Erro ao buscar informações de contato do usuário.' });
                         }
 
-                        const mailOptions = {
-                            from: '"Buku 📚" <buku.livro@gmail.com>',
-                            to: email,
-                            subject: 'Solicitação de Troca de Livro',
-                            html: html
-                        };
+                        if (userResults.length === 0) {
+                            console.error('Usuário não encontrado.');
+                            return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
+                        }
 
-                        transporter.sendMail(mailOptions, (err, info) => {
+                        const userContact = userResults[0];
+                        const email = userContact.email;
+                        const name = userContact.name;
+
+                        // Renderizar o template e enviar o e-mail
+                        ejs.renderFile(path.join(__dirname, 'views', 'templateLivroSolicitado.ejs'), {
+                            nomeDoSolicitante: name,
+                            nomeDoLivro: receivingBookTitle,
+                            nomeDoLivroOfertado: bookOffered,
+                            autorDoLivroOfertado: bookOfferedAuthor,
+                            link: `http://localhost:3000/troca?token=${token}`
+                        }, (err, html) => {
                             if (err) {
-                                console.error('Erro ao enviar o e-mail:', err);
-                                return res.status(500).json({ success: false, message: 'Erro ao enviar o e-mail.' });
+                                console.error('Erro ao renderizar o template:', err);
+                                return res.status(500).json({ success: false, message: 'Erro ao renderizar o template.' });
                             }
 
-                            console.log('E-mail enviado:', info.response);
-                            res.json({ success: true, message: 'Solicitação de troca enviada com sucesso.' });
+                            const mailOptions = {
+                                from: '"Buku 📚" <buku.livro@gmail.com>',
+                                to: email,
+                                subject: 'Solicitação de Troca de Livro',
+                                html: html
+                            };
+
+                            transporter.sendMail(mailOptions, (err, info) => {
+                                if (err) {
+                                    console.error('Erro ao enviar o e-mail:', err);
+                                    return res.status(500).json({ success: false, message: 'Erro ao enviar o e-mail.' });
+                                }
+
+                                console.log('E-mail enviado:', info.response);
+                                res.json({ success: true, message: 'Solicitação de troca enviada com sucesso.' });
+                            });
                         });
                     });
                 });
@@ -1233,6 +1287,10 @@ app.get('/troca', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'troca.html'));
 });
 
+// Rota para acessar a página do usuário proprietario do livro
+app.get('/ownerUser', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'ownerUser.html'));
+});
 
 // Rota para obter os detalhes da troca
 app.get('/api/exchange-details/:exchangeId', isAuthenticated, (req, res) => {
@@ -1275,93 +1333,57 @@ app.get('/api/exchange-details/:exchangeId', isAuthenticated, (req, res) => {
 
 // Rota para processar a ação de aceitar ou recusar a troca
 app.post('/api/exchange-action', isAuthenticated, async (req, res) => {
-    const { token, action } = req.body;
+  const { token, action } = req.body;
 
-    const getExchangeDetailsSql = `
-        SELECT t.id, t.usuario_solicitante_id, t.usuario_recebedor_id, t.livro_solicitante_id, t.livro_recebedor_id, 
-               u.email AS solicitante_email, u.name AS solicitante_name, u.phone AS solicitante_phone, 
-               ur.email AS recebedor_email, ur.name AS recebedor_name, ur.phone AS recebedor_phone
-        FROM trocas t
-        JOIN users u ON t.usuario_solicitante_id = u.id
-        JOIN users ur ON t.usuario_recebedor_id = ur.id
-        WHERE t.token = ?
-    `;
+  const getExchangeDetailsSql = `
+      SELECT t.id, t.usuario_solicitante_id, t.usuario_recebedor_id, t.livro_solicitante_id, t.livro_recebedor_id, 
+             u.email AS solicitante_email, u.name AS solicitante_name, u.phone AS solicitante_phone, 
+             ur.email AS recebedor_email, ur.name AS recebedor_name, ur.phone AS recebedor_phone
+      FROM trocas t
+      JOIN users u ON t.usuario_solicitante_id = u.id
+      JOIN users ur ON t.usuario_recebedor_id = ur.id
+      WHERE t.token = ?
+  `;
 
-    try {
-        const [results] = await db.promise().query(getExchangeDetailsSql, [token]);
+  try {
+    const [results] = await db.promise().query(getExchangeDetailsSql, [token]);
 
-        if (results.length === 0) {
-            return res.status(404).json({ success: false, message: 'Troca não encontrada.' });
-        }
-
-        const exchangeDetails = results[0];
-
-        if (action === 'accept') {
-            // Atualizar o status da troca para "Aceito"
-            const updateExchangeSql = 'UPDATE trocas SET status = "Aceito" WHERE id = ?';
-            await db.promise().query(updateExchangeSql, [exchangeDetails.id]);
-
-            // Excluir os livros da estante dos usuários
-            const deleteBooksSql = 'DELETE FROM livros WHERE id IN (?, ?)';
-            await db.promise().query(deleteBooksSql, [exchangeDetails.livro_solicitante_id, exchangeDetails.livro_recebedor_id]);
-
-            // Enviar e-mail para ambos os usuários
-            const emailContent = `
-                <p>Olá,</p>
-                <p>A troca foi concluída com sucesso! Aqui estão os meios de contato do outro usuário:</p>
-                <p><strong>Solicitante:</strong> ${exchangeDetails.solicitante_name} (${exchangeDetails.solicitante_email}, ${exchangeDetails.solicitante_phone})</p>
-                <p><strong>Recebedor:</strong> ${exchangeDetails.recebedor_name} (${exchangeDetails.recebedor_email}, ${exchangeDetails.recebedor_phone})</p>
-                <p>Por favor, entrem em contato para combinar a entrega dos livros.</p>
-            `;
-
-            const mailOptionsSolicitante = {
-                from: '"Buku 📚" <buku.livro@gmail.com>',
-                to: exchangeDetails.solicitante_email,
-                subject: 'Troca Concluída',
-                html: emailContent
-            };
-
-            const mailOptionsRecebedor = {
-                from: '"Buku 📚" <buku.livro@gmail.com>',
-                to: exchangeDetails.recebedor_email,
-                subject: 'Troca Concluída',
-                html: emailContent
-            };
-
-            await transporter.sendMail(mailOptionsSolicitante);
-            await transporter.sendMail(mailOptionsRecebedor);
-
-            res.json({ success: true, message: 'Troca concluída com sucesso.' });
-        } else if (action === 'deny') {
-            // Atualizar o status da troca para "Recusado"
-            const updateExchangeSql = 'UPDATE trocas SET status = "Recusado" WHERE id = ?';
-            await db.promise().query(updateExchangeSql, [exchangeDetails.id]);
-
-            // Enviar e-mail para o solicitante informando que a troca foi recusada
-            const emailContent = `
-                <p>Olá ${exchangeDetails.solicitante_name},</p>
-                <p>Infelizmente, sua solicitação de troca foi recusada.</p>
-            `;
-
-            const mailOptionsSolicitante = {
-                from: '"Buku 📚" <buku.livro@gmail.com>',
-                to: exchangeDetails.solicitante_email,
-                subject: 'Troca Recusada',
-                html: emailContent
-            };
-
-            await transporter.sendMail(mailOptionsSolicitante);
-
-            res.json({ success: true, message: 'Troca recusada.' });
-        } else {
-            res.status(400).json({ success: false, message: 'Ação inválida.' });
-        }
-    } catch (err) {
-        console.error('Erro ao processar a ação da troca:', err);
-        res.status(500).json({ success: false, message: 'Erro ao processar a ação da troca.' });
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: 'Troca não encontrada.' });
     }
-});
 
+    const exchangeDetails = results[0];
+
+    if (action === 'accept') {
+      // Atualizar o status da troca para "Aceita"
+      const updateExchangeSql = 'UPDATE trocas SET status = "Aceita" WHERE id = ?';
+      await db.promise().query(updateExchangeSql, [exchangeDetails.id]);
+
+      // Enviar e-mail para o solicitante informando que a troca foi aceita
+      const userName = exchangeDetails.solicitante_name;
+      const otherUserName = exchangeDetails.recebedor_name;
+      enviarEmailComTemplate(exchangeDetails.solicitante_email, 'Troca aceita', 'templateTrocaAceita', { userName, otherUserName });
+
+      return res.status(200).json({ success: true, message: 'Troca aceita com sucesso.' });
+    } else if (action === 'deny') {
+      // Atualizar o status da troca para "Recusada"
+      const updateExchangeSql = 'UPDATE trocas SET status = "Recusada" WHERE id = ?';
+      await db.promise().query(updateExchangeSql, [exchangeDetails.id]);
+
+      // Enviar e-mail para o solicitante informando que a troca foi negada
+      const userName = exchangeDetails.solicitante_name;
+      const otherUserName = exchangeDetails.recebedor_name;
+      enviarEmailComTemplate(exchangeDetails.solicitante_email, 'Troca negada', 'templateTrocaNegada', { userName, otherUserName });
+
+      return res.status(200).json({ success: true, message: 'Troca recusada com sucesso.' });
+    } else {
+      return res.status(400).json({ success: false, message: 'Ação inválida.' });
+    }
+  } catch (err) {
+    console.error('Erro ao processar a ação da troca:', err);
+    return res.status(500).json({ success: false, message: 'Erro ao processar a ação da troca.' });
+  }
+});
 // Rota para remover trocas pendentes com tokens expirados
 app.delete('/api/remove-expired-exchanges', async (req, res) => {
     const currentTime = new Date();

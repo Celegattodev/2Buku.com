@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrador - Gerenciar usuários</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/admin/admin_gerenciar_usuarios.css">
+</head>
+<body>
+    <header>
+        <nav id="navbar">
+            <img id="navbar_logo" src="/img/Logo-Buku-branco.png" alt="Logo" />
+            <ul id="nav_list">
+                <li class="nav-item active"><a href="#">Sobre Nós</a></li>
+                <li class="nav-item"><a href="#">Funcionamento</a></li>
+                <li class="nav-item"><a href="#">Perguntas Frequentes</a></li>
+            </ul>
+            <button class="btn-default">Cadastrar/Entrar</button>
+            <button id="mobile_btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </nav>
+        <div id="mobile_menu">
+            <ul id="mobile_nav_list">
+                <li class="nav-item"><a href="#">Sobre Nós</a></li>
+                <li class="nav-item"><a href="#">Funcionamento</a></li>
+                <li class="nav-item"><a href="#">Perguntas Frequentes</a></li>
+            </ul>
+            <button class="btn-default">Cadastrar/Entrar</button>
+        </div>
+    </header>
+    <div class="container-fluid">
+        <div class="col d-flex justify-content-center">
+            <div class="card mt-4 mb-5 shadow">
+                <div class="card-body">
+                    <div class="row text-center">
+                        <h3>Gerenciar Usuários</h3>
+                    </div>
+                    <form action="#" method="POST">
+                        <div class="mb-2">
+                            <label for="">Pesquisar Usuário</label>
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" placeholder="Nome de usuário, email...">
+                        </div>
+                    </form>
+                    <div class="mb-3">
+                        <a href="/admin" class="btn" id="btn-back">Voltar</a>
+                    </div>
+                    <div class="results mt-4">
+                        <div class="mt-2">
+                            <h5><b>Resultados de pesquisa</b></h5> 
+                            <ul class="list-group mt-3">
+                                <li class="list-group-item" id="item-history">
+                                    <div class="col mt-2 mb-2">
+                                        <h5>
+                                            <a href="#">Usuario 2</a>
+                                        </h5>
+                                        <div class="desc mt-3">
+                                            <p>email: usuario2@gmail.com</p>
+                                            <p>status: normal</p>
+                                        </div>
+                                        <a href="/user-history">
+                                            <button type="button" class="btn" id="button-details">Ver histórico de trocas</button>
+                                        </a>
+                                        <a href="/alert">
+                                            <button type="button" class="btn" id="button-alert">Alerta</button>
+                                        </a>
+                                    </div>
+                                </li>
+                                <li class="list-group-item" id="item-history">
+                                    <div class="col mt-2 mb-2">
+                                        <h5>
+                                            <a href="#">Usuario 3</a>
+                                        </h5>
+                                        <div class="desc mt-3">
+                                            <p>email: usuario3@gmail.com</p>
+                                            <p>status: suspenso</p>
+                                        </div>
+                                        <a href="/user-history">
+                                            <button type="button" class="btn" id="button-details">Ver histórico de trocas</button>
+                                        </a>
+                                        <a href="/alert">
+                                            <button type="button" class="btn" id="button-alert">Alerta</button>
+                                        </a>
+                                    </div>
+                                </li>
+                                <li class="list-group-item" id="item-history">
+                                    <div class="col mt-2 mb-2">
+                                        <h5>
+                                            <a href="#">Usuario 4</a>
+                                        </h5>
+                                        <div class="desc mt-3">
+                                            <p>email: usuario4@gmail.com</p>
+                                            <p>status: banido</p>
+                                        </div>
+                                        <button class="btn" id="button-db">Desbanir</button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

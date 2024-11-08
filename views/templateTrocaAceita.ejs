@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alteração de Senha</title>
+    <title>Troca aceita</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700&display=swap');
 
@@ -43,27 +43,6 @@
             font-size: 16px;
         }
 
-        .button-container {
-            text-align: center;
-            margin: 30px 0;
-        }
-
-        a.button {
-            display: inline-block;
-            padding: 15px 35px;
-            background-color: #fd9323;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        a.button:hover {
-            background-color: #ffa54d;
-            transition: background-color 0.3s;
-        }
-
         .footer {
             margin-top: 40px;
             text-align: center;
@@ -82,17 +61,11 @@
         }
     </style>
 </head>
-
 <body>
     <div class="email-container">
-        <h1>Alteração de Senha</h1>
-        <p>Olá,<%= userName %>,</p>
-        <p>Parece que você esqueceu sua senha :/, mas não se preocupe! Clique no botão abaixo para criar uma nova senha:
-        </p>
-        <div class="button-container">
-            <a href="http://localhost:3000/alterar-senha?token=<%= resetToken %>" class="button">Alterar Senha</a>
-        </div>
-        <p>Caso você não tenha solicitado essa alteração, por favor, ignore ou entre em contato conosco por esse e-mail.</p>
+        <h1>Troca aceita</h1>
+        <p>Olá, <%= userName %>,</p>
+        <p>A troca com o usuário <%= otherUserName %> foi aceita.</p>
         <p>Atenciosamente,<br>A equipe de suporte ♡</p>
         <div class="footer">
             <a href="http://localhost:3000/">

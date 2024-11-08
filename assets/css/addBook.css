@@ -131,13 +131,9 @@ h1 {
   }
 }
 
-#backToProfile {
-  margin: 40px;
+#backButton {
   position: absolute;
-  top: 70px;
-  /* Ajuste conforme a altura da navbar */
-  left: 20px;
-  /* Distância do lado esquerdo */
+  top: 120px; /* Ajuste conforme necessário */
+  left: 20px; /* Ajuste conforme necessário */
   z-index: 1000;
-  /* Para garantir que fique acima de outros elementos */
 }

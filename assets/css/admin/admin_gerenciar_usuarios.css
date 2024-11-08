@@ -1,0 +1,61 @@
+body{
+    background-image: url('/img/Buku-fundo.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.card{
+    width: 100vh;
+}
+a{
+    text-decoration: none;
+}
+
+.desc{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+p{
+    word-break: break-all;
+}
+
+#btn-back{
+    background-color: #366aca;
+    text-decoration: none;
+    border: none;
+    color: #fff;
+}
+#btn-back:hover{
+    background-color: #4976c9;
+}
+
+#button-details{
+    background-color: #00a30e;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #fff;
+}
+#button-details:hover{
+    background-color: #00b10f;
+}
+
+#button-alert{
+    background-color: #dc3545;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #fff;
+}
+#button-alert:hover{
+    background-color: #f1293d;
+}
+#button-db{
+    background-color: #fd9323;
+    border: none;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #fff;
+}
+#button-db:hover{
+    background-color: #ff9d34;
+}

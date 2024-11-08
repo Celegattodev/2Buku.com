@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrador</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/admin/admin.css">
+</head>
+<body>
+    <header>
+        <nav id="navbar">
+            <img id="navbar_logo" src="/img/Logo-Buku-branco.png" alt="Logo" />
+            <ul id="nav_list">
+                <li class="nav-item active"><a href="#">Sobre Nós</a></li>
+                <li class="nav-item"><a href="#">Funcionamento</a></li>
+                <li class="nav-item"><a href="#">Perguntas Frequentes</a></li>
+            </ul>
+            <button class="btn-default">Cadastrar/Entrar</button>
+            <button id="mobile_btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </nav>
+        <div id="mobile_menu">
+            <ul id="mobile_nav_list">
+                <li class="nav-item"><a href="#">Sobre Nós</a></li>
+                <li class="nav-item"><a href="#">Funcionamento</a></li>
+                <li class="nav-item"><a href="#">Perguntas Frequentes</a></li>
+            </ul>
+            <button class="btn-default">Cadastrar/Entrar</button>
+        </div>
+    </header>
+    <div class="container-fluid">
+        <div class="col">
+            <div class="card mt-4 mb-5">
+                <div class="card-body">
+                    <section class="details-profile text-center mb-5">
+                        <div class="profile-image-container">
+                            <img src="/img/profile-image/th.jpeg" alt="Foto de Perfil" class="profile-image">
+                        </div>
+                        <h3 class="card-title" id="profile-name">Administrador</h3>
+                        <p class="card-text" id="profile-email">{{userEmail}} - {{userState}}</p>
+                        <p class="card-text" id="profile-city">São Paulo</p>
+                        <p class="card-text" id="profile-phone">São Paulo</p>
+            
+                        <div class="card mt-4">
+                            <div class="card-body">
+                            <p id="profile-description">Administrador da plataforma Buku.</p>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="admin-actions">
+                        <h2>O que deseja fazer?</h2>
+                        <div class="actions">
+                            <a href="/manage-users">
+                                <div class="card" id="manage-card">
+                                    <div class="img-icone">
+                                        <img src="/img/gerenciar_usuarios.png" alt="" class="img">
+                                    </div>
+                                    <div class="action-text">
+                                        <h3>Gerenciar usuários</h3>
+                                        <p>Visualize os usuários da plataforma, os livros que cadastraram e seus status.</p>
+                                    </div>
+                                </div>
+                            </a>
+                            <a href="/alert">
+                                <div class="card" id="alert-card">
+                                    <div class="img-icone">
+                                        <img src="/img/alertar_usuario.png" alt="" class="img">
+                                    </div>
+                                    <div class="action-text">
+                                        <h3>Enviar alerta</h3>
+                                        <p>Envie uma mensagem para um usuário informando o motivo da suspensão ou banimento.</p>
+                                    </div>
+                                </div>
+                            </a>
+                            <a href="/relatorio">
+                                <div class="card" id="relatorio-card">
+                                    <div class="img-icone">
+                                        <img src="/img/relatorio_icone.png" alt="" class="img">
+                                    </div>
+                                    <div class="action-text">
+                                        <h3>Gerar relatório</h3>
+                                        <p>Gere um relatório sobre a plataforma com informações sobre os livros cadastrados no mês, o mais cadastrados, o número de usuários e mais.</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
