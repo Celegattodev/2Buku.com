@@ -38,6 +38,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 async function createBookCard(book) {
+    console.log('Criando card para o livro:', book);
+    
     const bookCard = document.createElement('div');
     bookCard.classList.add('product-card');
     bookCard.setAttribute('data-google-books-id', book.googleBooksId);

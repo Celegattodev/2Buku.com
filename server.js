@@ -686,37 +686,37 @@ app.get('/api/book-details/:bookId', isAuthenticated, async (req, res) => {
   const bookId = req.params.bookId;
 
   try {
-      const bookSql = 'SELECT * FROM livros WHERE id = ?';
-      const [bookResults] = await db.promise().query(bookSql, [bookId]);
+    const bookSql = 'SELECT * FROM livros WHERE id = ?';
+    const [bookResults] = await db.promise().query(bookSql, [bookId]);
 
-      if (bookResults.length === 0) {
-          return res.status(404).json({ success: false, message: 'Livro não encontrado.' });
+    if (bookResults.length === 0) {
+      return res.status(404).json({ success: false, message: 'Livro não encontrado.' });
+    }
+
+    const book = bookResults[0];
+
+    // Buscar a descrição do livro usando a Google Books API
+    const googleBooksId = book.google_books_id;
+    const googleBooksUrl = `https://www.googleapis.com/books/v1/volumes/${googleBooksId}`;
+    const googleBooksResponse = await axios.get(googleBooksUrl);
+    const bookDescription = googleBooksResponse.data.volumeInfo.description || 'Descrição não disponível';
+
+    const imagesSql = 'SELECT imagem_url FROM livro_imagens WHERE livro_id = ?';
+    const [imageResults] = await db.promise().query(imagesSql, [bookId]);
+
+    const images = imageResults.map(row => row.imagem_url);
+
+    res.status(200).json({
+      success: true,
+      book: {
+        description: bookDescription,
+        coverImage: book.imagem,
+        images: images
       }
-
-      const book = bookResults[0];
-
-      // Buscar a descrição do livro usando a Google Books API
-      const googleBooksId = book.google_books_id;
-      const googleBooksUrl = `https://www.googleapis.com/books/v1/volumes/${googleBooksId}`;
-      const googleBooksResponse = await axios.get(googleBooksUrl);
-      const bookDescription = googleBooksResponse.data.volumeInfo.description || 'Descrição não disponível';
-
-      const imagesSql = 'SELECT imagem_url FROM livro_imagens WHERE livro_id = ?';
-      const [imageResults] = await db.promise().query(imagesSql, [bookId]);
-
-      const images = imageResults.map(row => row.imagem_url);
-
-      res.status(200).json({
-          success: true,
-          book: {
-              description: bookDescription,
-              coverImage: book.imagem,
-              images: images
-          }
-      });
+    });
   } catch (err) {
-      console.error('Erro ao carregar os detalhes do livro:', err);
-      res.status(500).json({ success: false, message: 'Erro ao carregar os detalhes do livro.' });
+    console.error('Erro ao carregar os detalhes do livro:', err);
+    res.status(500).json({ success: false, message: 'Erro ao carregar os detalhes do livro.' });
   }
 });
 
@@ -975,18 +975,18 @@ app.get('/catalog', isAuthenticated, (req, res) => {
 
 // Rota para redirecionar para a página de catálogo
 app.get('/catalog-data', (req, res) => {
-  // Consulta para buscar os livros mais populares
+  // Consulta para buscar os livros mais populares e incluir o user_id do proprietário
   const popularBooksSql = `
-    SELECT google_books_id, COUNT(*) as count
+    SELECT google_books_id, user_id, COUNT(*) as count
     FROM livros
-    GROUP BY google_books_id
+    GROUP BY google_books_id, user_id
     ORDER BY count DESC
     LIMIT 10
   `;
 
-  // Consulta para buscar os últimos livros adicionados
+  // Consulta para buscar os últimos livros adicionados, incluindo o user_id do proprietário
   const latestBooksSql = `
-    SELECT google_books_id
+    SELECT google_books_id, user_id
     FROM livros
     ORDER BY data_adicao DESC
     LIMIT 10
@@ -1004,17 +1004,23 @@ app.get('/catalog-data', (req, res) => {
         return res.status(500).json({ success: false, message: 'Erro ao buscar últimos livros adicionados.' });
       }
 
-      // Buscar detalhes dos livros na API do Google Books
+      // Fazer chamadas à API Google Books para buscar detalhes dos livros
       const googleBooksApiUrl = 'https://www.googleapis.com/books/v1/volumes';
       const popularBooksPromises = popularBooks.map(book => {
         if (book.google_books_id) {
-          return axios.get(`${googleBooksApiUrl}/${book.google_books_id}`).then(response => response.data);
+          return axios.get(`${googleBooksApiUrl}/${book.google_books_id}`).then(response => ({
+            ...response.data,
+            userId: book.user_id // Inclua o userId diretamente aqui
+          }));
         }
         return Promise.resolve(null);
       });
       const latestBooksPromises = latestBooks.map(book => {
         if (book.google_books_id) {
-          return axios.get(`${googleBooksApiUrl}/${book.google_books_id}`).then(response => response.data);
+          return axios.get(`${googleBooksApiUrl}/${book.google_books_id}`).then(response => ({
+            ...response.data,
+            userId: book.user_id // Inclua o userId diretamente aqui
+          }));
         }
         return Promise.resolve(null);
       });
@@ -1029,7 +1035,7 @@ app.get('/catalog-data', (req, res) => {
                 author: result.volumeInfo.authors.join(', '),
                 imageUrl: result.volumeInfo.imageLinks.thumbnail,
                 genres: result.volumeInfo.categories,
-                ownerUser: result.volumeInfo.user_id // MEXIDO
+                userId: popularBooks[index].user_id  // Inclua userId aqui
               };
             }
             return null;
@@ -1043,7 +1049,7 @@ app.get('/catalog-data', (req, res) => {
                 author: result.volumeInfo.authors.join(', '),
                 imageUrl: result.volumeInfo.imageLinks.thumbnail,
                 genres: result.volumeInfo.categories,
-                ownerUser: result.volumeInfo.user_id // MEXIDO
+                userId: latestBooks[index].user_id  // Inclua userId aqui
               };
             }
             return null;
@@ -1058,6 +1064,7 @@ app.get('/catalog-data', (req, res) => {
     });
   });
 });
+
 
 // Rota para obter os livros do usuário logado
 app.get('/api/user-books', isAuthenticated, (req, res) => {
@@ -1433,40 +1440,39 @@ app.get('/search-books', async (req, res) => {
   }
 });
 
-app.get('/ownerUser/:userId', (req, res) => {
-  const userId = req.params.userId;
+// Rota para obter os detalhes do perfil do usuário proprietário
+app.get('/api/ownerUser/:userId', isAuthenticated, async (req, res) => {
+    const userId = req.params.userId;
 
-  // Consulta SQL para buscar informações do usuário
-  const userSql = `SELECT name, email, city, state, phone, biography, profileImage FROM users WHERE id = ?`;
-  db.query(userSql, [userId], (err, userResults) => {
-    if (err || userResults.length === 0) {
-      return res.json({ success: false, message: 'Usuário não encontrado.' });
-    }
+    try {
+        const userSql = 'SELECT name, email, city, state, phone, biography AS description FROM users WHERE id = ?';
+        const [userResults] = await db.promise().query(userSql, [userId]);
 
-    const user = userResults[0];
-
-    // Consulta para buscar os livros do usuário
-    const booksSql = `SELECT titulo AS title, autor AS author, imagem AS imageUrl FROM livros WHERE user_id = ?`;
-    db.query(booksSql, [userId], (err, books) => {
-      if (err) {
-        return res.json({ success: false, message: 'Erro ao buscar livros do usuário.' });
-      }
-
-      // Consulta para buscar os livros favoritos do usuário
-      const favoritesSql = `SELECT titulo AS title, autor AS author, imagem AS imageUrl FROM favoritos WHERE user_id = ?`;
-      db.query(favoritesSql, [userId], (err, favorites) => {
-        if (err) {
-          return res.json({ success: false, message: 'Erro ao buscar livros favoritos do usuário.' });
+        if (userResults.length === 0) {
+            return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
         }
 
-        // Enviar os dados do perfil, estante e favoritos do usuário
-        res.json({
-          success: true,
-          user: user,
-          books: books,
-          favorites: favorites
+        const user = userResults[0];
+
+        const booksSql = 'SELECT id, titulo AS title, autor AS author, imagem AS imageUrl FROM livros WHERE user_id = ?';
+        const [booksResults] = await db.promise().query(booksSql, [userId]);
+
+        const favoritesSql = 'SELECT id, titulo AS title, autor AS author, imagem AS imageUrl FROM favoritos WHERE user_id = ?';
+        const [favoritesResults] = await db.promise().query(favoritesSql, [userId]);
+
+        res.status(200).json({
+            success: true,
+            user: user,
+            books: booksResults,
+            favorites: favoritesResults
         });
-      });
-    });
-  });
+    } catch (err) {
+        console.error('Erro ao buscar detalhes do usuário:', err);
+        res.status(500).json({ success: false, message: 'Erro ao buscar detalhes do usuário.' });
+    }
+});
+
+// Rota para acessar a página do usuário proprietário do livro
+app.get('/ownerUser', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'ownerUser.html'));
 });
