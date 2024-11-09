@@ -45,6 +45,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
+
+
 function createBookCard(book) {
     const card = document.createElement('div');
     card.className = 'product-card';
@@ -78,7 +80,6 @@ function createBookCard(book) {
 
     return card;
 }
-
 function addCarouselNavigation() {
     const carousels = document.querySelectorAll('.carousel-container');
     carousels.forEach(carousel => {

@@ -1357,77 +1357,94 @@ app.get('/api/exchange-details/:exchangeId', isAuthenticated, (req, res) => {
 
 // Rota para processar a ação de aceitar ou recusar a troca
 app.post('/api/exchange-action', isAuthenticated, async (req, res) => {
-    const { token, action } = req.body;
+  const { token, action } = req.body;
 
-    const getExchangeDetailsSql = `
-        SELECT t.id, t.usuario_solicitante_id, t.usuario_recebedor_id, t.livro_solicitante_id, t.livro_recebedor_id, 
-               u.email AS solicitante_email, u.name AS solicitante_name, u.phone AS solicitante_phone, 
-               ur.email AS recebedor_email, ur.name AS recebedor_name, ur.phone AS recebedor_phone
-        FROM trocas t
-        JOIN users u ON t.usuario_solicitante_id = u.id
-        JOIN users ur ON t.usuario_recebedor_id = ur.id
-        WHERE t.token = ?
-    `;
+  const getExchangeDetailsSql = `
+      SELECT t.id, t.usuario_solicitante_id, t.usuario_recebedor_id, t.livro_solicitante_id, t.livro_recebedor_id, 
+             u.email AS solicitante_email, u.name AS solicitante_name, u.phone AS solicitante_phone, 
+             ur.email AS recebedor_email, ur.name AS recebedor_name, ur.phone AS recebedor_phone
+      FROM trocas t
+      JOIN users u ON t.usuario_solicitante_id = u.id
+      JOIN users ur ON t.usuario_recebedor_id = ur.id
+      WHERE t.token = ?
+  `;
 
-    try {
-        const [results] = await db.promise().query(getExchangeDetailsSql, [token]);
+  try {
+      const [results] = await db.promise().query(getExchangeDetailsSql, [token]);
 
-        if (results.length === 0) {
-            return res.status(404).json({ success: false, message: 'Troca não encontrada.' });
-        }
+      if (results.length === 0) {
+          return res.status(404).json({ success: false, message: 'Troca não encontrada.' });
+      }
 
-        const exchangeDetails = results[0];
+      const exchangeDetails = results[0];
 
-        if (action === 'accept') {
-            // Remover os livros da biblioteca de ambos os usuários
-            const deleteBooksSql = `
-                DELETE FROM livros 
-                WHERE (id = ? AND user_id = ?) 
-                OR (id = ? AND user_id = ?)
-            `;
-            await db.promise().query(deleteBooksSql, [
-                exchangeDetails.livro_solicitante_id, exchangeDetails.usuario_solicitante_id,
-                exchangeDetails.livro_recebedor_id, exchangeDetails.usuario_recebedor_id
-            ]);
+      if (action === 'accept') {
+          // Remover os livros da biblioteca de ambos os usuários
+          const deleteBooksSql = `
+              DELETE FROM livros 
+              WHERE (id = ? AND user_id = ?) 
+              OR (id = ? AND user_id = ?)
+          `;
+          await db.promise().query(deleteBooksSql, [
+              exchangeDetails.livro_solicitante_id, exchangeDetails.usuario_solicitante_id,
+              exchangeDetails.livro_recebedor_id, exchangeDetails.usuario_recebedor_id
+          ]);
 
-            // Atualizar o status da troca para "Concluída"
-            const updateExchangeSql = 'UPDATE trocas SET status = "Concluída" WHERE id = ?';
-            await db.promise().query(updateExchangeSql, [exchangeDetails.id]);
+          // Atualizar o status da troca para "Concluída"
+          const updateExchangeSql = 'UPDATE trocas SET status = "Concluída" WHERE id = ?';
+          await db.promise().query(updateExchangeSql, [exchangeDetails.id]);
 
-            // Enviar email de confirmação para ambos os usuários
-            const solicitanteEmail = exchangeDetails.solicitante_email;
-            const recebedorEmail = exchangeDetails.recebedor_email;
-            const solicitanteName = exchangeDetails.solicitante_name;
-            const recebedorName = exchangeDetails.recebedor_name;
+          // Enviar email de confirmação para ambos os usuários
+          const solicitanteEmail = exchangeDetails.solicitante_email;
+          const recebedorEmail = exchangeDetails.recebedor_email;
+          const solicitanteName = exchangeDetails.solicitante_name;
+          const recebedorName = exchangeDetails.recebedor_name;
+          const solicitantePhone = exchangeDetails.solicitante_phone;
+          const recebedorPhone = exchangeDetails.recebedor_phone;
 
-            enviarEmailComTemplate(solicitanteEmail, 'Troca Concluída', 'templateTrocaAceita', { userName: solicitanteName, otherUserName: recebedorName });
-            enviarEmailComTemplate(recebedorEmail, 'Troca Concluída', 'templateTrocaAceita', { userName: recebedorName, otherUserName: solicitanteName });
+          enviarEmailComTemplate(solicitanteEmail, 'Troca Concluída', 'templateTrocaAceita', {
+              userName: solicitanteName,
+              otherUserName: recebedorName,
+              otherUserEmail: recebedorEmail,
+              otherUserPhone: recebedorPhone
+          });
+          enviarEmailComTemplate(recebedorEmail, 'Troca Concluída', 'templateTrocaAceita', {
+              userName: recebedorName,
+              otherUserName: solicitanteName,
+              otherUserEmail: solicitanteEmail,
+              otherUserPhone: solicitantePhone
+          });
 
-            res.json({ success: true, message: 'Troca concluída com sucesso! Entre em contato com o outro usuário para combinar a entrega.' });
-        } else if (action === 'deny') {
-            // Atualizar o status da troca para "Recusada"
-            const updateExchangeSql = 'UPDATE trocas SET status = "Recusada" WHERE id = ?';
-            await db.promise().query(updateExchangeSql, [exchangeDetails.id]);
+          res.json({ success: true, message: 'Troca concluída com sucesso! Entre em contato com o outro usuário para combinar a entrega.' });
+      } else if (action === 'deny') {
+          // Atualizar o status da troca para "Recusada"
+          const updateExchangeSql = 'UPDATE trocas SET status = "Recusada" WHERE id = ?';
+          await db.promise().query(updateExchangeSql, [exchangeDetails.id]);
 
-            // Enviar email de notificação para ambos os usuários
-            const solicitanteEmail = exchangeDetails.solicitante_email;
-            const recebedorEmail = exchangeDetails.recebedor_email;
-            const solicitanteName = exchangeDetails.solicitante_name;
-            const recebedorName = exchangeDetails.recebedor_name;
+          // Enviar email de notificação para ambos os usuários
+          const solicitanteEmail = exchangeDetails.solicitante_email;
+          const recebedorEmail = exchangeDetails.recebedor_email;
+          const solicitanteName = exchangeDetails.solicitante_name;
+          const recebedorName = exchangeDetails.recebedor_name;
 
-            enviarEmailComTemplate(solicitanteEmail, 'Troca Negada', 'templateTrocaNegada', { userName: solicitanteName, otherUserName: recebedorName });
-            enviarEmailComTemplate(recebedorEmail, 'Troca Negada', 'templateTrocaNegada', { userName: recebedorName, otherUserName: solicitanteName });
+          enviarEmailComTemplate(solicitanteEmail, 'Troca Negada', 'templateTrocaNegada', {
+              userName: solicitanteName,
+              otherUserName: recebedorName
+          });
+          enviarEmailComTemplate(recebedorEmail, 'Troca Negada', 'templateTrocaNegada', {
+              userName: recebedorName,
+              otherUserName: solicitanteName
+          });
 
-            res.json({ success: true, message: 'Troca não foi concretizada.' });
-        } else {
-            res.status(400).json({ success: false, message: 'Ação inválida.' });
-        }
-    } catch (err) {
-        console.error('Erro ao processar a ação da troca:', err);
-        return res.status(500).json({ success: false, message: 'Erro ao processar a ação da troca.' });
-    }
+          res.json({ success: true, message: 'Troca não foi concretizada.' });
+      } else {
+          res.status(400).json({ success: false, message: 'Ação inválida.' });
+      }
+  } catch (err) {
+      console.error('Erro ao processar a ação da troca:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao processar a ação da troca.' });
+  }
 });
-
 // Rota para obter os detalhes do perfil do usuário proprietário
 app.get('/api/ownerUser/:userId', isAuthenticated, async (req, res) => {
     const userId = req.params.userId;

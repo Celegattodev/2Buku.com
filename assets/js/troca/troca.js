@@ -102,28 +102,28 @@ function handleExchangeAction(token, action) {
         },
         body: JSON.stringify({ token, action })
     })
-    .then(response => response.json())
-    .then(data => {
-        Swal.close();
-        if (data.success) {
-            if (action === 'accept') {
-                Swal.fire('Sucesso', 'Troca concluída com sucesso! Entre em contato com o outro usuário para combinar a entrega.', 'success')
-                    .then(() => {
-                        window.location.href = '/catalog';
-                    });
+        .then(response => response.json())
+        .then(data => {
+            Swal.close();
+            if (data.success) {
+                if (action === 'accept') {
+                    Swal.fire('Sucesso', 'Troca concluída com sucesso! Entre em contato com o outro usuário para combinar a entrega.', 'success')
+                        .then(() => {
+                            window.location.href = '/catalog';
+                        });
+                } else {
+                    Swal.fire('Informação', 'Troca não foi concretizada.', 'info')
+                        .then(() => {
+                            window.location.href = '/catalog';
+                        });
+                }
             } else {
-                Swal.fire('Informação', 'Troca não foi concretizada.', 'info')
-                    .then(() => {
-                        window.location.href = '/catalog';
-                    });
+                Swal.fire('Erro', data.message, 'error');
             }
-        } else {
-            Swal.fire('Erro', data.message, 'error');
-        }
-    })
-    .catch(error => {
-        Swal.close();
-        console.error('Erro ao processar a ação da troca:', error);
-        Swal.fire('Erro', 'Erro ao processar a ação da troca. Por favor, tente novamente.', 'error');
-    });
+        })
+        .catch(error => {
+            Swal.close();
+            console.error('Erro ao processar a ação da troca:', error);
+            Swal.fire('Erro', 'Erro ao processar a ação da troca. Por favor, tente novamente.', 'error');
+        });
 }
