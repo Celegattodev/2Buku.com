@@ -25,10 +25,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // Carregar livros favoritos do usuário
                     const userFavoritesContainer = document.getElementById('user-favorites');
-                    data.favorites.forEach(book => {
-                        const bookCard = createBookCard(book);
-                        userFavoritesContainer.appendChild(bookCard);
-                    });
+                    if (data.favorites.length === 0) {
+                        const noFavoritesMessage = document.createElement('p');
+                        noFavoritesMessage.textContent = 'Sem desejos';
+                        noFavoritesMessage.className = 'no-favorites-message';
+                        userFavoritesContainer.appendChild(noFavoritesMessage);
+                    } else {
+                        data.favorites.forEach(book => {
+                            const bookCard = createBookCard(book);
+                            userFavoritesContainer.appendChild(bookCard);
+                        });
+                    }
 
                     // Adicionar funcionalidade de navegação
                     addCarouselNavigation();
@@ -44,8 +51,6 @@ document.addEventListener('DOMContentLoaded', function () {
         Swal.fire('Erro', 'ID do usuário não fornecido.', 'error');
     }
 });
-
-
 
 function createBookCard(book) {
     const card = document.createElement('div');
@@ -80,20 +85,27 @@ function createBookCard(book) {
 
     return card;
 }
+
 function addCarouselNavigation() {
     const carousels = document.querySelectorAll('.carousel-container');
+
     carousels.forEach(carousel => {
         const preBtn = carousel.querySelector('.pre-btn');
         const nxtBtn = carousel.querySelector('.nxt-btn');
         const container = carousel.querySelector('.product-container');
 
-        preBtn.addEventListener('click', () => {
-            container.scrollLeft -= container.offsetWidth;
-        });
+        // Verifique se os elementos existem antes de tentar adicionar o listener
+        if (preBtn && nxtBtn && container) {
+            preBtn.addEventListener('click', () => {
+                container.scrollLeft -= container.offsetWidth;
+            });
 
-        nxtBtn.addEventListener('click', () => {
-            container.scrollLeft += container.offsetWidth;
-        });
+            nxtBtn.addEventListener('click', () => {
+                container.scrollLeft += container.offsetWidth;
+            });
+        } else {
+            console.warn("Elementos de navegação do carrossel não encontrados");
+        }
     });
 }
 

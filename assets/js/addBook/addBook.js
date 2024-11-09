@@ -37,7 +37,7 @@ function displayBooks(books) {
                         <p class="card-text">Autor: ${bookInfo.authors?.join(', ') || 'Desconhecido'}</p>
                         <button class="btn btn-info" onclick="showBookDetails('${book.id}')">Ver Detalhes</button>
                         <button class="btn btn-success" onclick="promptForImages('${book.id}', '${bookInfo.title}', '${bookInfo.authors?.join(', ')}', '${imageUrl}')">Adicionar à Biblioteca</button>
-                        <button class="btn btn-warning text-white" onclick="addToFavorites('${book.id}', '${bookInfo.title}', '${bookInfo.authors?.join(', ')}', '${imageUrl}')">Adicionar aos Favoritos</button>
+                        <button class="btn btn-warning text-white" onclick="addToFavorites('${book.id}', '${bookInfo.title}', '${bookInfo.authors?.join(', ')}', '${imageUrl}')">Adicionar aos Desejados</button>
                     </div>
                 </div>
             </div>
@@ -283,11 +283,11 @@ function addToLibrary(googleBooksId, title, author, imageUrl, bookImages) {
                             confirmButtonText: 'Ok'
                         });
                     });
-            } else if (data.message === 'Livro já existe na biblioteca' || data.message === 'Livro já está nos favoritos') {
+            } else if (data.message === 'Livro já existe na biblioteca' || data.message === 'Livro já está nos desejados') {
                 Swal.close(); // Fechar o alerta de carregamento
                 Swal.fire({
                     title: 'Atenção!',
-                    text: 'Este livro já existe na sua biblioteca ou nos seus favoritos.',
+                    text: 'Este livro já existe na sua biblioteca ou nos seus desejados.',
                     icon: 'info',
                     confirmButtonText: 'Ok'
                 });
@@ -326,31 +326,31 @@ function addToFavorites(googleBooksId, title, author, imageUrl) {
             if (data.success) {
                 Swal.fire({
                     title: 'Sucesso!',
-                    text: 'Livro adicionado aos favoritos com sucesso!',
+                    text: 'Livro adicionado aos desejados com sucesso!',
                     icon: 'success',
                     confirmButtonText: 'Ok'
                 });
-            } else if (data.message === 'Livro já está nos favoritos' || data.message === 'Livro já está na biblioteca') {
+            } else if (data.message === 'Livro já está nos desejados' || data.message === 'Livro já está na biblioteca') {
                 Swal.fire({
                     title: 'Atenção!',
-                    text: 'Este livro já está na sua biblioteca ou nos seus favoritos.',
+                    text: 'Este livro já está na sua biblioteca ou nos seus desejados.',
                     icon: 'info',
                     confirmButtonText: 'Ok'
                 });
             } else {
                 Swal.fire({
                     title: 'Erro!',
-                    text: data.message || 'Erro ao adicionar o livro aos favoritos.',
+                    text: data.message || 'Erro ao adicionar o livro aos desejados.',
                     icon: 'error',
                     confirmButtonText: 'Ok'
                 });
             }
         })
         .catch(error => {
-            console.error('Erro ao adicionar o livro aos favoritos:', error);
+            console.error('Erro ao adicionar o livro aos desejados:', error);
             Swal.fire({
                 title: 'Erro!',
-                text: 'Erro ao adicionar o livro aos favoritos.',
+                text: 'Erro ao adicionar o livro aos desejados.',
                 icon: 'error',
                 confirmButtonText: 'Ok'
             });

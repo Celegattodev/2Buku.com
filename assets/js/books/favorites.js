@@ -34,22 +34,22 @@ function deleteFavorite(bookId, bookElement) {
                 bookElement.remove();
                 Swal.fire(
                     'Deletado!',
-                    'Seu livro favorito foi deletado.',
+                    'Seu livro desejado foi deletado.',
                     'success'
                 );
             } else {
                 Swal.fire(
                     'Erro!',
-                    data.message || 'Erro ao deletar o livro favorito.',
+                    data.message || 'Erro ao deletar o livro desejado.',
                     'error'
                 );
             }
         })
         .catch(error => {
-            console.error('Erro ao deletar o livro favorito:', error);
+            console.error('Erro ao deletar o livro desejado:', error);
             Swal.fire(
                 'Erro!',
-                'Erro ao deletar o livro favorito.',
+                'Erro ao deletar o livro desejado.',
                 'error'
             );
         });

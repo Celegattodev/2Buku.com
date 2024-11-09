@@ -53,6 +53,7 @@ function viewBookDetails(bookId) {
             return response.json();
         })
         .then(data => {
+            console.log('Dados do livro recebidos:', data); // Adicione este log
             if (data.success) {
                 const { title, author, categories, publisher, publishedDate, description, coverImage, images } = data.book;
                 let imageGallery = '';

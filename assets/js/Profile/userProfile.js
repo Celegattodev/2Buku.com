@@ -57,14 +57,14 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(data => {
                 if (data.success) {
                     bookElement.remove();
-                    Swal.fire('Deletado!', 'Seu livro favorito foi deletado.', 'success');
+                    Swal.fire('Deletado!', 'Seu livro desejado foi deletado.', 'success');
                 } else {
-                    showError('Erro ao deletar o livro favorito.');
+                    showError('Erro ao deletar o livro desejado.');
                 }
             })
             .catch(error => {
-                console.error('Erro ao deletar o livro favorito:', error);
-                showError('Erro ao deletar o livro favorito.');
+                console.error('Erro ao deletar o livro desejado:', error);
+                showError('Erro ao deletar o livro desejado.');
             });
     }
 

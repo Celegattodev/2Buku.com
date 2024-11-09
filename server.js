@@ -162,8 +162,8 @@ app.get('/profile', isAuthenticated, (req, res) => {
         // Consulta para buscar os livros favoritos do usuário
         db.query('SELECT id, titulo, autor, imagem FROM favoritos WHERE user_id = ?', [req.session.userId], (err, favorites) => {
           if (err) {
-            console.error('Erro ao buscar livros favoritos do usuário:', err);
-            return res.status(500).send('Erro ao buscar livros favoritos.');
+            console.error('Erro ao buscar livros desejados do usuário:', err);
+            return res.status(500).send('Erro ao buscar livros desejados.');
           }
 
           // Substituição de placeholders no HTML
@@ -596,11 +596,11 @@ app.post('/add-book', isAuthenticated, (req, res) => {
     const checkFavoriteSql = 'SELECT * FROM favoritos WHERE google_books_id = ? AND user_id = ?';
     db.query(checkFavoriteSql, [googleBooksId, userId], (err, results) => {
       if (err) {
-        return res.status(500).json({ success: false, message: 'Erro ao verificar os favoritos' });
+        return res.status(500).json({ success: false, message: 'Erro ao verificar os desejados' });
       }
 
       if (results.length > 0) {
-        return res.status(409).json({ success: false, message: 'Livro já está nos favoritos' });
+        return res.status(409).json({ success: false, message: 'Livro já está nos desejados' });
       }
 
       // Verificar se o livro já está na biblioteca
@@ -686,7 +686,7 @@ app.post('/add-favorite', isAuthenticated, async (req, res) => {
     const { googleBooksId, title, author, imageUrl } = req.body;
     const userId = req.session.userId;
 
-    console.log('Recebido para adicionar aos favoritos:', { googleBooksId, title, author, imageUrl, userId });
+    console.log('Recebido para adicionar aos desejados:', { googleBooksId, title, author, imageUrl, userId });
 
     if (!googleBooksId) {
         console.error('ID do livro é obrigatório.');
@@ -708,19 +708,19 @@ app.post('/add-favorite', isAuthenticated, async (req, res) => {
         const [favoriteResults] = await db.promise().query(checkFavoriteSql, [userId, googleBooksId]);
 
         if (favoriteResults.length > 0) {
-            console.log('Livro já está nos favoritos.');
-            return res.status(400).json({ success: false, message: 'Livro já está nos favoritos.' });
+            console.log('Livro já está nos desejados.');
+            return res.status(400).json({ success: false, message: 'Livro já está nos desejados.' });
         }
 
         // Adicionar o livro aos favoritos
         const addFavoriteSql = 'INSERT INTO favoritos (google_books_id, titulo, autor, imagem, user_id) VALUES (?, ?, ?, ?, ?)';
         await db.promise().query(addFavoriteSql, [googleBooksId, title, author, imageUrl, userId]);
 
-        console.log('Livro adicionado aos favoritos com sucesso.');
-        res.json({ success: true, message: 'Livro adicionado aos favoritos com sucesso.' });
+        console.log('Livro adicionado aos desejados com sucesso.');
+        res.json({ success: true, message: 'Livro adicionado aos desejados com sucesso.' });
     } catch (err) {
-        console.error('Erro ao adicionar o livro aos favoritos:', err);
-        res.status(500).json({ success: false, message: 'Erro ao adicionar o livro aos favoritos.' });
+        console.error('Erro ao adicionar o livro aos desejados:', err);
+        res.status(500).json({ success: false, message: 'Erro ao adicionar o livro aos desejados.' });
     }
 });
 
@@ -879,8 +879,8 @@ app.get('/favorites', isAuthenticated, (req, res) => {
   // Consulta para buscar os livros favoritos do usuário
   db.query('SELECT id, titulo, autor, imagem FROM favoritos WHERE user_id = ?', [req.session.userId], (err, favorites) => {
     if (err) {
-      console.error('Erro ao buscar livros favoritos do usuário:', err);
-      return res.status(500).send('Erro ao buscar livros favoritos.');
+      console.error('Erro ao buscar livros desejados do usuário:', err);
+      return res.status(500).send('Erro ao buscar livros desejados.');
     }
 
     // Substituição de placeholders no HTML
@@ -903,7 +903,7 @@ app.get('/favorites', isAuthenticated, (req, res) => {
       }).join('');
 
       // Substituir placeholders no HTML
-      let html = data.replace('<!-- Os livros favoritos serão carregados aqui pelo JavaScript -->', favoriteListHTML);
+      let html = data.replace('<!-- Os livros desejados serão carregados aqui pelo JavaScript -->', favoriteListHTML);
 
       res.send(html);
     });
@@ -915,7 +915,7 @@ app.post('/add-favorite', isAuthenticated, (req, res) => {
     const { googleBooksId, title, author, imageUrl } = req.body;
     const userId = req.session.userId;
 
-    console.log('Recebido para adicionar aos favoritos:', { googleBooksId, title, author, imageUrl, userId });
+    console.log('Recebido para adicionar aos desejados:', { googleBooksId, title, author, imageUrl, userId });
 
     if (!googleBooksId) {
         console.error('ID do livro é obrigatório.');
@@ -939,25 +939,25 @@ app.post('/add-favorite', isAuthenticated, (req, res) => {
         const checkFavoriteSql = 'SELECT * FROM favoritos WHERE user_id = ? AND google_books_id = ?';
         db.query(checkFavoriteSql, [userId, googleBooksId], (err, results) => {
             if (err) {
-                console.error('Erro ao verificar os favoritos:', err);
-                return res.status(500).json({ success: false, message: 'Erro ao verificar os favoritos.' });
+                console.error('Erro ao verificar os desejados:', err);
+                return res.status(500).json({ success: false, message: 'Erro ao verificar os desejados.' });
             }
 
             if (results.length > 0) {
-                console.log('Livro já está nos favoritos.');
-                return res.status(400).json({ success: false, message: 'Livro já está nos favoritos.' });
+                console.log('Livro já está nos desejados.');
+                return res.status(400).json({ success: false, message: 'Livro já está nos desejados.' });
             }
 
             // Adicionar o livro aos favoritos
             const addFavoriteSql = 'INSERT INTO favoritos (google_books_id, titulo, autor, imagem, user_id) VALUES (?, ?, ?, ?, ?)';
             db.query(addFavoriteSql, [googleBooksId, title, author, imageUrl, userId], (err, results) => {
                 if (err) {
-                    console.error('Erro ao adicionar o livro aos favoritos:', err);
-                    return res.status(500).json({ success: false, message: 'Erro ao adicionar o livro aos favoritos.' });
+                    console.error('Erro ao adicionar o livro aos desejados:', err);
+                    return res.status(500).json({ success: false, message: 'Erro ao adicionar o livro aos desejados.' });
                 }
 
-                console.log('Livro adicionado aos favoritos com sucesso.');
-                res.json({ success: true, message: 'Livro adicionado aos favoritos com sucesso.' });
+                console.log('Livro adicionado aos desejados com sucesso.');
+                res.json({ success: true, message: 'Livro adicionado aos desejado com sucesso.' });
             });
         });
     });
@@ -971,8 +971,8 @@ app.delete('/remove-favorite/:id', isAuthenticated, (req, res) => {
   const deleteFavoriteSql = 'DELETE FROM favoritos WHERE id = ? AND user_id = ?';
   db.query(deleteFavoriteSql, [bookId, userId], (err, results) => {
     if (err) {
-      console.error('Erro ao deletar livro dos favoritos:', err);
-      return res.status(500).json({ success: false, message: 'Erro ao deletar livro dos favoritos.' });
+      console.error('Erro ao deletar livro dos desejados:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao deletar livro dos desejados.' });
     }
 
     if (results.affectedRows === 0) {
@@ -1042,32 +1042,29 @@ app.get('/catalog-data', (req, res) => {
       Promise.all([...popularBooksPromises, ...latestBooksPromises])
         .then(results => {
           const popularBooksDetails = results.slice(0, popularBooks.length).map((result, index) => {
-            if (result) {
-              return {
+            const volumeInfo = result && result.volumeInfo;
+            return volumeInfo ? {
                 googleBooksId: popularBooks[index].google_books_id,
-                title: result.volumeInfo.title,
-                author: result.volumeInfo.authors.join(', '),
-                imageUrl: result.volumeInfo.imageLinks.thumbnail,
-                genres: result.volumeInfo.categories,
-                userId: popularBooks[index].user_id  // Inclua userId aqui
-              };
-            }
-            return null;
-          }).filter(book => book !== null);
-
-          const latestBooksDetails = results.slice(popularBooks.length).map((result, index) => {
-            if (result) {
-              return {
+                title: volumeInfo.title || 'Título não disponível',
+                author: volumeInfo.authors && volumeInfo.authors.length > 0 ? volumeInfo.authors.join(', ') : 'Autor desconhecido',
+                imageUrl: volumeInfo.imageLinks && volumeInfo.imageLinks.thumbnail ? volumeInfo.imageLinks.thumbnail : '/img/default-book-image.jpg',
+                genres: volumeInfo.categories && volumeInfo.categories.length > 0 ? volumeInfo.categories : ['Gênero desconhecido'],
+                userId: popularBooks[index].user_id
+            } : null;
+        }).filter(book => book !== null);
+        
+        const latestBooksDetails = results.slice(popularBooks.length).map((result, index) => {
+            const volumeInfo = result && result.volumeInfo;
+            return volumeInfo ? {
                 googleBooksId: latestBooks[index].google_books_id,
-                title: result.volumeInfo.title,
-                author: result.volumeInfo.authors.join(', '),
-                imageUrl: result.volumeInfo.imageLinks.thumbnail,
-                genres: result.volumeInfo.categories,
-                userId: latestBooks[index].user_id  // Inclua userId aqui
-              };
-            }
-            return null;
-          }).filter(book => book !== null);
+                title: volumeInfo.title || 'Título não disponível',
+                author: volumeInfo.authors && volumeInfo.authors.length > 0 ? volumeInfo.authors.join(', ') : 'Autor desconhecido',
+                imageUrl: volumeInfo.imageLinks && volumeInfo.imageLinks.thumbnail ? volumeInfo.imageLinks.thumbnail : '/img/default-book-image.jpg',
+                genres: volumeInfo.categories && volumeInfo.categories.length > 0 ? volumeInfo.categories : ['Gênero desconhecido'],
+                userId: latestBooks[index].user_id
+            } : null;
+        }).filter(book => book !== null);
+        
 
           res.json({ popularBooks: popularBooksDetails, latestBooks: latestBooksDetails });
         })
@@ -1402,13 +1399,13 @@ app.post('/api/exchange-action', isAuthenticated, async (req, res) => {
           const solicitantePhone = exchangeDetails.solicitante_phone;
           const recebedorPhone = exchangeDetails.recebedor_phone;
 
-          enviarEmailComTemplate(solicitanteEmail, 'Troca Concluída', 'templateTrocaAceita', {
+          await enviarEmailComTemplate(solicitanteEmail, 'Troca Concluída', 'templateTrocaAceita', {
               userName: solicitanteName,
               otherUserName: recebedorName,
               otherUserEmail: recebedorEmail,
               otherUserPhone: recebedorPhone
           });
-          enviarEmailComTemplate(recebedorEmail, 'Troca Concluída', 'templateTrocaAceita', {
+          await enviarEmailComTemplate(recebedorEmail, 'Troca Concluída', 'templateTrocaAceita', {
               userName: recebedorName,
               otherUserName: solicitanteName,
               otherUserEmail: solicitanteEmail,
@@ -1427,11 +1424,11 @@ app.post('/api/exchange-action', isAuthenticated, async (req, res) => {
           const solicitanteName = exchangeDetails.solicitante_name;
           const recebedorName = exchangeDetails.recebedor_name;
 
-          enviarEmailComTemplate(solicitanteEmail, 'Troca Negada', 'templateTrocaNegada', {
+          await enviarEmailComTemplate(solicitanteEmail, 'Troca Negada', 'templateTrocaNegada', {
               userName: solicitanteName,
               otherUserName: recebedorName
           });
-          enviarEmailComTemplate(recebedorEmail, 'Troca Negada', 'templateTrocaNegada', {
+          await enviarEmailComTemplate(recebedorEmail, 'Troca Negada', 'templateTrocaNegada', {
               userName: recebedorName,
               otherUserName: solicitanteName
           });
@@ -1484,52 +1481,58 @@ app.get('/ownerUser', (req, res) => {
 
 // Rota para obter os detalhes do livro para a troca
 app.get('/api/exchange-book-details/:bookId', isAuthenticated, async (req, res) => {
-    const bookId = req.params.bookId;
+  const bookId = req.params.bookId;
+  console.log(`Recebendo detalhes do livro com ID: ${bookId}`); // Adicione este log
 
-    try {
-        const bookSql = 'SELECT * FROM livros WHERE id = ?';
-        const [bookResults] = await db.promise().query(bookSql, [bookId]);
+  try {
+      const bookSql = 'SELECT * FROM livros WHERE id = ?';
+      const [bookResults] = await db.promise().query(bookSql, [bookId]);
 
-        if (bookResults.length === 0) {
-            return res.status(404).json({ success: false, message: 'Livro não encontrado.' });
-        }
+      if (bookResults.length === 0) {
+          console.log(`Nenhum livro encontrado com ID: ${bookId}`); // Adicione este log
+          return res.status(404).json({ success: false, message: 'Livro não encontrado.' });
+      }
 
-        const book = bookResults[0];
+      const book = bookResults[0];
+      console.log('Detalhes do livro encontrados:', book); // Adicione este log
 
-        // Buscar a descrição do livro usando a Google Books API
-        const googleBooksId = book.google_books_id;
-        const googleBooksUrl = `https://www.googleapis.com/books/v1/volumes/${googleBooksId}`;
-        const googleBooksResponse = await axios.get(googleBooksUrl);
-        const volumeInfo = googleBooksResponse.data.volumeInfo;
+      // Buscar a descrição do livro usando a Google Books API
+      const googleBooksId = book.google_books_id;
+      const googleBooksUrl = `https://www.googleapis.com/books/v1/volumes/${googleBooksId}`;
+      const googleBooksResponse = await axios.get(googleBooksUrl);
+      const volumeInfo = googleBooksResponse.data.volumeInfo;
 
-        const bookDescription = volumeInfo.description || 'Descrição não disponível';
-        const bookCategories = volumeInfo.categories || ['Desconhecido'];
-        const bookPublisher = volumeInfo.publisher || 'Desconhecido';
-        const bookPublishedDate = volumeInfo.publishedDate || 'Desconhecido';
+      const bookDescription = volumeInfo.description || 'Descrição não disponível';
+      const bookCategories = volumeInfo.categories || ['Desconhecido'];
+      const bookPublisher = volumeInfo.publisher || 'Desconhecido';
+      const bookPublishedDate = volumeInfo.publishedDate || 'Desconhecido';
 
-        const imagesSql = 'SELECT imagem_url FROM livro_imagens WHERE livro_id = ?';
-        const [imageResults] = await db.promise().query(imagesSql, [book.id]);
+      console.log('Detalhes do Google Books API:', volumeInfo); // Adicione este log
 
-        const images = imageResults.map(row => row.imagem_url);
+      const imagesSql = 'SELECT imagem_url FROM livro_imagens WHERE livro_id = ?';
+      const [imageResults] = await db.promise().query(imagesSql, [book.id]);
 
-        res.status(200).json({
-            success: true,
-            book: {
-                id: book.id,
-                title: book.titulo,
-                author: book.autor,
-                description: bookDescription,
-                categories: bookCategories,
-                publisher: bookPublisher,
-                publishedDate: bookPublishedDate,
-                coverImage: book.imagem,
-                images: images
-            }
-        });
-    } catch (err) {
-        console.error('Erro ao carregar os detalhes do livro:', err);
-        res.status(500).json({ success: false, message: 'Erro ao carregar os detalhes do livro.' });
-    }
+      const images = imageResults.map(row => row.imagem_url);
+      console.log('Imagens do livro:', images); // Adicione este log
+
+      res.status(200).json({
+          success: true,
+          book: {
+              id: book.id,
+              title: book.titulo,
+              author: book.autor,
+              description: bookDescription,
+              categories: bookCategories,
+              publisher: bookPublisher,
+              publishedDate: bookPublishedDate,
+              coverImage: book.imagem,
+              images: images
+          }
+      });
+  } catch (err) {
+      console.error('Erro ao carregar os detalhes do livro:', err);
+      res.status(500).json({ success: false, message: 'Erro ao carregar os detalhes do livro.' });
+  }
 });
 
 // Rota para obter os detalhes do livro para o catálogo
