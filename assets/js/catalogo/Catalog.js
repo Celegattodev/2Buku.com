@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 async function createBookCard(book) {
     console.log('Criando card para o livro:', book);
-    
+
     const bookCard = document.createElement('div');
     bookCard.classList.add('product-card');
     bookCard.setAttribute('data-google-books-id', book.googleBooksId);
@@ -106,10 +106,10 @@ async function createBookCard(book) {
         requestExchange(book);
     });
 
-    // Adicionar o botão "Usuário Proprietário"
+    // Adicionar o botão "Ver Usuário"
     const ownerUserButton = document.createElement('button');
-    ownerUserButton.classList.add('btn', 'btn-info', 'btn-sm');
-    ownerUserButton.textContent = 'Usuário Proprietário';
+    ownerUserButton.classList.add('btn', 'btn-owner', 'btn-sm');
+    ownerUserButton.textContent = 'Ver Usuário';
 
     // Verifique se o book.userId está definido antes de definir o evento de clique
     if (book.userId) {
@@ -120,7 +120,6 @@ async function createBookCard(book) {
     } else {
         console.error('User ID não encontrado para este livro');
     }
-
 
     buttonContainer.appendChild(addToFavoritesButton);
     buttonContainer.appendChild(viewDetailsButton);
@@ -252,23 +251,23 @@ function sendExchangeRequest(receivingUserId, googleBooksId, sendingBookId) {
 }
 
 function showBookDetails(book) {
-    fetch(`https://www.googleapis.com/books/v1/volumes/${book.googleBooksId}`)
-        .then(response => response.json())
+    const googleBooksId = book.googleBooksId; // Certifique-se de que o ID do livro está correto
+    console.log(`Buscando detalhes do livro com Google Books ID: ${googleBooksId}`);
+    fetch(`/api/catalog-book-details/${googleBooksId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro ao buscar detalhes do livro');
+            }
+            return response.json();
+        })
         .then(bookDetails => {
-            const bookInfo = bookDetails.volumeInfo;
-            Promise.all([
-                translateGenres(bookInfo.categories),
-                translateText(bookInfo.description)
-            ])
-                .then(([translatedGenres, translatedDescription]) => {
-                    bookInfo.categories = translatedGenres;
-                    bookInfo.description = translatedDescription;
-                    displayBookDetails(bookInfo);
-                })
-                .catch(error => {
-                    console.error('Erro ao traduzir gêneros ou sinopse:', error);
-                    displayBookDetails(bookInfo);
-                });
+            if (bookDetails.success) {
+                const bookInfo = bookDetails.book;
+                console.log('Detalhes do livro recebidos:', bookInfo);
+                displayBookDetails(bookInfo);
+            } else {
+                console.error('Erro ao buscar detalhes do livro:', bookDetails.message);
+            }
         })
         .catch(error => console.error('Erro ao buscar detalhes do livro:', error));
 }
@@ -285,14 +284,26 @@ function displayBookDetails(bookInfo) {
             <div class="modal-body">
               <div class="row">
                 <div class="col-md-4">
-                  <img src="${bookInfo.imageLinks?.thumbnail.replace('http://', 'https://') || 'https://via.placeholder.com/128x192.png?text=No+Cover'}" class="img-fluid mb-3" alt="${bookInfo.title}">
+                  <img src="${bookInfo.coverImage.replace('http://', 'https://') || 'https://via.placeholder.com/128x192.png?text=No+Cover'}" class="img-fluid mb-3" alt="${bookInfo.title}">
                 </div>
                 <div class="col-md-8">
-                  <p><strong>Autor:</strong> ${bookInfo.authors?.join(', ') || 'Desconhecido'}</p>
-                  <p><strong>Gênero:</strong> ${bookInfo.categories?.join(', ') || 'Desconhecido'}</p>
+                  <p><strong>Autor:</strong> ${bookInfo.author || 'Desconhecido'}</p>
+                  <p><strong>Gênero:</strong> ${bookInfo.categories.join(', ') || 'Desconhecido'}</p>
                   <p><strong>Editora:</strong> ${bookInfo.publisher || 'Desconhecido'}</p>
                   <p><strong>Ano de Publicação:</strong> ${formatDate(bookInfo.publishedDate) || 'Desconhecido'}</p>
                   <p><strong>Sinopse:</strong> ${bookInfo.description || 'Não disponível'}</p>
+                </div>
+              </div>
+              <div class="row mt-3">
+                <div class="col-12">
+                  <h5>Imagens do Livro</h5>
+                  <div class="row">
+                    ${bookInfo.images.map(imageUrl => `
+                      <div class="col-md-4">
+                        <img src="${imageUrl}" class="img-fluid mb-3" alt="Imagem do Livro">
+                      </div>
+                    `).join('')}
+                  </div>
                 </div>
               </div>
             </div>
@@ -373,7 +384,12 @@ function addToFavorites(book) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(book)
+        body: JSON.stringify({
+            googleBooksId: book.googleBooksId,
+            title: book.title,
+            author: book.author,
+            imageUrl: book.imageUrl
+        })
     })
         .then(response => response.json())
         .then(data => {
@@ -399,7 +415,7 @@ function addToFavorites(book) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Erro',
-                    text: 'Erro ao adicionar o livro aos favoritos.',
+                    text: data.message || 'Erro ao adicionar o livro aos favoritos.',
                 });
             }
         })
@@ -425,25 +441,22 @@ async function searchBooks(event) {
         const data = await response.json();
 
         if (data.success) {
-            data.books.forEach(book => {
-                const bookElement = document.createElement('div');
-                bookElement.classList.add('col-md-4', 'mb-3');
-                bookElement.innerHTML = `
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">${book.titulo}</h5>
-                <p class="card-text">Autor: ${book.autor}</p>
-                <p class="card-text">Gênero: ${book.genero}</p>
-              </div>
-            </div>
-          `;
-                bookResults.appendChild(bookElement);
-            });
+            if (data.books.length === 0) {
+                bookResults.innerHTML = '<p class="text-center w-100">Livro não encontrado 😕</p>';
+            } else {
+                data.books.forEach(async (book) => {
+                    const bookCard = await createBookCard(book);
+                    const bookElement = document.createElement('div');
+                    bookElement.classList.add('col-md-4', 'mb-3');
+                    bookElement.appendChild(bookCard);
+                    bookResults.appendChild(bookElement);
+                });
+            }
         } else {
-            bookResults.innerHTML = '<p>Nenhum livro encontrado.</p>';
+            bookResults.innerHTML = '<p class="text-center w-100">Livro não encontrado :/</p>';
         }
     } catch (error) {
         console.error('Erro ao buscar livros:', error);
-        bookResults.innerHTML = '<p>Erro ao buscar livros.</p>';
+        bookResults.innerHTML = '<p class="text-center w-100">Erro ao buscar livros.</p>';
     }
 }

@@ -44,7 +44,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function viewBookDetails(bookId) {
-    fetch(`/api/book-details/${bookId}`)
+    console.log(`Buscando detalhes do livro com ID: ${bookId}`);
+    fetch(`/api/exchange-book-details/${bookId}`)
         .then(response => {
             if (!response.ok) {
                 return response.text().then(text => { throw new Error(text) });
@@ -53,15 +54,19 @@ function viewBookDetails(bookId) {
         })
         .then(data => {
             if (data.success) {
-                const { description, coverImage, images } = data.book;
+                const { title, author, categories, publisher, publishedDate, description, coverImage, images } = data.book;
                 let imageGallery = '';
                 images.forEach(imageUrl => {
                     imageGallery += `<img src="${imageUrl}" alt="Imagem do Livro" class="book-image">`;
                 });
 
                 Swal.fire({
-                    title: 'Detalhes do Livro',
+                    title: title,
                     html: `
+                        <p><strong>Autor:</strong> ${author}</p>
+                        <p><strong>Gênero:</strong> ${categories.join(', ')}</p>
+                        <p><strong>Editora:</strong> ${publisher}</p>
+                        <p><strong>Ano de Publicação:</strong> ${publishedDate}</p>
                         <p><strong>Sinopse:</strong> ${description}</p>
                         <img src="${coverImage}" alt="Imagem da Capa" class="book-cover">
                         <div class="image-gallery">${imageGallery}</div>
