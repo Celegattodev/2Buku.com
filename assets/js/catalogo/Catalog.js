@@ -58,12 +58,12 @@ async function createBookCard(book) {
     bookInfo.classList.add('product-info');
     const title = document.createElement('h4');
     title.classList.add('product-title');
-    title.textContent = book.title;
+    title.textContent = book.titulo || 'Título não disponível';
     bookInfo.appendChild(title);
 
     const author = document.createElement('p');
     author.classList.add('product-author');
-    author.innerHTML = `por <strong>${book.author}</strong>`;
+    author.innerHTML = `por <strong>${book.autor || 'Autor desconhecido'}</strong>`;
     bookInfo.appendChild(author);
 
     if (book.genres) {
