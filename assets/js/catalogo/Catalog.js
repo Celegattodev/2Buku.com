@@ -121,7 +121,6 @@ function createCatalogBookCard(book) {
     return bookCard;
 }
 
-
 function createSearchBookCard(book) {
     const bookCard = document.createElement('div');
     bookCard.classList.add('product-card');
@@ -377,11 +376,11 @@ function displayBookDetails(bookInfo) {
                 <div class="col-12">
                   <h5>Imagens do Livro</h5>
                   <div class="row">
-                    ${bookInfo.images.map(imageUrl => `
+                    ${(bookInfo.images && bookInfo.images.length > 0) ? bookInfo.images.map(imageUrl => `
                       <div class="col-md-4">
                         <img src="${imageUrl}" class="img-fluid mb-3" alt="Imagem do Livro">
                       </div>
-                    `).join('')}
+                    `).join('') : '<p>Não há imagens disponíveis</p>'}
                   </div>
                 </div>
               </div>

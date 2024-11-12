@@ -277,5 +277,69 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             showError('Por favor, preencha todos os campos e anexe pelo menos 3 imagens.');
         }
+
+        // Função para exibir detalhes do livro
+    function viewBookDetails(bookId) {
+        console.log(`Buscando detalhes do livro com ID: ${bookId}`);
+        fetch(`/api/book-details/${bookId}`)
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(text) });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('bookDescription').innerText = data.book.description;
+                    const bookImagesGrid = document.getElementById('bookImagesGrid');
+                    bookImagesGrid.innerHTML = ''; // Limpa as imagens anteriores
+
+                    // Adicionar a imagem de capa como o primeiro item
+                    const coverItem = document.createElement('div');
+                    coverItem.classList.add('image-item');
+                    const coverImg = document.createElement('img');
+                    coverImg.src = data.book.coverImage;
+                    coverImg.classList.add('img-fluid');
+                    const coverLabel = document.createElement('p');
+                    coverLabel.innerText = 'Imagem da Capa';
+                    coverItem.appendChild(coverImg);
+                    coverItem.appendChild(coverLabel);
+                    bookImagesGrid.appendChild(coverItem);
+
+                    // Adicionar as imagens adicionais
+                    data.book.images.forEach((imageUrl, index) => {
+                        const imageItem = document.createElement('div');
+                        imageItem.classList.add('image-item');
+                        const img = document.createElement('img');
+                        img.src = imageUrl;
+                        img.classList.add('img-fluid');
+                        const imgLabel = document.createElement('p');
+                        imgLabel.innerText = `Imagem ${index + 1}`;
+                        imageItem.appendChild(img);
+                        imageItem.appendChild(imgLabel);
+                        bookImagesGrid.appendChild(imageItem);
+                    });
+
+                    // Exibir o modal
+                    var bookDetailsModal = new bootstrap.Modal(document.getElementById('bookDetailsModal'));
+                    bookDetailsModal.show();
+                } else {
+                    showError('Erro ao carregar os detalhes do livro.');
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao carregar os detalhes do livro:', error);
+                showError('Erro ao carregar os detalhes do livro.');
+            });
+    }
+
+    // Adicionar evento de clique para exibir detalhes do livro
+    document.querySelectorAll('.book-item').forEach(item => {
+        item.addEventListener('click', function () {
+            const bookId = this.getAttribute('data-book-id');
+            viewBookDetails(bookId);
+        });
     });
 });
+    });
+
