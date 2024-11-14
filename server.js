@@ -1696,3 +1696,7 @@ app.get('/search-books', async (req, res) => {
   }
 });
 
+//Rota para acessar a página de relatório
+app.get('/admin_relatorio', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'admin_relatorio.html'));
+});
