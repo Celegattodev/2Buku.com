@@ -23,6 +23,15 @@ document.addEventListener('DOMContentLoaded', function () {
         loop: false,
     });
 
+    // Verificar se há livros na biblioteca
+    const swiperWrapper = document.querySelector('.swiper-wrapper');
+    const noBooksMessage = document.getElementById('no-books-message');
+    if (swiperWrapper.children.length === 0) {
+        noBooksMessage.style.display = 'block';
+    } else {
+        noBooksMessage.style.display = 'none';
+    }
+
     // Função para exibir mensagens de erro
     function showError(message) {
         Swal.fire('Erro!', message, 'error');
@@ -38,6 +47,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (data.success) {
                     bookElement.remove();
                     Swal.fire('Deletado!', 'Seu livro foi deletado.', 'success');
+                    // Verificar novamente se há livros na biblioteca
+                    if (swiperWrapper.children.length === 0) {
+                        noBooksMessage.style.display = 'block';
+                    }
                 } else {
                     showError('Erro ao deletar o livro.');
                 }
@@ -48,71 +61,10 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
-    // Função para deletar um livro favorito
-    function deleteFavorite(bookId, bookElement) {
-        fetch(`/remove-favorite/${bookId}`, {
-            method: 'DELETE'
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    bookElement.remove();
-                    Swal.fire('Deletado!', 'Seu livro desejado foi deletado.', 'success');
-                } else {
-                    showError('Erro ao deletar o livro desejado.');
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao deletar o livro desejado:', error);
-                showError('Erro ao deletar o livro desejado.');
-            });
-    }
-
-    // Função para adicionar um livro à biblioteca
-    function addToLibrary(googleBooksId, title, author, imageUrl, bookImages) {
-        const formData = new FormData();
-        formData.append('googleBooksId', googleBooksId);
-        formData.append('title', title);
-        formData.append('author', author);
-        formData.append('imageUrl', imageUrl);
-
-        for (let i = 0; i < bookImages.length; i++) {
-            formData.append('bookImages', bookImages[i]);
-        }
-
-        // Mostrar o modal de carregamento
-        Swal.fire({
-            title: 'Carregando...',
-            text: 'Por favor, aguarde enquanto as imagens são carregadas.',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-
-        fetch('/add-book', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                Swal.close(); // Fechar o modal de carregamento
-                if (data.success) {
-                    Swal.fire('Sucesso!', 'Livro adicionado com sucesso!', 'success');
-                } else {
-                    showError(data.message || 'Erro ao adicionar o livro.');
-                }
-            })
-            .catch(error => {
-                Swal.close(); // Fechar o modal de carregamento
-                console.error('Erro ao adicionar o livro:', error);
-                showError('Erro ao adicionar o livro.');
-            });
-    }
-
     // Adicionar evento de clique para os ícones de deletar
     document.querySelectorAll('.delete-icon').forEach(icon => {
-        icon.addEventListener('click', function () {
+        icon.addEventListener('click', function (event) {
+            event.stopPropagation(); // Impede a propagação do evento de clique
             const bookId = this.closest('.book-item').getAttribute('data-book-id');
             Swal.fire({
                 title: 'Tem certeza?',
@@ -133,7 +85,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Adicionar evento de clique para os ícones de deletar na seção de favoritos
     document.querySelectorAll('.delete-favorite-icon').forEach(icon => {
-        icon.addEventListener('click', function () {
+        icon.addEventListener('click', function (event) {
+            event.stopPropagation(); // Impede a propagação do evento de clique
             const bookId = this.closest('.favorite-item').getAttribute('data-book-id');
             Swal.fire({
                 title: 'Tem certeza?',
@@ -342,4 +295,3 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
     });
-

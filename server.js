@@ -1447,6 +1447,7 @@ app.get('/api/exchange-details/:exchangeId', isAuthenticated, (req, res) => {
   });
 });
 
+
 // Rota para processar a ação de aceitar ou recusar a troca
 app.post('/api/exchange-action', isAuthenticated, async (req, res) => {
   const { token, action } = req.body;
@@ -1454,10 +1455,13 @@ app.post('/api/exchange-action', isAuthenticated, async (req, res) => {
   const getExchangeDetailsSql = `
       SELECT t.id, t.usuario_solicitante_id, t.usuario_recebedor_id, t.livro_solicitante_id, t.livro_recebedor_id, 
              u.email AS solicitante_email, u.name AS solicitante_name, u.phone AS solicitante_phone, 
-             ur.email AS recebedor_email, ur.name AS recebedor_name, ur.phone AS recebedor_phone
+             ur.email AS recebedor_email, ur.name AS recebedor_name, ur.phone AS recebedor_phone,
+             l_solicitante.titulo AS solicitante_book_title, l_recebedor.titulo AS recebedor_book_title
       FROM trocas t
       JOIN users u ON t.usuario_solicitante_id = u.id
       JOIN users ur ON t.usuario_recebedor_id = ur.id
+      JOIN livros l_solicitante ON t.livro_solicitante_id = l_solicitante.id
+      JOIN livros l_recebedor ON t.livro_recebedor_id = l_recebedor.id
       WHERE t.token = ?
   `;
 
@@ -1493,18 +1497,24 @@ app.post('/api/exchange-action', isAuthenticated, async (req, res) => {
       const recebedorName = exchangeDetails.recebedor_name;
       const solicitantePhone = exchangeDetails.solicitante_phone;
       const recebedorPhone = exchangeDetails.recebedor_phone;
+      const solicitanteBookTitle = exchangeDetails.solicitante_book_title;
+      const recebedorBookTitle = exchangeDetails.recebedor_book_title;
 
       await enviarEmailComTemplate(solicitanteEmail, 'Troca Concluída', 'templateTrocaAceita', {
         userName: solicitanteName,
         otherUserName: recebedorName,
         otherUserEmail: recebedorEmail,
-        otherUserPhone: recebedorPhone
+        otherUserPhone: recebedorPhone,
+        userBookTitle: solicitanteBookTitle,
+        otherUserBookTitle: recebedorBookTitle
       });
       await enviarEmailComTemplate(recebedorEmail, 'Troca Concluída', 'templateTrocaAceita', {
         userName: recebedorName,
         otherUserName: solicitanteName,
         otherUserEmail: solicitanteEmail,
-        otherUserPhone: solicitantePhone
+        otherUserPhone: solicitantePhone,
+        userBookTitle: recebedorBookTitle,
+        otherUserBookTitle: solicitanteBookTitle
       });
 
       res.json({ success: true, message: 'Troca concluída com sucesso! Entre em contato com o outro usuário para combinar a entrega.' });
@@ -1518,10 +1528,13 @@ app.post('/api/exchange-action', isAuthenticated, async (req, res) => {
       const recebedorEmail = exchangeDetails.recebedor_email;
       const solicitanteName = exchangeDetails.solicitante_name;
       const recebedorName = exchangeDetails.recebedor_name;
+      const solicitanteBookTitle = exchangeDetails.solicitante_book_title;
+      const recebedorBookTitle = exchangeDetails.recebedor_book_title;
 
       await enviarEmailComTemplate(solicitanteEmail, 'Troca Negada', 'templateTrocaNegada', {
         userName: solicitanteName,
         otherUserName: recebedorName
+        
       });
       await enviarEmailComTemplate(recebedorEmail, 'Troca Negada', 'templateTrocaNegada', {
         userName: recebedorName,
@@ -1696,7 +1709,36 @@ app.get('/search-books', async (req, res) => {
   }
 });
 
-//Rota para acessar a página de relatório
-app.get('/admin_relatorio', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'admin_relatorio.html'));
+//Rota para o historico
+app.get('/historico', isAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'historicoDeTroca.html'));
+});
+
+//Rota para o historico
+app.get('/historico', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'historicoDeTroca.html'));
+});
+
+//Rota para obter as trocas
+app.get('/api/user-exchanges', isAuthenticated, (req, res) => {
+  const userId = req.session.userId;
+
+  const sql = `
+    SELECT t.*, u.name AS usuario_solicitante, ur.name AS usuario_recebedor, l_solicitante.titulo AS titulo_solicitante, l_recebedor.titulo AS titulo_recebedor
+    FROM trocas t
+    JOIN users u ON t.usuario_solicitante_id = u.id
+    JOIN users ur ON t.usuario_recebedor_id = ur.id
+    JOIN livros l_solicitante ON t.livro_solicitante_id = l_solicitante.id
+    JOIN livros l_recebedor ON t.livro_recebedor_id = l_recebedor.id
+    WHERE t.usuario_solicitante_id = ? OR t.usuario_recebedor_id = ?
+  `;
+
+  db.query(sql, [userId, userId], (err, results) => {
+    if (err) {
+      console.error("Erro ao buscar trocas do usuário:", err);
+      return res.status(500).json({ success: false, message: "Erro ao buscar trocas do usuário" });
+    }
+
+    res.json({ success: true, exchanges: results });
+  });
 });

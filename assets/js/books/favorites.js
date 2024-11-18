@@ -37,6 +37,17 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
+    // Função para verificar se há livros favoritos
+    function checkFavoritesList() {
+        const favoritesList = document.getElementById('favorites-list');
+        const noFavoritesMessage = document.getElementById('no-favorites-message');
+        if (favoritesList.children.length === 0) {
+            noFavoritesMessage.style.display = 'block';
+        } else {
+            noFavoritesMessage.style.display = 'none';
+        }
+    }
+
     // Adicionar evento de clique para os botões "Ver Detalhes"
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('view-details')) {
@@ -89,6 +100,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         'Seu livro desejado foi deletado.',
                         'success'
                     );
+                    // Verificar novamente se há livros favoritos
+                    checkFavoritesList();
                 } else {
                     Swal.fire(
                         'Erro!',
@@ -113,42 +126,48 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
             if (data.success) {
                 const favoritesList = document.getElementById('favorites-list');
-                data.favorites.forEach(favorite => {
-                    const googleBooksId = favorite.google_books_id;
-                    fetch(`https://www.googleapis.com/books/v1/volumes/${googleBooksId}`)
-                        .then(response => response.json())
-                        .then(bookData => {
-                            if (bookData) {
-                                const volumeInfo = bookData.volumeInfo || {};
-                                const book = {
-                                    coverImage: volumeInfo.imageLinks ? volumeInfo.imageLinks.thumbnail : '/img/default-book-image.jpg',
-                                    title: volumeInfo.title || 'Título não disponível',
-                                    author: volumeInfo.authors ? volumeInfo.authors.join(', ') : 'Autor desconhecido',
-                                    publisher: volumeInfo.publisher || 'Desconhecido',
-                                    publishedDate: volumeInfo.publishedDate || 'Desconhecido',
-                                    description: volumeInfo.description || 'Descrição não disponível'
-                                };
+                if (data.favorites.length === 0) {
+                    checkFavoritesList();
+                } else {
+                    data.favorites.forEach(favorite => {
+                        const googleBooksId = favorite.google_books_id;
+                        fetch(`https://www.googleapis.com/books/v1/volumes/${googleBooksId}`)
+                            .then(response => response.json())
+                            .then(bookData => {
+                                if (bookData) {
+                                    const volumeInfo = bookData.volumeInfo || {};
+                                    const book = {
+                                        coverImage: volumeInfo.imageLinks ? volumeInfo.imageLinks.thumbnail : '/img/default-book-image.jpg',
+                                        title: volumeInfo.title || 'Título não disponível',
+                                        author: volumeInfo.authors ? volumeInfo.authors.join(', ') : 'Autor desconhecido',
+                                        publisher: volumeInfo.publisher || 'Desconhecido',
+                                        publishedDate: volumeInfo.publishedDate || 'Desconhecido',
+                                        description: volumeInfo.description || 'Descrição não disponível'
+                                    };
 
-                                const favoriteCard = document.createElement('div');
-                                favoriteCard.classList.add('favorite-item');
-                                favoriteCard.innerHTML = `
-                                    <div class="card h-100">
-                                        <img src="${book.coverImage}" class="card-img-top" alt="${book.title}">
-                                        <div class="card-body">
-                                            <h5 class="card-title">${book.title}</h5>
-                                            <p class="card-text">por <strong>${book.author}</strong></p>
-                                            <button class="btn btn-primary btn-sm view-details" data-google-books-id="${googleBooksId}">Ver Detalhes</button>
-                                            <button class="btn btn-danger btn-sm delete-favorite" data-book-id="${favorite.id}">Remover</button>
+                                    const favoriteCard = document.createElement('div');
+                                    favoriteCard.classList.add('favorite-item', 'col-md-4', 'mb-4');
+                                    favoriteCard.innerHTML = `
+                                        <div class="card h-100">
+                                            <img src="${book.coverImage}" class="card-img-top" alt="${book.title}">
+                                            <div class="card-body">
+                                                <h5 class="card-title">${book.title}</h5>
+                                                <p class="card-text">por <strong>${book.author}</strong></p>
+                                                <button class="btn btn-primary btn-sm view-details" data-google-books-id="${googleBooksId}">Ver Detalhes</button>
+                                                <button class="btn btn-danger btn-sm delete-favorite" data-book-id="${favorite.id}">Remover</button>
+                                            </div>
                                         </div>
-                                    </div>
-                                `;
-                                favoritesList.appendChild(favoriteCard);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Erro ao carregar os detalhes do livro:', error);
-                        });
-                });
+                                    `;
+                                    favoritesList.appendChild(favoriteCard);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Erro ao carregar os detalhes do livro:', error);
+                            });
+                    });
+                    // Verificar se há livros favoritos após carregar
+                    checkFavoritesList();
+                }
             } else {
                 Swal.fire('Erro!', 'Erro ao carregar os livros favoritos.', 'error');
             }

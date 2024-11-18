@@ -66,10 +66,13 @@
         <h1>Troca aceita</h1>
         <p>Olá, <%= userName %>,</p>
         <p>A troca com o usuário <%= otherUserName %> foi aceita.</p>
+        <p><strong>Livro que você está trocando:</strong> <%= userBookTitle %></p>
+        <p><strong>Livro que você está recebendo:</strong> <%= otherUserBookTitle %></p>
         <p>Detalhes do outro usuário:</p>
         <p><strong>Nome:</strong> <%= otherUserName %></p>
         <p><strong>Email:</strong> <%= otherUserEmail %></p>
-        <p><strong>Telefone:</strong> <%= otherUserPhone %></p>
+        <p><strong>Telefone:</strong> <%= otherUserPhone ? otherUserPhone : 'telefone não cadastrado' %></p>
+
         <p>Atenciosamente,<br>A equipe de suporte ♡</p>
         <div class="footer">
             <a href="http://localhost:3000/">
