@@ -10,14 +10,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Preencher informações do usuário
                     document.getElementById('profile-img').src = data.user.profileImage || '/img/profile-image/th.jpeg';
                     document.getElementById('user-name').textContent = data.user.name;
+                    document.getElementById('user-email').textContent = data.user.email;
+                    document.getElementById('user-city').textContent = data.user.city; // Nome da cidade
                     document.getElementById('user-state').textContent = data.user.state;
-                    document.getElementById('user-description').textContent = data.user.description;
+                    document.getElementById('user-phone').textContent = data.user.phone;
+                    document.getElementById('user-description').textContent = data.user.biography;
 
                     // Atualizar o título com o nome do usuário
                     document.querySelector('.title h3').textContent = `Perfil do ${data.user.name}`;
 
                     // Carregar livros do usuário
                     const userBooksContainer = document.getElementById('user-books');
+                    userBooksContainer.innerHTML = ''; // Limpa o container antes de adicionar novos livros
                     data.books.forEach(book => {
                         const bookCard = createBookCard(book);
                         userBooksContainer.appendChild(bookCard);
@@ -25,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // Carregar livros favoritos do usuário
                     const userFavoritesContainer = document.getElementById('user-favorites');
+                    userFavoritesContainer.innerHTML = ''; // Limpa o container antes de adicionar novos livros
                     if (data.favorites.length === 0) {
                         const noFavoritesMessage = document.createElement('p');
                         noFavoritesMessage.textContent = 'Sem desejos';
@@ -62,7 +67,7 @@ function createBookCard(book) {
     const image = document.createElement('img');
     image.className = 'product-thumb';
     image.src = book.imageUrl || '/img/default-book-image.jpg';
-    image.alt = book.title;
+    image.alt = book.titulo;
 
     imageContainer.appendChild(image);
 
@@ -71,11 +76,11 @@ function createBookCard(book) {
 
     const title = document.createElement('h5');
     title.className = 'product-title';
-    title.textContent = book.title;
+    title.textContent = book.titulo;
 
     const author = document.createElement('p');
     author.className = 'product-author';
-    author.textContent = book.author;
+    author.textContent = book.autor;
 
     info.appendChild(title);
     info.appendChild(author);

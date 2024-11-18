@@ -25,13 +25,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Verificar se há livros na biblioteca
     const swiperWrapper = document.querySelector('.swiper-wrapper');
+    const books = swiperWrapper.querySelectorAll('.book-item');
     const noBooksMessage = document.getElementById('no-books-message');
-    if (swiperWrapper.children.length === 0) {
+    if (books.length === 0) {
         noBooksMessage.style.display = 'block';
     } else {
         noBooksMessage.style.display = 'none';
     }
-
+});
     // Função para exibir mensagens de erro
     function showError(message) {
         Swal.fire('Erro!', message, 'error');
@@ -294,4 +295,3 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
-    });

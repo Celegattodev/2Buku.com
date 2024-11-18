@@ -124,7 +124,7 @@ app.get("/", (req, res) => {
 });
 
 // Rota para redirecionar para a página de adicionar livro
-app.get("/addBook", (req, res) => {
+app.get("/addBook", isAuthenticated, (req, res) => {
   res.sendFile(path.join(__dirname, "views", "addBook.html"));
 });
 
@@ -151,9 +151,10 @@ app.get('/profile', isAuthenticated, (req, res) => {
 
       // Obter o nome da cidade usando o código da cidade e do estado
       const cityName = await getCityNameById(user.state, user.city);
+      user.city = cityName;
 
-      // Consulta para buscar os livros do usuário, incluindo a imagem
-      db.query('SELECT id, titulo, autor, imagem FROM livros WHERE user_id = ?', [req.session.userId], (err, books) => {
+      // Consulta para buscar os livros do usuário, incluindo a imagem e filtrando pelo status "Disponível"
+      db.query('SELECT id, titulo, autor, imagem FROM livros WHERE user_id = ? AND status = "Disponível"', [req.session.userId], (err, books) => {
         if (err) {
           console.error('Erro ao buscar livros do usuário:', err);
           return res.status(500).send('Erro ao buscar livros.');
@@ -1038,6 +1039,7 @@ app.get('/catalog-data', (req, res) => {
   const popularBooksSql = `
     SELECT google_books_id, user_id, COUNT(*) as count
     FROM livros
+    WHERE status = 'Disponível'
     GROUP BY google_books_id, user_id
     ORDER BY count DESC
     LIMIT 10
@@ -1047,6 +1049,7 @@ app.get('/catalog-data', (req, res) => {
   const latestBooksSql = `
     SELECT google_books_id, user_id
     FROM livros
+    WHERE status = 'Disponível'
     ORDER BY data_adicao DESC
     LIMIT 10
   `;
@@ -1110,7 +1113,6 @@ app.get('/catalog-data', (req, res) => {
             } : null;
           }).filter(book => book !== null);
 
-
           res.json({ popularBooks: popularBooksDetails, latestBooks: latestBooksDetails });
         })
         .catch(error => {
@@ -1125,16 +1127,14 @@ app.get('/catalog-data', (req, res) => {
 app.get('/api/user-books', isAuthenticated, (req, res) => {
   const userId = req.session.userId;
 
-  db.query('SELECT id, titulo, autor, imagem AS imageUrl, google_books_id FROM livros WHERE user_id = ?', [userId], (err, results) => {
+  db.query('SELECT id, titulo, autor, imagem AS imageUrl, google_books_id FROM livros WHERE user_id = ? AND status = "Disponível"', [userId], (err, results) => {
     if (err) {
       console.error('Erro ao buscar livros do usuário:', err);
       return res.status(500).json({ success: false, message: 'Erro ao buscar livros do usuário.' });
     }
 
     if (results.length === 0) {
-      console.log(`Nenhum livro encontrado para o usuário com ID ${userId}.`);
-    } else {
-      console.log(`Livros encontrados para o usuário com ID ${userId}:`, results);
+      return res.status(404).json({ success: false, message: 'Nenhum livro encontrado.' });
     }
 
     res.json({ success: true, userId: userId, books: results });
@@ -1353,7 +1353,7 @@ app.get('/troca', (req, res) => {
 });
 
 // Rota para acessar a página do usuário proprietario do livro
-app.get('/ownerUser', (req, res) => {
+app.get('/ownerUser', isAuthenticated, (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'ownerUser.html'));
 });
 
@@ -1456,7 +1456,8 @@ app.post('/api/exchange-action', isAuthenticated, async (req, res) => {
       SELECT t.id, t.usuario_solicitante_id, t.usuario_recebedor_id, t.livro_solicitante_id, t.livro_recebedor_id, 
              u.email AS solicitante_email, u.name AS solicitante_name, u.phone AS solicitante_phone, 
              ur.email AS recebedor_email, ur.name AS recebedor_name, ur.phone AS recebedor_phone,
-             l_solicitante.titulo AS solicitante_book_title, l_recebedor.titulo AS recebedor_book_title
+             l_solicitante.titulo AS solicitante_book_title, l_recebedor.titulo AS recebedor_book_title,
+             t.status
       FROM trocas t
       JOIN users u ON t.usuario_solicitante_id = u.id
       JOIN users ur ON t.usuario_recebedor_id = ur.id
@@ -1474,51 +1475,49 @@ app.post('/api/exchange-action', isAuthenticated, async (req, res) => {
 
     const exchangeDetails = results[0];
 
+    // Verifica se a troca já foi processada
+    if (exchangeDetails.status !== 'Pendente') {
+      return res.status(400).json({ success: false, message: 'Troca já foi processada.' });
+    }
+
     if (action === 'accept') {
-      // Remover os livros da biblioteca de ambos os usuários
-      const deleteBooksSql = `
-              DELETE FROM livros 
-              WHERE (id = ? AND user_id = ?) 
-              OR (id = ? AND user_id = ?)
-          `;
-      await db.promise().query(deleteBooksSql, [
-        exchangeDetails.livro_solicitante_id, exchangeDetails.usuario_solicitante_id,
-        exchangeDetails.livro_recebedor_id, exchangeDetails.usuario_recebedor_id
-      ]);
-
-      // Atualizar o status da troca para "Concluída"
-      const updateExchangeSql = 'UPDATE trocas SET status = "Concluída" WHERE id = ?';
+      // Atualizar o status da troca para "Aceito"
+      const updateExchangeSql = 'UPDATE trocas SET status = "Aceito" WHERE id = ?';
       await db.promise().query(updateExchangeSql, [exchangeDetails.id]);
-
+    
+      // Atualizar o status dos livros envolvidos na troca para "Trocado"
+      const updateBooksSql = 'UPDATE livros SET status = "Trocado" WHERE id IN (?, ?)';
+      await db.promise().query(updateBooksSql, [exchangeDetails.livro_solicitante_id, exchangeDetails.livro_recebedor_id]);
+    
       // Enviar email de confirmação para ambos os usuários
       const solicitanteEmail = exchangeDetails.solicitante_email;
       const recebedorEmail = exchangeDetails.recebedor_email;
       const solicitanteName = exchangeDetails.solicitante_name;
       const recebedorName = exchangeDetails.recebedor_name;
-      const solicitantePhone = exchangeDetails.solicitante_phone;
-      const recebedorPhone = exchangeDetails.recebedor_phone;
       const solicitanteBookTitle = exchangeDetails.solicitante_book_title;
       const recebedorBookTitle = exchangeDetails.recebedor_book_title;
 
-      await enviarEmailComTemplate(solicitanteEmail, 'Troca Concluída', 'templateTrocaAceita', {
+      await enviarEmailComTemplate(solicitanteEmail, 'Troca Aceita', 'templateTrocaAceita', {
         userName: solicitanteName,
         otherUserName: recebedorName,
-        otherUserEmail: recebedorEmail,
-        otherUserPhone: recebedorPhone,
         userBookTitle: solicitanteBookTitle,
-        otherUserBookTitle: recebedorBookTitle
+        otherUserBookTitle: recebedorBookTitle,
+        otherUserEmail: recebedorEmail,
+        otherUserPhone: exchangeDetails.recebedor_phone
       });
-      await enviarEmailComTemplate(recebedorEmail, 'Troca Concluída', 'templateTrocaAceita', {
+      await enviarEmailComTemplate(recebedorEmail, 'Troca Aceita', 'templateTrocaAceita', {
         userName: recebedorName,
         otherUserName: solicitanteName,
-        otherUserEmail: solicitanteEmail,
-        otherUserPhone: solicitantePhone,
         userBookTitle: recebedorBookTitle,
-        otherUserBookTitle: solicitanteBookTitle
+        otherUserBookTitle: solicitanteBookTitle,
+        otherUserEmail: solicitanteEmail,
+        otherUserPhone: exchangeDetails.solicitante_phone
       });
 
-      res.json({ success: true, message: 'Troca concluída com sucesso! Entre em contato com o outro usuário para combinar a entrega.' });
-    } else if (action === 'deny') {
+      return res.json({ success: true, message: 'Troca aceita com sucesso! Entre em contato com o outro usuário para combinar a entrega.' });
+    } 
+    
+    if (action === 'deny') {
       // Atualizar o status da troca para "Recusada"
       const updateExchangeSql = 'UPDATE trocas SET status = "Recusada" WHERE id = ?';
       await db.promise().query(updateExchangeSql, [exchangeDetails.id]);
@@ -1528,34 +1527,33 @@ app.post('/api/exchange-action', isAuthenticated, async (req, res) => {
       const recebedorEmail = exchangeDetails.recebedor_email;
       const solicitanteName = exchangeDetails.solicitante_name;
       const recebedorName = exchangeDetails.recebedor_name;
-      const solicitanteBookTitle = exchangeDetails.solicitante_book_title;
-      const recebedorBookTitle = exchangeDetails.recebedor_book_title;
 
-      await enviarEmailComTemplate(solicitanteEmail, 'Troca Negada', 'templateTrocaNegada', {
+      await enviarEmailComTemplate(solicitanteEmail, 'Troca Recusada', 'templateTrocaNegada', {
         userName: solicitanteName,
-        otherUserName: recebedorName
-        
+        otherUserName: recebedorName,
       });
-      await enviarEmailComTemplate(recebedorEmail, 'Troca Negada', 'templateTrocaNegada', {
+      await enviarEmailComTemplate(recebedorEmail, 'Troca Recusada', 'templateTrocaNegada', {
         userName: recebedorName,
-        otherUserName: solicitanteName
+        otherUserName: solicitanteName,
       });
 
-      res.json({ success: true, message: 'Troca não foi concretizada.' });
-    } else {
-      res.status(400).json({ success: false, message: 'Ação inválida.' });
+      return res.json({ success: true, message: 'Troca recusada com sucesso!' });
     }
+
+    return res.status(400).json({ success: false, message: 'Ação inválida.' });
   } catch (err) {
     console.error('Erro ao processar a ação da troca:', err);
     return res.status(500).json({ success: false, message: 'Erro ao processar a ação da troca.' });
   }
 });
+
 // Rota para obter os detalhes do perfil do usuário proprietário
 app.get('/api/ownerUser/:userId', isAuthenticated, async (req, res) => {
   const userId = req.params.userId;
 
   try {
-    const userSql = 'SELECT name, email, city, state, phone, biography AS description FROM users WHERE id = ?';
+    // Consulta para obter os detalhes do usuário
+    const userSql = 'SELECT name, email, state, city, phone, biography, photo AS profileImage FROM users WHERE id = ?';
     const [userResults] = await db.promise().query(userSql, [userId]);
 
     if (userResults.length === 0) {
@@ -1564,13 +1562,19 @@ app.get('/api/ownerUser/:userId', isAuthenticated, async (req, res) => {
 
     const user = userResults[0];
 
-    const booksSql = 'SELECT id, titulo AS title, autor AS author, imagem AS imageUrl FROM livros WHERE user_id = ?';
+    // Obter o nome da cidade usando o código da cidade e do estado
+    const cityName = await getCityNameById(user.state, user.city);
+    user.city = cityName;
+
+    // Consulta para obter os livros do usuário com status "Disponível"
+    const booksSql = 'SELECT id, titulo, autor, imagem AS imageUrl FROM livros WHERE user_id = ? AND status = "Disponível"';
     const [booksResults] = await db.promise().query(booksSql, [userId]);
 
-    const favoritesSql = 'SELECT id, titulo AS title, autor AS author, imagem AS imageUrl FROM favoritos WHERE user_id = ?';
+    // Consulta para obter os livros favoritos do usuário
+    const favoritesSql = 'SELECT id, titulo, autor, imagem AS imageUrl FROM favoritos WHERE user_id = ?';
     const [favoritesResults] = await db.promise().query(favoritesSql, [userId]);
 
-    res.status(200).json({
+    res.json({
       success: true,
       user: user,
       books: booksResults,
@@ -1685,7 +1689,6 @@ app.get('/api/catalog-book-details/:googleBooksId', isAuthenticated, async (req,
     res.status(500).json({ success: false, message: 'Erro ao carregar os detalhes do livro.' });
   }
 });
-
 // Rota para buscar livros
 app.get('/search-books', async (req, res) => {
   const searchQuery = req.query.q;
@@ -1698,7 +1701,7 @@ app.get('/search-books', async (req, res) => {
     const searchSql = `
       SELECT id, titulo, autor, imagem AS imageUrl, google_books_id AS googleBooksId, user_id AS userId
       FROM livros
-      WHERE titulo LIKE ? OR autor LIKE ?
+      WHERE (titulo LIKE ? OR autor LIKE ?) AND status = "Disponível"
     `;
     const [results] = await db.promise().query(searchSql, [`%${searchQuery}%`, `%${searchQuery}%`]);
 
@@ -1724,7 +1727,8 @@ app.get('/api/user-exchanges', isAuthenticated, (req, res) => {
   const userId = req.session.userId;
 
   const sql = `
-    SELECT t.*, u.name AS usuario_solicitante, ur.name AS usuario_recebedor, l_solicitante.titulo AS titulo_solicitante, l_recebedor.titulo AS titulo_recebedor
+    SELECT t.*, u.name AS usuario_solicitante, ur.name AS usuario_recebedor, 
+           l_solicitante.titulo AS titulo_solicitante, l_recebedor.titulo AS titulo_recebedor
     FROM trocas t
     JOIN users u ON t.usuario_solicitante_id = u.id
     JOIN users ur ON t.usuario_recebedor_id = ur.id
@@ -1735,8 +1739,8 @@ app.get('/api/user-exchanges', isAuthenticated, (req, res) => {
 
   db.query(sql, [userId, userId], (err, results) => {
     if (err) {
-      console.error("Erro ao buscar trocas do usuário:", err);
-      return res.status(500).json({ success: false, message: "Erro ao buscar trocas do usuário" });
+      console.error('Erro ao buscar trocas do usuário:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao buscar trocas do usuário.' });
     }
 
     res.json({ success: true, exchanges: results });

@@ -128,4 +128,6 @@ ALTER TABLE `trocas`
   ADD CONSTRAINT `trocas_ibfk_1` FOREIGN KEY (`usuario_solicitante_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `trocas_ibfk_2` FOREIGN KEY (`usuario_recebedor_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `trocas_ibfk_3` FOREIGN KEY (`livro_solicitante_id`) REFERENCES `livros` (`id`) ON DELETE CASCADE;
-COMMIT;
+
+ALTER TABLE `livros`
+ADD COLUMN `status` ENUM('Disponível', 'Trocado') DEFAULT 'Disponível';
