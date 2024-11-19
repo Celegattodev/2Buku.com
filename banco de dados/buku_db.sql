@@ -131,3 +131,15 @@ ALTER TABLE `trocas`
 
 ALTER TABLE `livros`
 ADD COLUMN `status` ENUM('Disponível', 'Trocado') DEFAULT 'Disponível';
+
+CREATE TABLE `admins` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL UNIQUE,
+  `state` varchar(255) NOT NULL,
+  `city` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `phone` varchar(255) NOT NULL,
+  `biography` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

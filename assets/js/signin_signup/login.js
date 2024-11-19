@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const email = document.getElementById('login-email').value.trim();
         const password = document.getElementById('login-password').value.trim();
+        const adminLogin = document.getElementById('admin-login').checked;
 
         if (!email || !password) {
             Swal.fire({
@@ -18,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ email, password, adminLogin })
             });
 
             const data = await response.json();

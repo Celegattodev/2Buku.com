@@ -1,140 +1,114 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Perfil do Usuário</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/css/global.css">
-  <link rel="stylesheet" href="/css/styles.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-  <link rel="stylesheet" href="/css/navbar.css">
-  <link rel="stylesheet" href="/css/user/userProfile.css">
-  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOM3Tx7W7A9M12YVJc0DApLqD1KkA2V/ZcfO9g8" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-
-  <!-- Font Awesome para ícones -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
-    integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrador</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/admin/admin.css">
 </head>
 
 <body>
-  <!-- VLIBRAS -->
-  <div vw class="enabled">
-    <div vw-access-button class="active"></div>
-    <div vw-plugin-wrapper>
-      <div class="vw-plugin-top-wrapper"></div>
-    </div>
-  </div>
-  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-  <script>
-    new window.VLibras.Widget('https://vlibras.gov.br/app');
-  </script>
-
-  <header>
-    <nav id="navbar">
-      <a href="/catalog">
-        <img id="navbar_logo" src="/img/Logo-Buku-branco.png" alt="Logo" />
-      </a>
-      <ul id="nav_list">
-        <li class="nav-item active"><a href="#">Sobre Nós</a></li>
-        <li class="nav-item"><a href="#">Funcionamento</a></li>
-        <li class="nav-item"><a href="#">Perguntas Frequentes</a></li>
-      </ul>
-      <button class="btn-default"><a href="/catalog">Catálogo</a></button>   
-      <button id="mobile_btn">
-        <i class="fa-solid fa-bars"></i>
-      </button>
-    </nav>
-    <div id="mobile_menu">
-      <ul id="mobile_nav_list">
-        <li class="nav-item"><a href="#">Sobre Nós</a></li>
-        <li class="nav-item"><a href="#">Funcionamento</a></li>
-        <li class="nav-item"><a href="#">Perguntas Frequentes</a></li>
-      </ul>
-      <button class="btn-default"><a href="/catalog">Catálogo</a></button>    
-    </div>
-  </header>
-
-  <div class="container-fluid p-5">
-    <div class="row justify-content-center">
-      <div class="col-lg-8">
-        <div class="card shadow p-4">
-          <section class="details-profile text-center mb-5">
-            <div class="profile-image-container">
-              <img src="/img/profile-image/th.jpeg" alt="Foto de Perfil" class="profile-image">
-            </div>
-
-            <h3 class="card-title" id="profile-name">{{userName}}</h3>
-            <p class="card-text" id="profile-email">{{userEmail}} - {{userState}}</p>
-            <p class="card-text" id="profile-city">{{userCity}}</p>
-            <p class="card-text" id="profile-phone">{{userPhone}}</p>
-
-            <div class="card mt-4">
-              <div class="card-body">
-                <p id="profile-description">{{userDescription}}</p>
-              </div>
-            </div>
-          </section>
-
-          <h2 class="text-center mb-4">Meus Livros</h2>
-          <div class="swiper-container position-relative" id="meus-livros-swiper">
-            <div class="swiper-wrapper">
-              <!-- Placeholder para os livros renderizados pelo servidor -->
-              {{userBooks}}
-            </div>
-            <div class="swiper-button-next meus-livros-next"></div>
-            <div class="swiper-button-prev meus-livros-prev"></div>
-            <p id="no-books-message" class="text-center position-absolute top-50 start-50 translate-middle">Sem livros na biblioteca</p>
-          </div>
-
-          <div class="d-flex justify-content-center mt-4">
-            <a href="/addbook" class="btn btn-primary">Adicionar seu Livro</a>
-            <a href="/favorites" class="btn btn-primary mx-2"><i class="fas fa-heart"></i></a>
-            <a href="/historico" class="btn btn-primary">Histórico de trocas</a>
-          </div>
-
-          <div class="d-flex justify-content-center mt-4">
-            <a href="/update-profile" class="btn btn-primary mx-2" id="edit-button">Editar Perfil</a>
-            <button id="delete-account-button" class="btn btn-danger mx-2">Deletar Conta</button>
-            <a href="/logout" class="btn btn-secondary mx-2" id="logout-button">Logout</a>
-          </div>
+    <header>
+        <nav id="navbar">
+            <img id="navbar_logo" src="/img/Logo-Buku-branco.png" alt="Logo" />
+            <ul id="nav_list">
+                <li class="nav-item active"><a href="#">Sobre Nós</a></li>
+                <li class="nav-item"><a href="#">Funcionamento</a></li>
+                <li class="nav-item"><a href="#">Perguntas Frequentes</a></li>
+            </ul>
+            <button class="btn-default">Cadastrar/Entrar</button>
+            <button id="mobile_btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </nav>
+        <div id="mobile_menu">
+            <ul id="mobile_nav_list">
+                <li class="nav-item"><a href="#">Sobre Nós</a></li>
+                <li class="nav-item"><a href="#">Funcionamento</a></li>
+                <li class="nav-item"><a href="#">Perguntas Frequentes</a></li>
+            </ul>
+            <button class="btn-default">Cadastrar/Entrar</button>
         </div>
-      </div>
-    </div>
-  </div>
+    </header>
+    <div class="container-fluid">
+        <div class="col">
+            <div class="card mt-4 mb-5">
+                <div class="card-body">
+                    <section class="details-profile text-center mb-5">
+                        <div class="profile-image-container">
+                            <img src="/img/profile-image/th.jpeg" alt="Foto de Perfil" class="profile-image">
+                        </div>
+                        <h3 class="card-title" id="profile-name"></h3>
+                        <p class="card-text" id="profile-email"></p>
+                        <p class="card-text" id="profile-city"></p>
+                        <p class="card-text" id="profile-phone"></p>
 
-  <!-- Modal para exibir detalhes do livro -->
-  <div class="modal fade" id="bookDetailsModal" tabindex="-1" aria-labelledby="bookDetailsModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="bookDetailsModalLabel">Detalhes do Livro</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="card mt-4">
+                            <div class="card-body">
+                                <p id="profile-description"></p>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="admin-actions">
+                        <h2>O que deseja fazer?</h2>
+                        <div class="actions">
+                            <a href="/manage-users">
+                                <div class="card" id="manage-card">
+                                    <div class="img-icone">
+                                        <img src="/img/gerenciar_usuarios.png" alt="" class="img">
+                                    </div>
+                                    <div class="action-text">
+                                        <h3>Gerenciar usuários</h3>
+                                        <p>Visualize os usuários da plataforma, os livros que cadastraram e seus status.
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                            <a href="/alert">
+                                <div class="card" id="alert-card">
+                                    <div class="img-icone">
+                                        <img src="/img/alertar_usuario.png" alt="" class="img">
+                                    </div>
+                                    <div class="action-text">
+                                        <h3>Enviar alerta</h3>
+                                        <p>Envie uma mensagem para um usuário informando o motivo da suspensão ou
+                                            banimento.</p>
+                                    </div>
+                                </div>
+                            </a>
+                            <a href="/relatorio">
+                                <div class="card" id="relatorio-card">
+                                    <div class="img-icone">
+                                        <img src="/img/relatorio_icone.png" alt="" class="img">
+                                    </div>
+                                    <div class="action-text">
+                                        <h3>Gerar relatório</h3>
+                                        <p>Gere um relatório sobre a plataforma com informações sobre os livros
+                                            cadastrados no mês, o mais cadastrados, o número de usuários e mais.</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </section>
+                    <div class="admin-buttons">
+                        <a href="/update-profile" class="btn btn-primary">Editar Perfil</a>
+                        <button id="logout-button" class="btn btn-danger">Logout</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="modal-body">
-          <div id="bookDescription"></div>
-          <div class="image-grid" id="bookImagesGrid">
-            <!-- As imagens do livro serão inseridas aqui -->
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
-
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="/js/navbar.js"></script>
-  <script src="/js/books/book.js"></script>
-  <script src="/js/Profile/logout.js"></script>
-  <script src="/js/Profile/userProfile.js"></script>
-  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/js/navbar.js"></script>
+<script src="/js/admin/admin.js"></script>
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </html>

@@ -215,14 +215,9 @@ app.get('/profile', isAuthenticated, (req, res) => {
   );
 });
 
-// Rota para a página de login
-app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'inscricao-buku.html'));
-});
-
 // Rota para processar o login
 app.post("/login", (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, adminLogin } = req.body;
 
   // Verifique se os campos de email e senha foram fornecidos
   if (!email || !password) {
@@ -233,7 +228,8 @@ app.post("/login", (req, res) => {
   }
 
   // Consulta ao banco de dados para verificar se o email existe
-  db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
+  const table = adminLogin ? "admins" : "users";
+  db.query(`SELECT * FROM ${table} WHERE email = ?`, [email], (err, results) => {
     if (err) {
       console.error("Erro ao verificar email:", err);
       return res.status(500).json({
@@ -266,6 +262,15 @@ app.post("/login", (req, res) => {
       if (isMatch) {
         req.session.userId = user.id; // Certifique-se de que o ID está correto
 
+        // Redirecionar para a página de administrador se for login de administrador
+        if (adminLogin) {
+          return res.status(200).json({
+            success: true,
+            message: 'Login de administrador bem-sucedido.',
+            redirect: '/admin'
+          });
+        }
+
         // Sucesso no login, redirecionando para a página de perfil
         return res.status(200).json({
           success: true,
@@ -282,7 +287,6 @@ app.post("/login", (req, res) => {
     });
   });
 });
-
 
 // Rota para processar o registro
 app.post("/register", (req, res) => {
@@ -508,15 +512,10 @@ app.delete('/delete-account', (req, res) => {
 app.get('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) {
-      console.error('Erro ao encerrar a sessão:', err);
-      return res.status(500).json({
-        success: false,
-        message: 'Erro no servidor.'
-      });
+      console.error('Erro ao fazer logout:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao fazer logout.' });
     }
-
-    // Redireciona para a página de login com um parâmetro de consulta
-    res.redirect('/login?logout=success');
+    res.redirect('/login'); // Redireciona para a página de login após o logout
   });
 });
 
@@ -1745,4 +1744,49 @@ app.get('/api/user-exchanges', isAuthenticated, (req, res) => {
 
     res.json({ success: true, exchanges: results });
   });
+});
+
+// Rota para enviar o arquivo admin.html
+app.get('/admin', isAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'admin.html'));
+});
+
+// Rota API para fornecer dados do administrador
+app.get('/api/admin-data', isAuthenticated, (req, res) => {
+  const adminId = req.session.userId; // Certifique-se de que o ID do administrador está na sessão
+
+  if (!adminId) {
+    return res.status(401).json({ success: false, message: 'Administrador não autenticado.' });
+  }
+
+  // Consulta SQL para buscar os dados do administrador
+  const sql = 'SELECT name, email, state, city, phone, biography FROM admins WHERE id = ?';
+  db.query(sql, [adminId], (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar dados do administrador:', err);
+      return res.status(500).json({ success: false, message: 'Erro no servidor.' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: 'Administrador não encontrado.' });
+    }
+
+    const admin = results[0];
+
+    // Enviar os dados do administrador como resposta JSON
+    res.json({
+      success: true,
+      adminName: admin.name,
+      adminEmail: admin.email,
+      adminState: admin.state,
+      adminCity: admin.city,
+      adminPhone: admin.phone,
+      adminBiography: admin.biography
+    });
+  });
+});
+
+// Rota para a tela de login
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'inscricao-buku.html'));
 });
