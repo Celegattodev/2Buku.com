@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relatório da Plataforma</title>
+    <title>Relatório</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/global.css">
     <link rel="stylesheet" href="/css/styles.css">
@@ -35,137 +35,68 @@
     </header>
     <div class="container-fluid">
         <div class="col">
-            <div class="card mt-5 mb-5">
+            <div class="card mt-4 mb-5 shadow">
                 <div class="card-body">
                     <h2>Relatório</h2>
-                    <a href="/admin">
-                        <button type="button" class="btn" id="btn-voltar">Voltar</button>
-                    </a>
-                    <section class="total mb-5">
-                        <div class="bloco">
-                            <h4>Total de usuários cadastrados</h4>
-                            <h1>50</h1>
+                    <div class="total row">
+                        <div class="bloco col-md-4">
+                            <h4>Total de Usuários</h4>
+                            <p id="total-usuarios" class="valor"></p>
                         </div>
-                        <div class="bloco">
-                            <h4>Total de livros cadastrados</h4>
-                            <h1>50</h1>
+                        <div class="bloco col-md-4">
+                            <h4>Total de Livros</h4>
+                            <p id="total-livros" class="valor"></p>
                         </div>
-                        <div class="bloco">
-                            <h4>Total de trocas realizadas</h4>
-                            <h1>50</h1>
+                        <div class="bloco col-md-4">
+                            <h4>Total de Trocas</h4>
+                            <p id="total-trocas" class="valor"></p>
                         </div>
-                    </section>
-                    <section class="mes mb-5">
-                        <h3>Nesse mês</h3>
-                        <div class="cards-mes">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4>Usuários cadastrados</h4>
-                                    <h1>50</h1>
-                                </div>
+                    </div>
+                    <div class="mes">
+                        <h3>Dados deste Mês</h3>
+                        <div class="total row">
+                            <div class="bloco col-md-4">
+                                <h4>Usuários Cadastrados</h4>
+                                <p id="usuarios-mes" class="valor"></p>
                             </div>
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4>Livros cadastrados</h4>
-                                    <h1>50</h1>
-                                </div>
+                            <div class="bloco col-md-4">
+                                <h4>Livros Cadastrados</h4>
+                                <p id="livros-mes" class="valor"></p>
                             </div>
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4>Trocas realizadas</h4>
-                                    <h1>50</h1>
-                                </div>
+                            <div class="bloco col-md-4">
+                                <h4>Trocas Realizadas</h4>
+                                <p id="trocas-mes" class="valor"></p>
                             </div>
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4>Suspensões</h4>
-                                    <h1>50</h1>
-                                </div>
+                            <div class="bloco col-md-4">
+                                <h4>Suspensões</h4>
+                                <p id="suspensoes-mes" class="valor"></p>
                             </div>
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4>Banimentos</h4>
-                                    <h1>50</h1>
-                                </div>
+                            <div class="bloco col-md-4">
+                                <h4>Banimentos</h4>
+                                <p id="banimentos-mes" class="valor"></p>
                             </div>
                         </div>
-                    </section>
-                    <section class="usuarios-troca mb-5">
-                        <h4>Usuários com mais trocas na plataforma:</h4>
-                        <div class="usuarios">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="user-image">
-                                        <img src="/img/profile-image/th.jpeg" alt="">
-                                    </div>
-                                    <div class="user-desc">
-                                        <h4>Usuario</h4>
-                                        <p>Número de trocas</p>
-                                        <h1>50</h1>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="user-image">
-                                        <img src="/img/profile-image/th.jpeg" alt="">
-                                    </div>
-                                    <div class="user-desc">
-                                        <h4>Usuario</h4>
-                                        <p>Número de trocas</p>
-                                        <h1>50</h1>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="user-image">
-                                        <img src="/img/profile-image/th.jpeg" alt="">
-                                    </div>
-                                    <div class="user-desc">
-                                        <h4>Usuario</h4>
-                                        <p>Número de trocas</p>
-                                        <h1>50</h1>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                    </section>
-                    <section class="livros mb-5">
-                        <div class="card">
-                            
-                            <div class="livro mb-3">
-                                <img src="/img/capas/1984_capa.jpg" alt="">
-                            </div>
-                            <div class="row mb-3">
-                                <button type="button" class="btn" id="details-button">Ver detalhes</button>
-                            </div>
-                            <div class="book-desc">
-                                <h4>50 vezes cadastrado</h4>
-                            </div>
-                            <div class="desc-card">
-                                <h4>Livro mais cadastrado</h4>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="livro mb-3">
-                                <img src="/img/capas/1984_capa.jpg" alt="">
-                            </div>
-                            <div class="row mb-3">
-                                <button type="button" class="btn" id="details-button">Ver detalhes</button>
-                            </div>
-                            <div class="book-desc">
-                                <h4>50 vezes trocado</h4>
-                            </div>
-                            <div class="desc-card">
-                                <h4>Livro mais trocado</h4>
-                            </div>
-                        </div>
-                    </section>
+                    </div>
+                    <div class="usuarios-troca">
+                        <h4>Usuários com Mais Trocas</h4>
+                        <div class="usuarios row" id="usuarios-mais-trocas"></div>
+                    </div>
+                    <div class="livros">
+                        <h4>Livros Mais Cadastrados</h4>
+                        <div class="cards-mes row" id="livros-mais-cadastrados"></div>
+                    </div>
+                    <div class="row mt-5">
+                        <a href="/admin" class="btn" id="btn-voltar">Voltar</a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/navbar.js"></script>
+    <script src="/js/admin/admin_relatorio.js"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

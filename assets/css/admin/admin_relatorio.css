@@ -1,162 +1,210 @@
-body{
+body {
     background-image: url('/img/Buku-fundo.png');
     background-repeat: no-repeat;
     background-size: cover;
 }
 
-.col{
+.col {
     display: flex;
     justify-content: center;
 }
 
-.card{
-    width: 120vh;
+.card {
+    width: 100%;
+    max-width: 1200px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin: 20px;
 }
 
-#btn-voltar{
+#btn-voltar {
     background-color: #00a30e;
     color: rgb(255, 255, 255);
     margin-bottom: 10px;
     width: 100px;
     font-weight: 600;
+    border-radius: 5px;
 }
-#btn-voltar:hover{
+
+#btn-voltar:hover {
     background-color: #00b10f;
 }
 
-h2{
+h2 {
     font-weight: 600;
     text-align: center;
+    margin-bottom: 20px;
 }
 
-.total{
+.total {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
     background-color: #007bff;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
 }
-.total>.bloco{
+
+.total>.bloco {
     flex: 1;
     text-align: center;
     padding: 10px;
     color: rgb(255, 255, 255);
     text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.4);
-    
+    margin: 10px;
+    border-radius: 10px;
+    background-color: #0056b3;
 }
-.bloco>h4{
+
+.bloco>h4 {
     margin-top: 10px;
     font-weight: 600;
 }
 
-h1{
+.valor {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+h1 {
     font-weight: 600;
 }
 
-.mes>h3{
+.mes>h3 {
     text-align: center;
+    margin-bottom: 20px;
 }
 
-.cards-mes{
+.cards-mes {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 30px;
 }
-.cards-mes>.card{
+
+.cards-mes>.card {
     background-color: #fd9323;
     text-align: center;
     color: rgb(255, 255, 255);
-    width: 35vh;
+    width: 100%;
+    max-width: 300px;
     border: 1px solid rgb(190, 190, 190);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
-.cards-mes>.card>.card-body>h4{
+
+.cards-mes>.card>.card-body>h4 {
     font-weight: 600;
 }
-.cards-mes>.card>.card-body>h1{
+
+.cards-mes>.card>.card-body>h1 {
     text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.4);
 }
 
 /* ------------ USUARIOS ------------ */
 
-.usuarios-troca>h4{
+.usuarios-troca>h4 {
     text-align: center;
+    margin-bottom: 20px;
 }
-.usuarios{
+
+.usuarios {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 20px;
 }
-.usuarios>.card{
-    width: 30vh;
+
+.usuarios>.card {
+    width: 100%;
+    max-width: 300px;
     background-color: #6c8bf7;
     color: rgb(255, 255, 255);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
-.user-image{
+
+.user-image {
     display: flex;
     justify-content: center;
     margin-top: 10px;
     margin-bottom: 15px;
 }
-.user-image>img{
+
+.user-image>img {
     width: 140px;
     box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.7);
     border-radius: 50%;
 }
-.user-desc>h4{
+
+.user-desc>h4 {
     font-weight: 600;
 }
-.user-desc{
+
+.user-desc {
     text-align: center;
 }
 
 /* ------------ LIVROS ------------ */
 
-.livros{
+.livros {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 30px;
 }
-.livros>.card{
-    width: 45vh;
+
+.livros>.card {
+    width: 100%;
+    max-width: 300px;
     overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
-.livro{
+.livro {
     display: flex;
     justify-content: center;
 }
-.livro>img{
+
+.livro>img {
     margin-top: 20px;
     width: 150px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.6);
 }
-.book-desc{
+
+.book-desc {
     padding: 5px;
 }
-.book-desc>h4{
+
+.book-desc>h4 {
     text-align: center;
 }
 
-.row{
+.row {
     display: flex;
     justify-content: center;
 }
-#details-button{
+
+#details-button {
     background-color: #007bff;
     width: 20vh;
     color: rgb(255, 255, 255);
 }
-#details-button:hover{
+
+#details-button:hover {
     background-color: #1b89ff;
 }
 
-.livros>.card>.desc-card{
+.livros>.card>.desc-card {
     text-align: center;
     background-color: #00a30e;
     color: rgb(255, 255, 255);
     padding: 10px;
 }
-.livros>.card>.desc-card>h4{
+
+.livros>.card>.desc-card>h4 {
     margin-top: 5px;
     font-weight: 600;
 }

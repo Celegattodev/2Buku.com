@@ -16,6 +16,7 @@ const { enviarEmailComTemplate } = require("./email/emailService");
 const multer = require('multer');
 const sharp = require('sharp');
 const cloudinary = require('cloudinary').v2;
+const { format } = require('date-fns');
 
 // Configuração do Cloudinary
 cloudinary.config({
@@ -258,16 +259,46 @@ app.post("/login", (req, res) => {
         });
       }
 
-      // Se a senha for válida, armazene o ID do usuário na sessão
+      // Se a senha for válida, verificar o status da conta
       if (isMatch) {
-        req.session.userId = user.id; // Certifique-se de que o ID está correto
+        if (user.status === 'banido') {
+          return res.status(403).json({
+            success: false,
+            status: 'banido',
+            message: 'Sua conta foi banida permanentemente. Caso tenha dúvidas, entre em contato pelo email buku.livro@gmail.com.'
+          });
+        }
 
-        // Redirecionar para a página de administrador se for login de administrador
+        if (user.status === 'suspenso' && user.suspension_expiry && new Date(user.suspension_expiry) > new Date()) {
+          const formattedDate = format(new Date(user.suspension_expiry), 'dd/MM/yyyy HH:mm:ss');
+          return res.status(403).json({
+            success: false,
+            status: 'suspenso',
+            token_expiry: formattedDate,
+            message: `Sua conta está suspensa até ${formattedDate}. Caso tenha dúvidas, entre em contato pelo email buku.livro@gmail.com.`
+          });
+        }
+
+        // Armazene o ID do usuário na sessão
+        req.session.userId = user.id; // Certifique-se de que o ID está correto
+        req.session.isAdmin = adminLogin; // Adicionar flag para verificar se é admin
+
+        // Verificar se é login de administrador
         if (adminLogin) {
+          // Gerar código de verificação
+          const codigoVerificacao = Math.floor(100000 + Math.random() * 900000).toString();
+          req.session.codigoVerificacao = codigoVerificacao;
+          req.session.tentativas = 0;
+          req.session.bloqueadoAte = null;
+          req.session.verificado = false; // Adicionar flag de verificação
+
+          // Enviar código de verificação por e-mail
+          enviarCodigoVerificacao(user.email, codigoVerificacao);
+
           return res.status(200).json({
             success: true,
-            message: 'Login de administrador bem-sucedido.',
-            redirect: '/admin'
+            message: 'Login de administrador bem-sucedido. Código de verificação enviado por e-mail.',
+            redirect: '/adminVerify'
           });
         }
 
@@ -286,6 +317,34 @@ app.post("/login", (req, res) => {
       }
     });
   });
+});
+
+// Middleware para verificar se o usuário está autenticado e é administrador
+const isAdmin = (req, res, next) => {
+  if (req.session.userId && req.session.isAdmin) {
+    next();
+  } else {
+    res.redirect('/login'); // Redireciona para login se não estiver autenticado ou não for admin
+  }
+};
+
+// Middleware para verificar se o usuário está autenticado e não é administrador
+const isUser = (req, res, next) => {
+  if (req.session.userId && !req.session.isAdmin) {
+    next();
+  } else {
+    res.redirect('/login'); // Redireciona para login se não estiver autenticado ou for admin
+  }
+};
+
+// Rota para enviar o arquivo admin.html
+app.get('/admin', isAdmin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'admin.html'));
+});
+
+// Rota para enviar o arquivo userProfile.html
+app.get('/profile', isUser, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'userProfile.html'));
 });
 
 // Rota para processar o registro
@@ -1483,11 +1542,11 @@ app.post('/api/exchange-action', isAuthenticated, async (req, res) => {
       // Atualizar o status da troca para "Aceito"
       const updateExchangeSql = 'UPDATE trocas SET status = "Aceito" WHERE id = ?';
       await db.promise().query(updateExchangeSql, [exchangeDetails.id]);
-    
+
       // Atualizar o status dos livros envolvidos na troca para "Trocado"
       const updateBooksSql = 'UPDATE livros SET status = "Trocado" WHERE id IN (?, ?)';
       await db.promise().query(updateBooksSql, [exchangeDetails.livro_solicitante_id, exchangeDetails.livro_recebedor_id]);
-    
+
       // Enviar email de confirmação para ambos os usuários
       const solicitanteEmail = exchangeDetails.solicitante_email;
       const recebedorEmail = exchangeDetails.recebedor_email;
@@ -1514,8 +1573,8 @@ app.post('/api/exchange-action', isAuthenticated, async (req, res) => {
       });
 
       return res.json({ success: true, message: 'Troca aceita com sucesso! Entre em contato com o outro usuário para combinar a entrega.' });
-    } 
-    
+    }
+
     if (action === 'deny') {
       // Atualizar o status da troca para "Recusada"
       const updateExchangeSql = 'UPDATE trocas SET status = "Recusada" WHERE id = ?';
@@ -1790,3 +1849,280 @@ app.get('/api/admin-data', isAuthenticated, (req, res) => {
 app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'inscricao-buku.html'));
 });
+
+// Função para enviar o código de verificação por e-mail
+const enviarCodigoVerificacao = (email, codigo) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'buku.livro@gmail.com',
+      pass: 'sdmj lybh fcrf nqyd'
+    }
+  });
+
+  const mailOptions = {
+    from: '"Buku 📚" <buku.livro@gmail.com>',
+    to: email,
+    subject: 'Código de Verificação',
+    text: `Seu código de verificação é: ${codigo}`
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Erro ao enviar o e-mail:', error);
+    } else {
+      console.log('E-mail enviado:', info.response);
+    }
+  });
+};
+
+// Rota para verificar o código de verificação
+app.post('/verificar-codigo', isAuthenticated, (req, res) => {
+  const { codigo } = req.body;
+  const { codigoVerificacao, tentativas, bloqueadoAte } = req.session;
+
+  if (bloqueadoAte && new Date() < new Date(bloqueadoAte)) {
+    return res.status(403).json({
+      success: false,
+      message: 'Login bloqueado. Tente novamente mais tarde.'
+    });
+  }
+
+  if (codigo === codigoVerificacao) {
+    req.session.codigoVerificacao = null;
+    req.session.tentativas = 0;
+    req.session.bloqueadoAte = null;
+    req.session.verificado = true; // Atualizar flag de verificação
+    return res.status(200).json({
+      success: true,
+      message: 'Código verificado com sucesso.'
+    });
+  } else {
+    req.session.tentativas += 1;
+    if (req.session.tentativas >= 3) {
+      req.session.bloqueadoAte = new Date(Date.now() + 60 * 60 * 1000); // Bloquear por 1 hora
+      return res.status(403).json({
+        success: false,
+        message: 'Muitas tentativas falhas. Login bloqueado por 1 hora.'
+      });
+    }
+    return res.status(401).json({
+      success: false,
+      message: 'Código incorreto. Tente novamente.'
+    });
+  }
+});
+
+// Middleware para verificar se o usuário está autenticado e verificado
+const isAuthenticatedAndVerified = (req, res, next) => {
+  if (req.session.userId && req.session.verificado) {
+    next();
+  } else if (req.session.userId && !req.session.verificado) {
+    res.redirect('/admin'); // Redireciona para a página de verificação de código
+  } else {
+    res.redirect('/login'); // Redireciona para login se não estiver autenticado
+  }
+};
+
+// Rota para enviar o arquivo adminVerify.html
+app.get('/adminVerify', isAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'adminVerify.html'));
+});
+
+// Rota para enviar o arquivo admin.html
+app.get('/admin', isAuthenticatedAndVerified, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'admin.html'));
+});
+
+// Rota para enviar o arquivo adminAlert.html
+app.get('/alert', isAuthenticatedAndVerified, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'adminAlert.html'));
+});
+
+// Rota para enviar o arquivo admin_relatorio.html
+app.get('/relatorio', isAuthenticatedAndVerified, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'admin_relatorio.html'));
+});
+
+// Rota para enviar o arquivo admin_gerenciar_usuarios.html
+app.get('/manage-users', isAuthenticatedAndVerified, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'admin_gerenciar_usuarios.html'));
+});
+
+
+// Rota para obter informações dos usuários e seus livros
+app.get('/api/users', isAuthenticatedAndVerified, async (req, res) => {
+  const searchQuery = req.query.search || '';
+  const sql = `
+    SELECT u.id, u.name, u.email, u.state, u.city, u.phone, u.biography, u.status, l.id AS book_id, l.titulo, l.autor, l.imagem, l.status AS book_status
+    FROM users u
+    LEFT JOIN livros l ON u.id = l.user_id
+    WHERE u.name LIKE ? OR u.email LIKE ?
+  `;
+  db.query(sql, [`%${searchQuery}%`, `%${searchQuery}%`], async (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar informações dos usuários:', err);
+      return res.status(500).json({ success: false, message: 'Erro no servidor.' });
+    }
+
+    // Obter o nome da cidade usando o código da cidade e do estado
+    for (const user of results) {
+      user.city = await getCityNameById(user.state, user.city);
+    }
+
+    res.json({ success: true, users: results });
+  });
+});
+
+// Função para enviar o e-mail de alerta
+const enviarEmailAlerta = (email, message) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'buku.livro@gmail.com',
+      pass: 'sdmj lybh fcrf nqyd'
+    }
+  });
+
+  const mailOptions = {
+    from: '"Buku 📚" <buku.livro@gmail.com>',
+    to: email,
+    subject: 'Alerta de Conta',
+    text: message
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Erro ao enviar o e-mail:', error);
+    } else {
+      console.log('E-mail enviado:', info.response);
+    }
+  });
+};
+
+// Rota para enviar o alerta e aplicar a punição
+app.post('/send-alert', isAuthenticatedAndVerified, (req, res) => {
+  const { email, message, punishment } = req.body;
+
+  // Verificar se o e-mail do usuário existe
+  db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar usuário:', err);
+      return res.status(500).json({ success: false, message: 'Erro no servidor.' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: 'Email não encontrado.' });
+    }
+
+    const user = results[0];
+    let status = 'ativo';
+    let expiryDate = null;
+
+    if (punishment === '3dias') {
+      status = 'suspenso';
+      expiryDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); // 3 dias
+    } else if (punishment === '5dias') {
+      status = 'suspenso';
+      expiryDate = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000); // 5 dias
+    } else if (punishment === 'banimento') {
+      status = 'banido';
+    }
+
+    // Atualizar o status do usuário no banco de dados
+    db.query('UPDATE users SET status = ?, suspension_expiry = ? WHERE email = ?', [status, expiryDate, email], (err, results) => {
+      if (err) {
+        console.error('Erro ao atualizar status do usuário:', err);
+        return res.status(500).json({ success: false, message: 'Erro no servidor.' });
+      }
+
+      // Enviar e-mail de alerta
+      enviarEmailAlerta(email, message);
+
+      res.json({ success: true, message: 'Alerta enviado e punição aplicada com sucesso.' });
+    });
+  });
+});
+
+// Middleware para verificar se o usuário está suspenso ou banido
+const checkSuspensionAndBan = (req, res, next) => {
+  const userId = req.session.userId;
+  if (!userId) {
+    return res.redirect('/login');
+  }
+
+  db.query('SELECT status, suspension_expiry FROM users WHERE id = ?', [userId], (err, results) => {
+    if (err) {
+      console.error('Erro ao verificar status do usuário:', err);
+      return res.status(500).json({ success: false, message: 'Erro no servidor.' });
+    }
+
+    if (results.length === 0) {
+      return res.redirect('/login');
+    }
+
+    const user = results[0];
+    const now = new Date();
+
+    if (user.status === 'banido') {
+      return res.status(403).json({
+        success: false,
+        message: 'Sua conta foi banida permanentemente. Caso tenha dúvidas, entre em contato pelo email buku.livro@gmail.com.'
+      });
+    }
+
+    if (user.status === 'suspenso' && user.suspension_expiry && new Date(user.suspension_expiry) > now) {
+      return res.status(403).json({
+        success: false,
+        message: `Sua conta está suspensa até ${user.suspension_expiry}. Caso tenha dúvidas, entre em contato pelo email buku.livro@gmail.com.`
+      });
+    }
+
+    if (user.status === 'suspenso' && user.suspension_expiry && new Date(user.suspension_expiry) <= now) {
+      // Se a suspensão expirou, atualizar o status para ativo
+      db.query('UPDATE users SET status = "ativo", suspension_expiry = NULL WHERE id = ?', [userId], (err) => {
+        if (err) {
+          console.error('Erro ao atualizar status do usuário:', err);
+          return res.status(500).json({ success: false, message: 'Erro no servidor.' });
+        }
+        next();
+      });
+    } else {
+      next();
+    }
+  })};
+
+    // Rota para obter os dados do relatório
+    app.get('/api/relatorio', isAuthenticatedAndVerified, async (req, res) => {
+      try {
+        const totalUsuarios = await db.promise().query('SELECT COUNT(*) AS total FROM users');
+        const totalLivros = await db.promise().query('SELECT COUNT(*) AS total FROM livros');
+        const totalTrocas = await db.promise().query('SELECT COUNT(*) AS total FROM trocas');
+        const usuariosMes = await db.promise().query('SELECT COUNT(*) AS total FROM users WHERE MONTH(data_cadastro) = MONTH(CURRENT_DATE()) AND YEAR(data_cadastro) = YEAR(CURRENT_DATE())');
+        const livrosMes = await db.promise().query('SELECT COUNT(*) AS total FROM livros WHERE MONTH(data_adicao) = MONTH(CURRENT_DATE()) AND YEAR(data_adicao) = YEAR(CURRENT_DATE())');
+        const trocasMes = await db.promise().query('SELECT COUNT(*) AS total FROM trocas WHERE MONTH(data_solicitacao) = MONTH(CURRENT_DATE()) AND YEAR(data_solicitacao) = YEAR(CURRENT_DATE())');
+        const suspensoesMes = await db.promise().query('SELECT COUNT(*) AS total FROM users WHERE status = "suspenso" AND MONTH(suspension_expiry) = MONTH(CURRENT_DATE()) AND YEAR(suspension_expiry) = YEAR(CURRENT_DATE())');
+        const banimentosMes = await db.promise().query('SELECT COUNT(*) AS total FROM users WHERE status = "banido" AND MONTH(data_banimento) = MONTH(CURRENT_DATE()) AND YEAR(data_banimento) = YEAR(CURRENT_DATE())');
+        const usuariosMaisTrocas = await db.promise().query('SELECT u.id, u.name, COUNT(t.id) AS total_trocas FROM users u JOIN trocas t ON u.id = t.usuario_solicitante_id OR u.id = t.usuario_recebedor_id GROUP BY u.id ORDER BY total_trocas DESC LIMIT 5');
+        const livrosMaisCadastrados = await db.promise().query('SELECT titulo, autor, imagem, COUNT(*) AS total FROM livros GROUP BY titulo, autor, imagem ORDER BY total DESC LIMIT 5');
+        const livroMaisTrocado = await db.promise().query('SELECT l.titulo, l.autor, l.imagem, COUNT(t.id) AS total_trocas FROM livros l JOIN trocas t ON l.id = t.livro_solicitante_id OR l.id = t.livro_recebedor_id GROUP BY l.titulo, l.autor, l.imagem ORDER BY total_trocas DESC LIMIT 1');
+    
+        res.json({
+          success: true,
+          totalUsuarios: totalUsuarios[0][0].total,
+          totalLivros: totalLivros[0][0].total,
+          totalTrocas: totalTrocas[0][0].total,
+          usuariosMes: usuariosMes[0][0].total,
+          livrosMes: livrosMes[0][0].total,
+          trocasMes: trocasMes[0][0].total,
+          suspensoesMes: suspensoesMes[0][0].total,
+          banimentosMes: banimentosMes[0][0].total,
+          usuariosMaisTrocas: usuariosMaisTrocas[0],
+          livrosMaisCadastrados: livrosMaisCadastrados[0],
+          livroMaisTrocado: livroMaisTrocado[0]
+        });
+      } catch (error) {
+        console.error('Erro ao buscar dados do relatório:', error);
+        res.status(500).json({ success: false, message: 'Erro no servidor.' });
+      }
+    });

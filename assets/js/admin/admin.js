@@ -4,11 +4,11 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                document.getElementById('profile-name').textContent = data.adminName;
-                document.getElementById('profile-email').textContent = `${data.adminEmail} - ${data.adminState}`;
-                document.getElementById('profile-city').textContent = data.adminCity;
-                document.getElementById('profile-phone').textContent = data.adminPhone;
-                document.getElementById('profile-description').textContent = data.adminBiography;
+                document.getElementById('profile-name').textContent = data.name;
+                document.getElementById('profile-email').textContent = `${data.email} - ${data.state}`;
+                document.getElementById('profile-city').textContent = data.city;
+                document.getElementById('profile-phone').textContent = data.phone;
+                document.getElementById('profile-description').textContent = data.biography;
             } else {
                 console.error('Erro ao obter dados do administrador:', data.message);
             }

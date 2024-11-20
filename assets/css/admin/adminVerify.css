@@ -1,0 +1,19 @@
+body {
+    background-image: url('/img/Buku-fundo.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+    background-color: #366aca;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #4976c9;
+}

@@ -143,3 +143,19 @@ CREATE TABLE `admins` (
   `biography` text,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+ALTER TABLE `users`
+MODIFY COLUMN `status` ENUM('ativo', 'banido', 'suspenso') DEFAULT 'ativo';
+
+ALTER TABLE `users`
+ADD COLUMN `suspension_expiry` datetime DEFAULT NULL;
+
+ALTER TABLE `users`
+ADD COLUMN `data_cadastro` DATETIME DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE `livros`
+ADD COLUMN `data_adicao` DATETIME DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE `users`
+ADD COLUMN `data_banimento` DATETIME NULL;
