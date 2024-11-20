@@ -2018,6 +2018,7 @@ app.post('/send-alert', isAuthenticatedAndVerified, (req, res) => {
     const user = results[0];
     let status = 'ativo';
     let expiryDate = null;
+    let banDate = null;
 
     if (punishment === '3dias') {
       status = 'suspenso';
@@ -2027,10 +2028,11 @@ app.post('/send-alert', isAuthenticatedAndVerified, (req, res) => {
       expiryDate = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000); // 5 dias
     } else if (punishment === 'banimento') {
       status = 'banido';
+      banDate = new Date(); // Data de banimento
     }
 
     // Atualizar o status do usuário no banco de dados
-    db.query('UPDATE users SET status = ?, suspension_expiry = ? WHERE email = ?', [status, expiryDate, email], (err, results) => {
+    db.query('UPDATE users SET status = ?, suspension_expiry = ?, data_banimento = ? WHERE email = ?', [status, expiryDate, banDate, email], (err, results) => {
       if (err) {
         console.error('Erro ao atualizar status do usuário:', err);
         return res.status(500).json({ success: false, message: 'Erro no servidor.' });
