@@ -1,0 +1,132 @@
+body{
+    background-color: rgb(255, 255, 255);
+}
+
+#navbar{
+    padding-left: 75px;
+    padding-right: 75px;
+    padding-top: 20px;
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgb(255, 255, 255);
+}
+
+h3{
+    color: #fd9323;
+    font-weight: 600;
+    font-size: 30px;
+}
+
+#nav_list{
+    display: flex;
+    flex: 1;
+    gap: 100px;
+    justify-content: end;
+}
+#nav_list>li{
+    list-style: none;
+    display: flex;
+    height: min-content;
+    border-bottom-right-radius: 0px;
+}
+.nav-button{
+    width: 200px;
+    padding: 12px;
+    border-radius: 20px;
+    border-bottom-right-radius: 0px;
+    text-decoration: none;
+    text-align: center;
+    background-color: #fd9323;
+    border: none;
+    color: rgb(255, 255, 255);
+    font-weight: 600;
+}
+.nav-button:hover{
+    background-color: #ffa03b;
+}
+#button-funcionamento{
+    cursor: pointer;
+}
+
+#navbar_logo{
+    width: 120px;
+}
+
+
+
+/* Para dispositivos mobile  */
+#mobile_btn{
+    display: none;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    margin-right: 20px;
+}
+.mobile_menu{
+    height: 0px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+}
+.mobile_menu.active{
+    height: auto;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+#mobile_nav_list{
+    display: none;
+    list-style: none;
+    padding: 0px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+@media screen and (max-width: 1100px){
+    header{
+        position: fixed;
+        width: 100%;
+        z-index: 3;
+    }
+    #navbar{
+        padding-left: 50px;
+        padding-right: 50px;
+        
+    }
+    #nav_list{
+        display: none;
+        
+    }
+    #mobile_btn{
+        display: flex;
+    }
+    
+    
+    #mobile_nav_list.active{
+        width: 100%;
+        display: block;
+        opacity: 1;
+        transition-delay: 0.3s;
+    }
+
+
+    #mobile_nav_list.nav-item{
+        flex-direction: column;
+    }
+    .nav-button{
+        display: flex;
+        border-radius: 0px;
+        width: 100%;
+        align-self: center;
+    }
+    #link-funcionamento{
+        padding: 0px;
+    }
+
+    #button-collapse-funcionamento{
+        padding: 12px;
+    }
+}

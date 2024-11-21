@@ -120,8 +120,9 @@ const isAuthenticated = (req, res, next) => {
 };
 
 // Rota para a página inicial
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "views", "inscricao-buku.html"));
+// Rota para a tela de landing page
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'landingpage.html'));
 });
 
 // Rota para redirecionar para a página de adicionar livro
@@ -2092,39 +2093,97 @@ const checkSuspensionAndBan = (req, res, next) => {
     } else {
       next();
     }
-  })};
+  })
+};
 
-    // Rota para obter os dados do relatório
-    app.get('/api/relatorio', isAuthenticatedAndVerified, async (req, res) => {
-      try {
-        const totalUsuarios = await db.promise().query('SELECT COUNT(*) AS total FROM users');
-        const totalLivros = await db.promise().query('SELECT COUNT(*) AS total FROM livros');
-        const totalTrocas = await db.promise().query('SELECT COUNT(*) AS total FROM trocas');
-        const usuariosMes = await db.promise().query('SELECT COUNT(*) AS total FROM users WHERE MONTH(data_cadastro) = MONTH(CURRENT_DATE()) AND YEAR(data_cadastro) = YEAR(CURRENT_DATE())');
-        const livrosMes = await db.promise().query('SELECT COUNT(*) AS total FROM livros WHERE MONTH(data_adicao) = MONTH(CURRENT_DATE()) AND YEAR(data_adicao) = YEAR(CURRENT_DATE())');
-        const trocasMes = await db.promise().query('SELECT COUNT(*) AS total FROM trocas WHERE MONTH(data_solicitacao) = MONTH(CURRENT_DATE()) AND YEAR(data_solicitacao) = YEAR(CURRENT_DATE())');
-        const suspensoesMes = await db.promise().query('SELECT COUNT(*) AS total FROM users WHERE status = "suspenso" AND MONTH(suspension_expiry) = MONTH(CURRENT_DATE()) AND YEAR(suspension_expiry) = YEAR(CURRENT_DATE())');
-        const banimentosMes = await db.promise().query('SELECT COUNT(*) AS total FROM users WHERE status = "banido" AND MONTH(data_banimento) = MONTH(CURRENT_DATE()) AND YEAR(data_banimento) = YEAR(CURRENT_DATE())');
-        const usuariosMaisTrocas = await db.promise().query('SELECT u.id, u.name, COUNT(t.id) AS total_trocas FROM users u JOIN trocas t ON u.id = t.usuario_solicitante_id OR u.id = t.usuario_recebedor_id GROUP BY u.id ORDER BY total_trocas DESC LIMIT 5');
-        const livrosMaisCadastrados = await db.promise().query('SELECT titulo, autor, imagem, COUNT(*) AS total FROM livros GROUP BY titulo, autor, imagem ORDER BY total DESC LIMIT 5');
-        const livroMaisTrocado = await db.promise().query('SELECT l.titulo, l.autor, l.imagem, COUNT(t.id) AS total_trocas FROM livros l JOIN trocas t ON l.id = t.livro_solicitante_id OR l.id = t.livro_recebedor_id GROUP BY l.titulo, l.autor, l.imagem ORDER BY total_trocas DESC LIMIT 1');
-    
-        res.json({
-          success: true,
-          totalUsuarios: totalUsuarios[0][0].total,
-          totalLivros: totalLivros[0][0].total,
-          totalTrocas: totalTrocas[0][0].total,
-          usuariosMes: usuariosMes[0][0].total,
-          livrosMes: livrosMes[0][0].total,
-          trocasMes: trocasMes[0][0].total,
-          suspensoesMes: suspensoesMes[0][0].total,
-          banimentosMes: banimentosMes[0][0].total,
-          usuariosMaisTrocas: usuariosMaisTrocas[0],
-          livrosMaisCadastrados: livrosMaisCadastrados[0],
-          livroMaisTrocado: livroMaisTrocado[0]
-        });
-      } catch (error) {
-        console.error('Erro ao buscar dados do relatório:', error);
-        res.status(500).json({ success: false, message: 'Erro no servidor.' });
-      }
+// Rota para obter os dados do relatório
+app.get('/api/relatorio', isAuthenticatedAndVerified, async (req, res) => {
+  try {
+    const totalUsuarios = await db.promise().query('SELECT COUNT(*) AS total FROM users');
+    const totalLivros = await db.promise().query('SELECT COUNT(*) AS total FROM livros');
+    const totalTrocas = await db.promise().query('SELECT COUNT(*) AS total FROM trocas');
+    const usuariosMes = await db.promise().query('SELECT COUNT(*) AS total FROM users WHERE MONTH(data_cadastro) = MONTH(CURRENT_DATE()) AND YEAR(data_cadastro) = YEAR(CURRENT_DATE())');
+    const livrosMes = await db.promise().query('SELECT COUNT(*) AS total FROM livros WHERE MONTH(data_adicao) = MONTH(CURRENT_DATE()) AND YEAR(data_adicao) = YEAR(CURRENT_DATE())');
+    const trocasMes = await db.promise().query('SELECT COUNT(*) AS total FROM trocas WHERE MONTH(data_solicitacao) = MONTH(CURRENT_DATE()) AND YEAR(data_solicitacao) = YEAR(CURRENT_DATE())');
+    const suspensoesMes = await db.promise().query('SELECT COUNT(*) AS total FROM users WHERE status = "suspenso" AND MONTH(suspension_expiry) = MONTH(CURRENT_DATE()) AND YEAR(suspension_expiry) = YEAR(CURRENT_DATE())');
+    const banimentosMes = await db.promise().query('SELECT COUNT(*) AS total FROM users WHERE status = "banido" AND MONTH(data_banimento) = MONTH(CURRENT_DATE()) AND YEAR(data_banimento) = YEAR(CURRENT_DATE())');
+    const usuariosMaisTrocas = await db.promise().query('SELECT u.id, u.name, COUNT(t.id) AS total_trocas FROM users u JOIN trocas t ON u.id = t.usuario_solicitante_id OR u.id = t.usuario_recebedor_id GROUP BY u.id ORDER BY total_trocas DESC LIMIT 5');
+    const livrosMaisCadastrados = await db.promise().query('SELECT titulo, autor, imagem, COUNT(*) AS total FROM livros GROUP BY titulo, autor, imagem ORDER BY total DESC LIMIT 5');
+    const livroMaisTrocado = await db.promise().query('SELECT l.titulo, l.autor, l.imagem, COUNT(t.id) AS total_trocas FROM livros l JOIN trocas t ON l.id = t.livro_solicitante_id OR l.id = t.livro_recebedor_id GROUP BY l.titulo, l.autor, l.imagem ORDER BY total_trocas DESC LIMIT 1');
+
+    res.json({
+      success: true,
+      totalUsuarios: totalUsuarios[0][0].total,
+      totalLivros: totalLivros[0][0].total,
+      totalTrocas: totalTrocas[0][0].total,
+      usuariosMes: usuariosMes[0][0].total,
+      livrosMes: livrosMes[0][0].total,
+      trocasMes: trocasMes[0][0].total,
+      suspensoesMes: suspensoesMes[0][0].total,
+      banimentosMes: banimentosMes[0][0].total,
+      usuariosMaisTrocas: usuariosMaisTrocas[0],
+      livrosMaisCadastrados: livrosMaisCadastrados[0],
+      livroMaisTrocado: livroMaisTrocado[0]
     });
+  } catch (error) {
+    console.error('Erro ao buscar dados do relatório:', error);
+    res.status(500).json({ success: false, message: 'Erro no servidor.' });
+  }
+});
+
+// Rota para a tela de landing page
+app.get('/inicio', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'landingpage.html'));
+});
+
+// Rota para acessar a página de histórico de trocas
+app.get('/historico', isAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'historico.html'));
+});
+
+// Rota para obter as trocas de um usuário específico
+app.get('/api/user-exchanges', isAuthenticated, (req, res) => {
+  const userId = req.query.userId || req.session.userId;
+
+  const sql = `
+    SELECT t.*, 
+           us.name AS usuario_solicitante, 
+           ur.name AS usuario_recebedor, 
+           ls.titulo AS titulo_solicitante, 
+           lr.titulo AS titulo_recebedor
+    FROM trocas t
+    JOIN users us ON t.usuario_solicitante_id = us.id
+    JOIN users ur ON t.usuario_recebedor_id = ur.id
+    JOIN livros ls ON t.livro_solicitante_id = ls.id
+    JOIN livros lr ON t.livro_recebedor_id = lr.id
+    WHERE t.usuario_solicitante_id = ? OR t.usuario_recebedor_id = ?
+  `;
+
+  db.query(sql, [userId, userId], (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar trocas do usuário:', err);
+      return res.status(500).json({ success: false, message: 'Erro no servidor.' });
+    }
+
+    res.json({ success: true, exchanges: results, currentUserId: userId });
+  });
+});
+
+// Rota para acessar a página de alerta com o e-mail preenchido
+app.get('/alert', isAuthenticatedAndVerified, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'adminAlert.html'));
+});
+
+// Rota para desbanir um usuário
+app.post('/unban-user', isAuthenticatedAndVerified, (req, res) => {
+  const { userId } = req.body;
+
+  db.query('UPDATE users SET status = "ativo", data_banimento = NULL WHERE id = ?', [userId], (err, results) => {
+    if (err) {
+      console.error('Erro ao desbanir usuário:', err);
+      return res.status(500).json({ success: false, message: 'Erro no servidor.' });
+    }
+
+    res.json({ success: true, message: 'Usuário desbanido com sucesso.' });
+  });
+});

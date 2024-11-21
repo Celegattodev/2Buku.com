@@ -39,39 +39,31 @@ p {
     background-color: #4976c9;
 }
 
-#button-details, #button-alert, #button-db {
+.btn-alert, .btn-unban {
     margin-top: 10px;
     margin-right: 10px;
     border-radius: 5px;
     padding: 10px 20px;
     font-weight: bold;
-}
-
-#button-details {
-    background-color: #00a30e;
     color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-#button-details:hover {
-    background-color: #00b10f;
-}
-
-#button-alert {
+.btn-alert {
     background-color: #dc3545;
-    color: #fff;
 }
 
-#button-alert:hover {
+.btn-alert:hover {
     background-color: #f1293d;
 }
 
-#button-db {
+.btn-unban {
     background-color: #fd9323;
-    color: #fff;
-    border: none;
 }
 
-#button-db:hover {
+.btn-unban:hover {
     background-color: #ff9d34;
 }
 

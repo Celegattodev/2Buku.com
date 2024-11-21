@@ -78,18 +78,60 @@ document.addEventListener('DOMContentLoaded', function () {
                                         </div>
                                     </div>
                                 </div>
-                                <a href="/user-history">
-                                    <button type="button" class="btn" id="button-details">Ver histórico de trocas</button>
-                                </a>
-                                <a href="/alert">
-                                    <button type="button" class="btn" id="button-alert">Alerta</button>
-                                </a>
+                                
+                                <button type="button" class="btn btn-alert" data-user-email="${user.email}">Alerta</button>
                                 ${user.status === 'banido' ? `
-                                    <button class="btn" id="button-db">Desbanir</button>
+                                    <button class="btn btn-unban" data-user-id="${user.id}">Desbanir</button>
                                 ` : ''}
                             </div>
                         `;
                         usersContainer.appendChild(userItem);
+                    });
+
+                    // Adicionar funcionalidade aos botões de alerta
+                    document.querySelectorAll('.btn-alert').forEach(button => {
+                        button.addEventListener('click', function () {
+                            const userEmail = this.getAttribute('data-user-email');
+                            window.location.href = `/alert?email=${userEmail}`;
+                        });
+                    });
+
+                    // Adicionar funcionalidade aos botões de desbanir
+                    document.querySelectorAll('.btn-unban').forEach(button => {
+                        button.addEventListener('click', function () {
+                            const userId = this.getAttribute('data-user-id');
+                            fetch('/unban-user', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ userId })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Sucesso!',
+                                        text: data.message,
+                                    }).then(() => {
+                                        fetchAndRenderUsers(); // Atualizar a lista de usuários
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Erro',
+                                        text: data.message || 'Erro ao desbanir usuário.',
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Erro:', error);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Erro no servidor',
+                                    text: 'Ocorreu um erro ao desbanir o usuário. Por favor, tente novamente.',
+                                });
+                            });
+                        });
                     });
                 } else {
                     console.error('Erro ao obter informações dos usuários:', data.message);

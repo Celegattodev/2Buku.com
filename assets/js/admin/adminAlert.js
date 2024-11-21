@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const userEmail = urlParams.get('email');
+    if (userEmail) {
+        document.getElementById('alert-email').value = userEmail;
+    }
+
     document.querySelector('.form-alert').addEventListener('submit', async (event) => {
         event.preventDefault(); // Evita o envio padrão do formulário
 
