@@ -197,7 +197,7 @@ header {
     align-items: center;
     gap: 15px;
     max-width: 600px;
-    margin: 0 auto;
+    margin: 0 auto 15px auto;
     animation: fadeInUp 1s ease-in-out;
 }
 
@@ -214,8 +214,10 @@ header {
     justify-content: center;
     align-items: center;
     font-weight: bold;
+    flex-shrink: 0;
+    text-align: center;
+    line-height: 40px; /* Adicionado para centralizar verticalmente o texto */
 }
-
 #last-circle {
     background-color: #fd9323;
 }
