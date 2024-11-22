@@ -1,61 +1,96 @@
-body{
+body {
     background-image: url('/img/Buku-fundo.png');
     background-repeat: no-repeat;
     background-size: cover;
 }
 
-.card{
+.card {
     width: 100vh;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
-a{
+
+a {
     text-decoration: none;
 }
 
-.desc{
+.desc {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    margin-bottom: 15px;
 }
-p{
+
+p {
     word-break: break-all;
 }
 
-#btn-back{
+#btn-back {
     background-color: #366aca;
     text-decoration: none;
     border: none;
     color: #fff;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-weight: bold;
 }
-#btn-back:hover{
+
+#btn-back:hover {
     background-color: #4976c9;
 }
 
-#button-details{
-    background-color: #00a30e;
-    border-radius: 10px;
-    text-decoration: none;
+.btn-alert, .btn-unban {
+    margin-top: 10px;
+    margin-right: 10px;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-weight: bold;
     color: #fff;
-}
-#button-details:hover{
-    background-color: #00b10f;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-#button-alert{
+.btn-alert {
     background-color: #dc3545;
-    border-radius: 10px;
-    text-decoration: none;
-    color: #fff;
 }
-#button-alert:hover{
+
+.btn-alert:hover {
     background-color: #f1293d;
 }
-#button-db{
+
+.btn-unban {
     background-color: #fd9323;
-    border: none;
-    border-radius: 10px;
-    text-decoration: none;
-    color: #fff;
 }
-#button-db:hover{
+
+.btn-unban:hover {
     background-color: #ff9d34;
+}
+
+.accordion-button {
+    font-weight: bold;
+    color: #366aca;
+}
+
+.accordion-button:not(.collapsed) {
+    color: #fff;
+    background-color: #366aca;
+}
+
+.book-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.book-image {
+    width: 50px;
+    height: 75px;
+    margin-right: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.book-info p {
+    margin: 0;
 }

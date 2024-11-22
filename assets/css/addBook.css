@@ -137,3 +137,11 @@ h1 {
   left: 20px; /* Ajuste conforme necessário */
   z-index: 1000;
 }
+.btn-default a {
+  color: white;
+  text-decoration: none;
+}
+
+.btn-default a:hover {
+  color: white;
+}

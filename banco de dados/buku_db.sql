@@ -128,4 +128,36 @@ ALTER TABLE `trocas`
   ADD CONSTRAINT `trocas_ibfk_1` FOREIGN KEY (`usuario_solicitante_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `trocas_ibfk_2` FOREIGN KEY (`usuario_recebedor_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `trocas_ibfk_3` FOREIGN KEY (`livro_solicitante_id`) REFERENCES `livros` (`id`) ON DELETE CASCADE;
-COMMIT;
+
+ALTER TABLE `livros`
+ADD COLUMN `status` ENUM('Disponível', 'Trocado') DEFAULT 'Disponível';
+
+CREATE TABLE `admins` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL UNIQUE,
+  `state` varchar(255) NOT NULL,
+  `city` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `phone` varchar(255) NOT NULL,
+  `biography` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+ALTER TABLE `users`
+ADD COLUMN `status` ENUM('ativo', 'banido', 'suspenso') DEFAULT 'ativo';
+
+ALTER TABLE `users`
+ADD COLUMN `suspension_expiry` datetime DEFAULT NULL;
+
+ALTER TABLE `users`
+ADD COLUMN `data_cadastro` DATETIME DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE `livros`
+ADD COLUMN `data_adicao` DATETIME DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE `users`
+ADD COLUMN `data_banimento` DATETIME NULL;
+
+ALTER TABLE users ADD COLUMN profile_image VARCHAR(255) AFTER biography;

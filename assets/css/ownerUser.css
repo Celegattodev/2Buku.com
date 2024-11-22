@@ -233,3 +233,11 @@ body {
     margin-bottom: 10%;
     height: 100%;
 }
+.btn-default a {
+    color: white;
+    text-decoration: none;
+  }
+  
+  .btn-default a:hover {
+    color: white;
+  }

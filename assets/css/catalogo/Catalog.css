@@ -407,4 +407,11 @@ h1, h2 {
   font-size: 12px;
   color: #6c757d;
 }
+.btn-default a {
+  color: white;
+  text-decoration: none;
+}
 
+.btn-default a:hover {
+  color: white;
+}

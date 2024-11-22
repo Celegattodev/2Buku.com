@@ -16,6 +16,7 @@ const { enviarEmailComTemplate } = require("./email/emailService");
 const multer = require('multer');
 const sharp = require('sharp');
 const cloudinary = require('cloudinary').v2;
+const { format } = require('date-fns');
 
 // Configuração do Cloudinary
 cloudinary.config({
@@ -119,12 +120,13 @@ const isAuthenticated = (req, res, next) => {
 };
 
 // Rota para a página inicial
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "views", "inscricao-buku.html"));
+// Rota para a tela de landing page
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'landingpage.html'));
 });
 
 // Rota para redirecionar para a página de adicionar livro
-app.get("/addBook", (req, res) => {
+app.get("/addBook", isAuthenticated, (req, res) => {
   res.sendFile(path.join(__dirname, "views", "addBook.html"));
 });
 
@@ -151,9 +153,10 @@ app.get('/profile', isAuthenticated, (req, res) => {
 
       // Obter o nome da cidade usando o código da cidade e do estado
       const cityName = await getCityNameById(user.state, user.city);
+      user.city = cityName;
 
-      // Consulta para buscar os livros do usuário, incluindo a imagem
-      db.query('SELECT id, titulo, autor, imagem FROM livros WHERE user_id = ?', [req.session.userId], (err, books) => {
+      // Consulta para buscar os livros do usuário, incluindo a imagem e filtrando pelo status "Disponível"
+      db.query('SELECT id, titulo, autor, imagem FROM livros WHERE user_id = ? AND status = "Disponível"', [req.session.userId], (err, books) => {
         if (err) {
           console.error('Erro ao buscar livros do usuário:', err);
           return res.status(500).send('Erro ao buscar livros.');
@@ -214,14 +217,9 @@ app.get('/profile', isAuthenticated, (req, res) => {
   );
 });
 
-// Rota para a página de login
-app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'inscricao-buku.html'));
-});
-
 // Rota para processar o login
 app.post("/login", (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, adminLogin } = req.body;
 
   // Verifique se os campos de email e senha foram fornecidos
   if (!email || !password) {
@@ -232,7 +230,8 @@ app.post("/login", (req, res) => {
   }
 
   // Consulta ao banco de dados para verificar se o email existe
-  db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
+  const table = adminLogin ? "admins" : "users";
+  db.query(`SELECT * FROM ${table} WHERE email = ?`, [email], (err, results) => {
     if (err) {
       console.error("Erro ao verificar email:", err);
       return res.status(500).json({
@@ -261,9 +260,50 @@ app.post("/login", (req, res) => {
         });
       }
 
-      // Se a senha for válida, armazene o ID do usuário na sessão
+      // Se a senha for válida, verificar o status da conta
       if (isMatch) {
+        if (user.status === 'banido') {
+          return res.status(403).json({
+            success: false,
+            status: 'banido',
+            data_banimento: user.data_banimento,
+            message: 'Sua conta foi banida permanentemente. Caso tenha dúvidas, entre em contato pelo email buku.livro@gmail.com.'
+          });
+        }
+
+        if (user.status === 'suspenso' && user.suspension_expiry && new Date(user.suspension_expiry) > new Date()) {
+          return res.status(403).json({
+            success: false,
+            status: 'suspenso',
+            suspension_expiry: user.suspension_expiry,
+            message: `Sua conta está suspensa até ${user.suspension_expiry}. Caso tenha dúvidas, entre em contato pelo email buku.livro@gmail.com.`
+          });
+        }
+
+        // Armazene o ID do usuário na sessão
         req.session.userId = user.id; // Certifique-se de que o ID está correto
+        req.session.isAdmin = adminLogin; // Adicionar flag para verificar se é admin
+
+        // Verificar se é login de administrador
+        if (adminLogin) {
+          // Gerar código de verificação
+          const codigoVerificacao = Math.floor(100000 + Math.random() * 900000).toString();
+          req.session.codigoVerificacao = codigoVerificacao;
+          req.session.tentativas = 0;
+          req.session.bloqueadoAte = null;
+          req.session.verificado = false; // Adicionar flag de verificação
+
+          const { email, name } = user;
+          const userName = name;
+          // Enviar código de verificação por e-mail
+          enviarEmailComTemplate(email, 'Código de verificação', 'templateCodigoVerificacao', { userName, codigoVerificacao });
+          
+          return res.status(200).json({
+            success: true,
+            message: 'Login de administrador bem-sucedido. Código de verificação enviado por e-mail.',
+            redirect: '/adminVerify'
+          });
+        }
 
         // Sucesso no login, redirecionando para a página de perfil
         return res.status(200).json({
@@ -282,6 +322,33 @@ app.post("/login", (req, res) => {
   });
 });
 
+// Middleware para verificar se o usuário está autenticado e é administrador
+const isAdmin = (req, res, next) => {
+  if (req.session.userId && req.session.isAdmin) {
+    next();
+  } else {
+    res.redirect('/login'); // Redireciona para login se não estiver autenticado ou não for admin
+  }
+};
+
+// Middleware para verificar se o usuário está autenticado e não é administrador
+const isUser = (req, res, next) => {
+  if (req.session.userId && !req.session.isAdmin) {
+    next();
+  } else {
+    res.redirect('/login'); // Redireciona para login se não estiver autenticado ou for admin
+  }
+};
+
+// Rota para enviar o arquivo admin.html
+app.get('/admin', isAdmin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'admin.html'));
+});
+
+// Rota para enviar o arquivo userProfile.html
+app.get('/profile', isUser, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'userProfile.html'));
+});
 
 // Rota para processar o registro
 app.post("/register", (req, res) => {
@@ -507,15 +574,10 @@ app.delete('/delete-account', (req, res) => {
 app.get('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) {
-      console.error('Erro ao encerrar a sessão:', err);
-      return res.status(500).json({
-        success: false,
-        message: 'Erro no servidor.'
-      });
+      console.error('Erro ao fazer logout:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao fazer logout.' });
     }
-
-    // Redireciona para a página de login com um parâmetro de consulta
-    res.redirect('/login?logout=success');
+    res.redirect('/login'); // Redireciona para a página de login após o logout
   });
 });
 
@@ -682,45 +744,45 @@ app.delete('/delete-book/:id', (req, res) => {
 });
 // Rota para adicionar um livro aos favoritos
 app.post('/add-favorite', isAuthenticated, async (req, res) => {
-    const { googleBooksId, title, author, imageUrl } = req.body;
-    const userId = req.session.userId;
+  const { googleBooksId, title, author, imageUrl } = req.body;
+  const userId = req.session.userId;
 
-    console.log('Recebido para adicionar aos desejados:', { googleBooksId, title, author, imageUrl, userId });
+  console.log('Recebido para adicionar aos desejados:', { googleBooksId, title, author, imageUrl, userId });
 
-    if (!googleBooksId) {
-        console.error('ID do livro é obrigatório.');
-        return res.status(400).json({ success: false, message: 'ID do livro é obrigatório.' });
+  if (!googleBooksId) {
+    console.error('ID do livro é obrigatório.');
+    return res.status(400).json({ success: false, message: 'ID do livro é obrigatório.' });
+  }
+
+  try {
+    // Verificar se o livro já está na biblioteca
+    const checkLibrarySql = 'SELECT * FROM livros WHERE user_id = ? AND google_books_id = ?';
+    const [libraryResults] = await db.promise().query(checkLibrarySql, [userId, googleBooksId]);
+
+    if (libraryResults.length > 0) {
+      console.log('Livro já está na biblioteca.');
+      return res.status(400).json({ success: false, message: 'Livro já está na biblioteca.' });
     }
 
-    try {
-        // Verificar se o livro já está na biblioteca
-        const checkLibrarySql = 'SELECT * FROM livros WHERE user_id = ? AND google_books_id = ?';
-        const [libraryResults] = await db.promise().query(checkLibrarySql, [userId, googleBooksId]);
+    // Verificar se o livro já está nos favoritos
+    const checkFavoriteSql = 'SELECT * FROM favoritos WHERE user_id = ? AND google_books_id = ?';
+    const [favoriteResults] = await db.promise().query(checkFavoriteSql, [userId, googleBooksId]);
 
-        if (libraryResults.length > 0) {
-            console.log('Livro já está na biblioteca.');
-            return res.status(400).json({ success: false, message: 'Livro já está na biblioteca.' });
-        }
-
-        // Verificar se o livro já está nos favoritos
-        const checkFavoriteSql = 'SELECT * FROM favoritos WHERE user_id = ? AND google_books_id = ?';
-        const [favoriteResults] = await db.promise().query(checkFavoriteSql, [userId, googleBooksId]);
-
-        if (favoriteResults.length > 0) {
-            console.log('Livro já está nos desejados.');
-            return res.status(400).json({ success: false, message: 'Livro já está nos desejados.' });
-        }
-
-        // Adicionar o livro aos favoritos
-        const addFavoriteSql = 'INSERT INTO favoritos (google_books_id, titulo, autor, imagem, user_id) VALUES (?, ?, ?, ?, ?)';
-        await db.promise().query(addFavoriteSql, [googleBooksId, title, author, imageUrl, userId]);
-
-        console.log('Livro adicionado aos desejados com sucesso.');
-        res.json({ success: true, message: 'Livro adicionado aos desejados com sucesso.' });
-    } catch (err) {
-        console.error('Erro ao adicionar o livro aos desejados:', err);
-        res.status(500).json({ success: false, message: 'Erro ao adicionar o livro aos desejados.' });
+    if (favoriteResults.length > 0) {
+      console.log('Livro já está nos desejados.');
+      return res.status(400).json({ success: false, message: 'Livro já está nos desejados.' });
     }
+
+    // Adicionar o livro aos favoritos
+    const addFavoriteSql = 'INSERT INTO favoritos (google_books_id, titulo, autor, imagem, user_id) VALUES (?, ?, ?, ?, ?)';
+    await db.promise().query(addFavoriteSql, [googleBooksId, title, author, imageUrl, userId]);
+
+    console.log('Livro adicionado aos desejados com sucesso.');
+    res.json({ success: true, message: 'Livro adicionado aos desejados com sucesso.' });
+  } catch (err) {
+    console.error('Erro ao adicionar o livro aos desejados:', err);
+    res.status(500).json({ success: false, message: 'Erro ao adicionar o livro aos desejados.' });
+  }
 });
 
 // Rota para a página de esqueci a senha
@@ -876,90 +938,135 @@ app.get('/favorites', isAuthenticated, (req, res) => {
   }
 
   // Consulta para buscar os livros favoritos do usuário
-  db.query('SELECT id, titulo, autor, imagem FROM favoritos WHERE user_id = ?', [req.session.userId], (err, favorites) => {
+  db.query('SELECT id, titulo, autor, imagem, google_books_id FROM favoritos WHERE user_id = ?', [req.session.userId], (err, favorites) => {
     if (err) {
       console.error('Erro ao buscar livros desejados do usuário:', err);
       return res.status(500).send('Erro ao buscar livros desejados.');
     }
 
-    // Substituição de placeholders no HTML
-    const filePath = path.join(__dirname, 'views', 'favorites.html');
-    fs.readFile(filePath, 'utf8', (err, data) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).send('Erro interno do servidor');
+    // Renderizar a página de favoritos com os livros favoritos do usuário
+    res.sendFile(path.join(__dirname, 'views', 'favorites.html'));
+  });
+});
+
+// Rota para obter os detalhes do livro para o catálogo
+app.get('/api/catalog-book-details/:googleBooksId', isAuthenticated, async (req, res) => {
+  const googleBooksId = req.params.googleBooksId;
+
+  try {
+    const googleBooksUrl = `https://www.googleapis.com/books/v1/volumes/${googleBooksId}`;
+    const googleBooksResponse = await axios.get(googleBooksUrl);
+    const volumeInfo = googleBooksResponse.data.volumeInfo;
+
+    const bookDescription = volumeInfo.description || 'Descrição não disponível';
+    const bookCategories = volumeInfo.categories || ['Desconhecido'];
+    const bookPublisher = volumeInfo.publisher || 'Desconhecido';
+    const bookPublishedDate = volumeInfo.publishedDate || 'Desconhecido';
+    const bookTitle = volumeInfo.title || 'Título não disponível';
+    const bookAuthors = volumeInfo.authors ? volumeInfo.authors.join(', ') : 'Autor desconhecido';
+    const bookCoverImage = volumeInfo.imageLinks ? volumeInfo.imageLinks.thumbnail : '/img/default-book-image.jpg';
+
+    // Buscar o ID do livro na tabela livros
+    const getBookIdSql = 'SELECT id FROM livros WHERE google_books_id = ?';
+    const [bookIdResults] = await db.promise().query(getBookIdSql, [googleBooksId]);
+    if (bookIdResults.length === 0) {
+      return res.status(404).json({ success: false, message: 'Livro não encontrado.' });
+    }
+    const livroId = bookIdResults[0].id;
+
+    // Buscar as imagens do livro na tabela livro_imagens
+    const getImagesSql = 'SELECT imagem_url FROM livro_imagens WHERE livro_id = ?';
+    const [imagesResults] = await db.promise().query(getImagesSql, [livroId]);
+    const bookImages = imagesResults.map(row => row.imagem_url);
+
+    res.status(200).json({
+      success: true,
+      book: {
+        title: bookTitle,
+        author: bookAuthors,
+        description: bookDescription,
+        categories: bookCategories,
+        publisher: bookPublisher,
+        publishedDate: bookPublishedDate,
+        coverImage: bookCoverImage,
+        images: bookImages // Adicionar as imagens à resposta
       }
-
-      // Renderizar livros favoritos com ícone de deletar fixo
-      const favoriteListHTML = favorites.map(book => {
-        return `
-          <div class="col-md-4 favorite-item" data-book-id="${book.id}">
-            <i class="fas fa-trash-alt delete-favorite-icon" title="Deletar"></i>
-            <img src="${book.imagem || '/img/default-book-image.jpg'}" alt="${book.titulo}">
-            <p><strong>${book.titulo}</strong></p>
-            <p>${book.autor}</p>
-          </div>`;
-      }).join('');
-
-      // Substituir placeholders no HTML
-      let html = data.replace('<!-- Os livros desejados serão carregados aqui pelo JavaScript -->', favoriteListHTML);
-
-      res.send(html);
     });
+  } catch (err) {
+    console.error('Erro ao carregar os detalhes do livro:', err);
+    res.status(500).json({ success: false, message: 'Erro ao carregar os detalhes do livro.' });
+  }
+});
+
+// Rota para buscar os livros favoritos do usuário
+app.get('/api/user-favorites', isAuthenticated, (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).json({ success: false, message: 'Usuário não autenticado.' });
+  }
+
+  // Consulta para buscar os livros favoritos do usuário
+  db.query('SELECT id, titulo, autor, imagem, google_books_id FROM favoritos WHERE user_id = ?', [req.session.userId], (err, favorites) => {
+    if (err) {
+      console.error('Erro ao buscar livros desejados do usuário:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao buscar livros desejados.' });
+    }
+
+    // Retornar os livros favoritos do usuário em formato JSON
+    res.status(200).json({ success: true, favorites });
   });
 });
 
 // Rota para adicionar um livro aos favoritos
 app.post('/add-favorite', isAuthenticated, (req, res) => {
-    const { googleBooksId, title, author, imageUrl } = req.body;
-    const userId = req.session.userId;
+  const { googleBooksId, title, author, imageUrl } = req.body;
+  const userId = req.session.userId;
 
-    console.log('Recebido para adicionar aos desejados:', { googleBooksId, title, author, imageUrl, userId });
+  console.log('Recebido para adicionar aos desejados:', { googleBooksId, title, author, imageUrl, userId });
 
-    if (!googleBooksId) {
-        console.error('ID do livro é obrigatório.');
-        return res.status(400).json({ success: false, message: 'ID do livro é obrigatório.' });
+  if (!googleBooksId) {
+    console.error('ID do livro é obrigatório.');
+    return res.status(400).json({ success: false, message: 'ID do livro é obrigatório.' });
+  }
+
+  // Verificar se o livro já está na biblioteca
+  const checkLibrarySql = 'SELECT * FROM livros WHERE user_id = ? AND google_books_id = ?';
+  db.query(checkLibrarySql, [userId, googleBooksId], (err, results) => {
+    if (err) {
+      console.error('Erro ao verificar a biblioteca:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao verificar a biblioteca.' });
     }
 
-    // Verificar se o livro já está na biblioteca
-    const checkLibrarySql = 'SELECT * FROM livros WHERE user_id = ? AND google_books_id = ?';
-    db.query(checkLibrarySql, [userId, googleBooksId], (err, results) => {
+    if (results.length > 0) {
+      console.log('Livro já está na biblioteca.');
+      return res.status(400).json({ success: false, message: 'Livro já está na biblioteca.' });
+    }
+
+    // Verificar se o livro já está nos favoritos
+    const checkFavoriteSql = 'SELECT * FROM favoritos WHERE user_id = ? AND google_books_id = ?';
+    db.query(checkFavoriteSql, [userId, googleBooksId], (err, results) => {
+      if (err) {
+        console.error('Erro ao verificar os desejados:', err);
+        return res.status(500).json({ success: false, message: 'Erro ao verificar os desejados.' });
+      }
+
+      if (results.length > 0) {
+        console.log('Livro já está nos desejados.');
+        return res.status(400).json({ success: false, message: 'Livro já está nos desejados.' });
+      }
+
+      // Adicionar o livro aos favoritos
+      const addFavoriteSql = 'INSERT INTO favoritos (google_books_id, titulo, autor, imagem, user_id) VALUES (?, ?, ?, ?, ?)';
+      db.query(addFavoriteSql, [googleBooksId, title, author, imageUrl, userId], (err, results) => {
         if (err) {
-            console.error('Erro ao verificar a biblioteca:', err);
-            return res.status(500).json({ success: false, message: 'Erro ao verificar a biblioteca.' });
+          console.error('Erro ao adicionar o livro aos desejados:', err);
+          return res.status(500).json({ success: false, message: 'Erro ao adicionar o livro aos desejados.' });
         }
 
-        if (results.length > 0) {
-            console.log('Livro já está na biblioteca.');
-            return res.status(400).json({ success: false, message: 'Livro já está na biblioteca.' });
-        }
-
-        // Verificar se o livro já está nos favoritos
-        const checkFavoriteSql = 'SELECT * FROM favoritos WHERE user_id = ? AND google_books_id = ?';
-        db.query(checkFavoriteSql, [userId, googleBooksId], (err, results) => {
-            if (err) {
-                console.error('Erro ao verificar os desejados:', err);
-                return res.status(500).json({ success: false, message: 'Erro ao verificar os desejados.' });
-            }
-
-            if (results.length > 0) {
-                console.log('Livro já está nos desejados.');
-                return res.status(400).json({ success: false, message: 'Livro já está nos desejados.' });
-            }
-
-            // Adicionar o livro aos favoritos
-            const addFavoriteSql = 'INSERT INTO favoritos (google_books_id, titulo, autor, imagem, user_id) VALUES (?, ?, ?, ?, ?)';
-            db.query(addFavoriteSql, [googleBooksId, title, author, imageUrl, userId], (err, results) => {
-                if (err) {
-                    console.error('Erro ao adicionar o livro aos desejados:', err);
-                    return res.status(500).json({ success: false, message: 'Erro ao adicionar o livro aos desejados.' });
-                }
-
-                console.log('Livro adicionado aos desejados com sucesso.');
-                res.json({ success: true, message: 'Livro adicionado aos desejado com sucesso.' });
-            });
-        });
+        console.log('Livro adicionado aos desejados com sucesso.');
+        res.json({ success: true, message: 'Livro adicionado aos desejado com sucesso.' });
+      });
     });
+  });
 });
 
 // Rota para remover um livro dos favoritos
@@ -992,6 +1099,7 @@ app.get('/catalog-data', (req, res) => {
   const popularBooksSql = `
     SELECT google_books_id, user_id, COUNT(*) as count
     FROM livros
+    WHERE status = 'Disponível'
     GROUP BY google_books_id, user_id
     ORDER BY count DESC
     LIMIT 10
@@ -1001,6 +1109,7 @@ app.get('/catalog-data', (req, res) => {
   const latestBooksSql = `
     SELECT google_books_id, user_id
     FROM livros
+    WHERE status = 'Disponível'
     ORDER BY data_adicao DESC
     LIMIT 10
   `;
@@ -1043,27 +1152,26 @@ app.get('/catalog-data', (req, res) => {
           const popularBooksDetails = results.slice(0, popularBooks.length).map((result, index) => {
             const volumeInfo = result && result.volumeInfo;
             return volumeInfo ? {
-                googleBooksId: popularBooks[index].google_books_id,
-                title: volumeInfo.title || 'Título não disponível',
-                author: volumeInfo.authors && volumeInfo.authors.length > 0 ? volumeInfo.authors.join(', ') : 'Autor desconhecido',
-                imageUrl: volumeInfo.imageLinks && volumeInfo.imageLinks.thumbnail ? volumeInfo.imageLinks.thumbnail : '/img/default-book-image.jpg',
-                genres: volumeInfo.categories && volumeInfo.categories.length > 0 ? volumeInfo.categories : ['Gênero desconhecido'],
-                userId: popularBooks[index].user_id
+              googleBooksId: popularBooks[index].google_books_id,
+              title: volumeInfo.title || 'Título não disponível',
+              author: volumeInfo.authors && volumeInfo.authors.length > 0 ? volumeInfo.authors.join(', ') : 'Autor desconhecido',
+              imageUrl: volumeInfo.imageLinks && volumeInfo.imageLinks.thumbnail ? volumeInfo.imageLinks.thumbnail : '/img/default-book-image.jpg',
+              genres: volumeInfo.categories && volumeInfo.categories.length > 0 ? volumeInfo.categories : ['Gênero desconhecido'],
+              userId: popularBooks[index].user_id
             } : null;
-        }).filter(book => book !== null);
-        
-        const latestBooksDetails = results.slice(popularBooks.length).map((result, index) => {
+          }).filter(book => book !== null);
+
+          const latestBooksDetails = results.slice(popularBooks.length).map((result, index) => {
             const volumeInfo = result && result.volumeInfo;
             return volumeInfo ? {
-                googleBooksId: latestBooks[index].google_books_id,
-                title: volumeInfo.title || 'Título não disponível',
-                author: volumeInfo.authors && volumeInfo.authors.length > 0 ? volumeInfo.authors.join(', ') : 'Autor desconhecido',
-                imageUrl: volumeInfo.imageLinks && volumeInfo.imageLinks.thumbnail ? volumeInfo.imageLinks.thumbnail : '/img/default-book-image.jpg',
-                genres: volumeInfo.categories && volumeInfo.categories.length > 0 ? volumeInfo.categories : ['Gênero desconhecido'],
-                userId: latestBooks[index].user_id
+              googleBooksId: latestBooks[index].google_books_id,
+              title: volumeInfo.title || 'Título não disponível',
+              author: volumeInfo.authors && volumeInfo.authors.length > 0 ? volumeInfo.authors.join(', ') : 'Autor desconhecido',
+              imageUrl: volumeInfo.imageLinks && volumeInfo.imageLinks.thumbnail ? volumeInfo.imageLinks.thumbnail : '/img/default-book-image.jpg',
+              genres: volumeInfo.categories && volumeInfo.categories.length > 0 ? volumeInfo.categories : ['Gênero desconhecido'],
+              userId: latestBooks[index].user_id
             } : null;
-        }).filter(book => book !== null);
-        
+          }).filter(book => book !== null);
 
           res.json({ popularBooks: popularBooksDetails, latestBooks: latestBooksDetails });
         })
@@ -1075,21 +1183,18 @@ app.get('/catalog-data', (req, res) => {
   });
 });
 
-
 // Rota para obter os livros do usuário logado
 app.get('/api/user-books', isAuthenticated, (req, res) => {
   const userId = req.session.userId;
 
-  db.query('SELECT id, titulo, autor, imagem AS imageUrl, google_books_id FROM livros WHERE user_id = ?', [userId], (err, results) => {
+  db.query('SELECT id, titulo, autor, imagem AS imageUrl, google_books_id FROM livros WHERE user_id = ? AND status = "Disponível"', [userId], (err, results) => {
     if (err) {
       console.error('Erro ao buscar livros do usuário:', err);
       return res.status(500).json({ success: false, message: 'Erro ao buscar livros do usuário.' });
     }
 
     if (results.length === 0) {
-      console.log(`Nenhum livro encontrado para o usuário com ID ${userId}.`);
-    } else {
-      console.log(`Livros encontrados para o usuário com ID ${userId}:`, results);
+      return res.status(404).json({ success: false, message: 'Nenhum livro encontrado.' });
     }
 
     res.json({ success: true, userId: userId, books: results });
@@ -1308,8 +1413,59 @@ app.get('/troca', (req, res) => {
 });
 
 // Rota para acessar a página do usuário proprietario do livro
-app.get('/ownerUser', (req, res) => {
+app.get('/ownerUser', isAuthenticated, (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'ownerUser.html'));
+});
+
+// Rota para obter os detalhes do livro para a troca
+app.get('/api/exchange-book-details/:bookId', isAuthenticated, async (req, res) => {
+  const bookId = req.params.bookId;
+
+  try {
+    // Buscar os detalhes do livro na tabela livros
+    const getBookDetailsSql = 'SELECT * FROM livros WHERE id = ?';
+    const [bookResults] = await db.promise().query(getBookDetailsSql, [bookId]);
+
+    if (bookResults.length === 0) {
+      return res.status(404).json({ success: false, message: 'Livro não encontrado.' });
+    }
+
+    const book = bookResults[0];
+
+    // Buscar a descrição do livro usando a Google Books API
+    const googleBooksId = book.google_books_id;
+    const googleBooksUrl = `https://www.googleapis.com/books/v1/volumes/${googleBooksId}`;
+    const googleBooksResponse = await axios.get(googleBooksUrl);
+    const volumeInfo = googleBooksResponse.data.volumeInfo;
+
+    const bookDescription = volumeInfo.description || 'Descrição não disponível';
+    const bookCategories = volumeInfo.categories || ['Desconhecido'];
+    const bookPublisher = volumeInfo.publisher || 'Desconhecido';
+    const bookPublishedDate = volumeInfo.publishedDate || 'Desconhecido';
+
+    // Buscar as imagens do livro na tabela livro_imagens
+    const getImagesSql = 'SELECT imagem_url FROM livro_imagens WHERE livro_id = ?';
+    const [imagesResults] = await db.promise().query(getImagesSql, [bookId]);
+    const bookImages = imagesResults.map(row => row.imagem_url);
+
+    res.status(200).json({
+      success: true,
+      book: {
+        id: book.id,
+        title: book.titulo,
+        author: book.autor,
+        description: bookDescription,
+        categories: bookCategories,
+        publisher: bookPublisher,
+        publishedDate: bookPublishedDate,
+        coverImage: book.imagem,
+        images: bookImages
+      }
+    });
+  } catch (err) {
+    console.error('Erro ao carregar os detalhes do livro:', err);
+    res.status(500).json({ success: false, message: 'Erro ao carregar os detalhes do livro.' });
+  }
 });
 
 // Rota para obter os detalhes da troca
@@ -1351,6 +1507,7 @@ app.get('/api/exchange-details/:exchangeId', isAuthenticated, (req, res) => {
   });
 });
 
+
 // Rota para processar a ação de aceitar ou recusar a troca
 app.post('/api/exchange-action', isAuthenticated, async (req, res) => {
   const { token, action } = req.body;
@@ -1358,231 +1515,240 @@ app.post('/api/exchange-action', isAuthenticated, async (req, res) => {
   const getExchangeDetailsSql = `
       SELECT t.id, t.usuario_solicitante_id, t.usuario_recebedor_id, t.livro_solicitante_id, t.livro_recebedor_id, 
              u.email AS solicitante_email, u.name AS solicitante_name, u.phone AS solicitante_phone, 
-             ur.email AS recebedor_email, ur.name AS recebedor_name, ur.phone AS recebedor_phone
+             ur.email AS recebedor_email, ur.name AS recebedor_name, ur.phone AS recebedor_phone,
+             l_solicitante.titulo AS solicitante_book_title, l_recebedor.titulo AS recebedor_book_title,
+             t.status
       FROM trocas t
       JOIN users u ON t.usuario_solicitante_id = u.id
       JOIN users ur ON t.usuario_recebedor_id = ur.id
+      JOIN livros l_solicitante ON t.livro_solicitante_id = l_solicitante.id
+      JOIN livros l_recebedor ON t.livro_recebedor_id = l_recebedor.id
       WHERE t.token = ?
   `;
 
   try {
-      const [results] = await db.promise().query(getExchangeDetailsSql, [token]);
+    const [results] = await db.promise().query(getExchangeDetailsSql, [token]);
 
-      if (results.length === 0) {
-          return res.status(404).json({ success: false, message: 'Troca não encontrada.' });
-      }
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: 'Troca não encontrada.' });
+    }
 
-      const exchangeDetails = results[0];
+    const exchangeDetails = results[0];
 
-      if (action === 'accept') {
-          // Remover os livros da biblioteca de ambos os usuários
-          const deleteBooksSql = `
-              DELETE FROM livros 
-              WHERE (id = ? AND user_id = ?) 
-              OR (id = ? AND user_id = ?)
-          `;
-          await db.promise().query(deleteBooksSql, [
-              exchangeDetails.livro_solicitante_id, exchangeDetails.usuario_solicitante_id,
-              exchangeDetails.livro_recebedor_id, exchangeDetails.usuario_recebedor_id
-          ]);
+    // Verifica se a troca já foi processada
+    if (exchangeDetails.status !== 'Pendente') {
+      return res.status(400).json({ success: false, message: 'Troca já foi processada.' });
+    }
 
-          // Atualizar o status da troca para "Concluída"
-          const updateExchangeSql = 'UPDATE trocas SET status = "Concluída" WHERE id = ?';
-          await db.promise().query(updateExchangeSql, [exchangeDetails.id]);
+    if (action === 'accept') {
+      // Atualizar o status da troca para "Aceito"
+      const updateExchangeSql = 'UPDATE trocas SET status = "Aceito" WHERE id = ?';
+      await db.promise().query(updateExchangeSql, [exchangeDetails.id]);
 
-          // Enviar email de confirmação para ambos os usuários
-          const solicitanteEmail = exchangeDetails.solicitante_email;
-          const recebedorEmail = exchangeDetails.recebedor_email;
-          const solicitanteName = exchangeDetails.solicitante_name;
-          const recebedorName = exchangeDetails.recebedor_name;
-          const solicitantePhone = exchangeDetails.solicitante_phone;
-          const recebedorPhone = exchangeDetails.recebedor_phone;
+      // Atualizar o status dos livros envolvidos na troca para "Trocado"
+      const updateBooksSql = 'UPDATE livros SET status = "Trocado" WHERE id IN (?, ?)';
+      await db.promise().query(updateBooksSql, [exchangeDetails.livro_solicitante_id, exchangeDetails.livro_recebedor_id]);
 
-          await enviarEmailComTemplate(solicitanteEmail, 'Troca Concluída', 'templateTrocaAceita', {
-              userName: solicitanteName,
-              otherUserName: recebedorName,
-              otherUserEmail: recebedorEmail,
-              otherUserPhone: recebedorPhone
-          });
-          await enviarEmailComTemplate(recebedorEmail, 'Troca Concluída', 'templateTrocaAceita', {
-              userName: recebedorName,
-              otherUserName: solicitanteName,
-              otherUserEmail: solicitanteEmail,
-              otherUserPhone: solicitantePhone
-          });
+      // Enviar email de confirmação para ambos os usuários
+      const solicitanteEmail = exchangeDetails.solicitante_email;
+      const recebedorEmail = exchangeDetails.recebedor_email;
+      const solicitanteName = exchangeDetails.solicitante_name;
+      const recebedorName = exchangeDetails.recebedor_name;
+      const solicitanteBookTitle = exchangeDetails.solicitante_book_title;
+      const recebedorBookTitle = exchangeDetails.recebedor_book_title;
 
-          res.json({ success: true, message: 'Troca concluída com sucesso! Entre em contato com o outro usuário para combinar a entrega.' });
-      } else if (action === 'deny') {
-          // Atualizar o status da troca para "Recusada"
-          const updateExchangeSql = 'UPDATE trocas SET status = "Recusada" WHERE id = ?';
-          await db.promise().query(updateExchangeSql, [exchangeDetails.id]);
+      await enviarEmailComTemplate(solicitanteEmail, 'Troca Aceita', 'templateTrocaAceita', {
+        userName: solicitanteName,
+        otherUserName: recebedorName,
+        userBookTitle: solicitanteBookTitle,
+        otherUserBookTitle: recebedorBookTitle,
+        otherUserEmail: recebedorEmail,
+        otherUserPhone: exchangeDetails.recebedor_phone
+      });
+      await enviarEmailComTemplate(recebedorEmail, 'Troca Aceita', 'templateTrocaAceita', {
+        userName: recebedorName,
+        otherUserName: solicitanteName,
+        userBookTitle: recebedorBookTitle,
+        otherUserBookTitle: solicitanteBookTitle,
+        otherUserEmail: solicitanteEmail,
+        otherUserPhone: exchangeDetails.solicitante_phone
+      });
 
-          // Enviar email de notificação para ambos os usuários
-          const solicitanteEmail = exchangeDetails.solicitante_email;
-          const recebedorEmail = exchangeDetails.recebedor_email;
-          const solicitanteName = exchangeDetails.solicitante_name;
-          const recebedorName = exchangeDetails.recebedor_name;
+      return res.json({ success: true, message: 'Troca aceita com sucesso! Entre em contato com o outro usuário para combinar a entrega.' });
+    }
 
-          await enviarEmailComTemplate(solicitanteEmail, 'Troca Negada', 'templateTrocaNegada', {
-              userName: solicitanteName,
-              otherUserName: recebedorName
-          });
-          await enviarEmailComTemplate(recebedorEmail, 'Troca Negada', 'templateTrocaNegada', {
-              userName: recebedorName,
-              otherUserName: solicitanteName
-          });
+    if (action === 'deny') {
+      // Atualizar o status da troca para "Recusada"
+      const updateExchangeSql = 'UPDATE trocas SET status = "Recusada" WHERE id = ?';
+      await db.promise().query(updateExchangeSql, [exchangeDetails.id]);
 
-          res.json({ success: true, message: 'Troca não foi concretizada.' });
-      } else {
-          res.status(400).json({ success: false, message: 'Ação inválida.' });
-      }
+      // Enviar email de notificação para ambos os usuários
+      const solicitanteEmail = exchangeDetails.solicitante_email;
+      const recebedorEmail = exchangeDetails.recebedor_email;
+      const solicitanteName = exchangeDetails.solicitante_name;
+      const recebedorName = exchangeDetails.recebedor_name;
+
+      await enviarEmailComTemplate(solicitanteEmail, 'Troca Recusada', 'templateTrocaNegada', {
+        userName: solicitanteName,
+        otherUserName: recebedorName,
+      });
+      await enviarEmailComTemplate(recebedorEmail, 'Troca Recusada', 'templateTrocaNegada', {
+        userName: recebedorName,
+        otherUserName: solicitanteName,
+      });
+
+      return res.json({ success: true, message: 'Troca recusada com sucesso!' });
+    }
+
+    return res.status(400).json({ success: false, message: 'Ação inválida.' });
   } catch (err) {
-      console.error('Erro ao processar a ação da troca:', err);
-      return res.status(500).json({ success: false, message: 'Erro ao processar a ação da troca.' });
+    console.error('Erro ao processar a ação da troca:', err);
+    return res.status(500).json({ success: false, message: 'Erro ao processar a ação da troca.' });
   }
 });
+
 // Rota para obter os detalhes do perfil do usuário proprietário
 app.get('/api/ownerUser/:userId', isAuthenticated, async (req, res) => {
-    const userId = req.params.userId;
+  const userId = req.params.userId;
 
-    try {
-        const userSql = 'SELECT name, email, city, state, phone, biography AS description FROM users WHERE id = ?';
-        const [userResults] = await db.promise().query(userSql, [userId]);
+  try {
+    // Consulta para obter os detalhes do usuário
+    const userSql = 'SELECT name, email, state, city, phone, biography, photo AS profileImage FROM users WHERE id = ?';
+    const [userResults] = await db.promise().query(userSql, [userId]);
 
-        if (userResults.length === 0) {
-            return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
-        }
-
-        const user = userResults[0];
-
-        const booksSql = 'SELECT id, titulo AS title, autor AS author, imagem AS imageUrl FROM livros WHERE user_id = ?';
-        const [booksResults] = await db.promise().query(booksSql, [userId]);
-
-        const favoritesSql = 'SELECT id, titulo AS title, autor AS author, imagem AS imageUrl FROM favoritos WHERE user_id = ?';
-        const [favoritesResults] = await db.promise().query(favoritesSql, [userId]);
-
-        res.status(200).json({
-            success: true,
-            user: user,
-            books: booksResults,
-            favorites: favoritesResults
-        });
-    } catch (err) {
-        console.error('Erro ao buscar detalhes do usuário:', err);
-        res.status(500).json({ success: false, message: 'Erro ao buscar detalhes do usuário.' });
+    if (userResults.length === 0) {
+      return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
     }
+
+    const user = userResults[0];
+
+    // Obter o nome da cidade usando o código da cidade e do estado
+    const cityName = await getCityNameById(user.state, user.city);
+    user.city = cityName;
+
+    // Consulta para obter os livros do usuário com status "Disponível"
+    const booksSql = 'SELECT id, titulo, autor, imagem AS imageUrl FROM livros WHERE user_id = ? AND status = "Disponível"';
+    const [booksResults] = await db.promise().query(booksSql, [userId]);
+
+    // Consulta para obter os livros favoritos do usuário
+    const favoritesSql = 'SELECT id, titulo, autor, imagem AS imageUrl FROM favoritos WHERE user_id = ?';
+    const [favoritesResults] = await db.promise().query(favoritesSql, [userId]);
+
+    res.json({
+      success: true,
+      user: user,
+      books: booksResults,
+      favorites: favoritesResults
+    });
+  } catch (err) {
+    console.error('Erro ao buscar detalhes do usuário:', err);
+    res.status(500).json({ success: false, message: 'Erro ao buscar detalhes do usuário.' });
+  }
 });
 
 // Rota para acessar a página do usuário proprietário do livro
 app.get('/ownerUser', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'ownerUser.html'));
+  res.sendFile(path.join(__dirname, 'views', 'ownerUser.html'));
 });
 
-// Rota para obter os detalhes do livro para a troca
-app.get('/api/exchange-book-details/:bookId', isAuthenticated, async (req, res) => {
+// Rota para obter os detalhes do livro
+app.get('/api/book-details/:bookId', isAuthenticated, async (req, res) => {
   const bookId = req.params.bookId;
-  console.log(`Recebendo detalhes do livro com ID: ${bookId}`); // Adicione este log
 
   try {
-      const bookSql = 'SELECT * FROM livros WHERE id = ?';
-      const [bookResults] = await db.promise().query(bookSql, [bookId]);
+    const bookSql = 'SELECT * FROM livros WHERE id = ?';
+    const [bookResults] = await db.promise().query(bookSql, [bookId]);
 
-      if (bookResults.length === 0) {
-          console.log(`Nenhum livro encontrado com ID: ${bookId}`); // Adicione este log
-          return res.status(404).json({ success: false, message: 'Livro não encontrado.' });
+    if (bookResults.length === 0) {
+      return res.status(404).json({ success: false, message: 'Livro não encontrado.' });
+    }
+
+    const book = bookResults[0];
+
+    // Buscar a descrição do livro usando a Google Books API
+    const googleBooksId = book.google_books_id;
+    const googleBooksUrl = `https://www.googleapis.com/books/v1/volumes/${googleBooksId}`;
+    const googleBooksResponse = await axios.get(googleBooksUrl);
+    const volumeInfo = googleBooksResponse.data.volumeInfo;
+
+    const bookDescription = volumeInfo.description || 'Descrição não disponível';
+    const bookCategories = volumeInfo.categories || ['Desconhecido'];
+    const bookPublisher = volumeInfo.publisher || 'Desconhecido';
+    const bookPublishedDate = volumeInfo.publishedDate || 'Desconhecido';
+
+    const imagesSql = 'SELECT imagem_url FROM livro_imagens WHERE livro_id = ?';
+    const [imageResults] = await db.promise().query(imagesSql, [book.id]);
+
+    const images = imageResults.map(row => row.imagem_url);
+
+    res.status(200).json({
+      success: true,
+      book: {
+        id: book.id,
+        title: book.titulo,
+        author: book.autor,
+        description: bookDescription,
+        categories: bookCategories,
+        publisher: bookPublisher,
+        publishedDate: bookPublishedDate,
+        coverImage: book.imagem,
+        images: images
       }
-
-      const book = bookResults[0];
-      console.log('Detalhes do livro encontrados:', book); // Adicione este log
-
-      // Buscar a descrição do livro usando a Google Books API
-      const googleBooksId = book.google_books_id;
-      const googleBooksUrl = `https://www.googleapis.com/books/v1/volumes/${googleBooksId}`;
-      const googleBooksResponse = await axios.get(googleBooksUrl);
-      const volumeInfo = googleBooksResponse.data.volumeInfo;
-
-      const bookDescription = volumeInfo.description || 'Descrição não disponível';
-      const bookCategories = volumeInfo.categories || ['Desconhecido'];
-      const bookPublisher = volumeInfo.publisher || 'Desconhecido';
-      const bookPublishedDate = volumeInfo.publishedDate || 'Desconhecido';
-
-      console.log('Detalhes do Google Books API:', volumeInfo); // Adicione este log
-
-      const imagesSql = 'SELECT imagem_url FROM livro_imagens WHERE livro_id = ?';
-      const [imageResults] = await db.promise().query(imagesSql, [book.id]);
-
-      const images = imageResults.map(row => row.imagem_url);
-      console.log('Imagens do livro:', images); // Adicione este log
-
-      res.status(200).json({
-          success: true,
-          book: {
-              id: book.id,
-              title: book.titulo,
-              author: book.autor,
-              description: bookDescription,
-              categories: bookCategories,
-              publisher: bookPublisher,
-              publishedDate: bookPublishedDate,
-              coverImage: book.imagem,
-              images: images
-          }
-      });
+    });
   } catch (err) {
-      console.error('Erro ao carregar os detalhes do livro:', err);
-      res.status(500).json({ success: false, message: 'Erro ao carregar os detalhes do livro.' });
+    console.error('Erro ao carregar os detalhes do livro:', err);
+    res.status(500).json({ success: false, message: 'Erro ao carregar os detalhes do livro.' });
   }
 });
 
 // Rota para obter os detalhes do livro para o catálogo
 app.get('/api/catalog-book-details/:googleBooksId', isAuthenticated, async (req, res) => {
-    const googleBooksId = req.params.googleBooksId;
+  const googleBooksId = req.params.googleBooksId;
 
-    try {
-        const bookSql = 'SELECT * FROM livros WHERE google_books_id = ?';
-        const [bookResults] = await db.promise().query(bookSql, [googleBooksId]);
+  try {
+    const bookSql = 'SELECT * FROM livros WHERE google_books_id = ?';
+    const [bookResults] = await db.promise().query(bookSql, [googleBooksId]);
 
-        if (bookResults.length === 0) {
-            return res.status(404).json({ success: false, message: 'Livro não encontrado.' });
-        }
-
-        const book = bookResults[0];
-
-        // Buscar a descrição do livro usando a Google Books API
-        const googleBooksUrl = `https://www.googleapis.com/books/v1/volumes/${googleBooksId}`;
-        const googleBooksResponse = await axios.get(googleBooksUrl);
-        const volumeInfo = googleBooksResponse.data.volumeInfo;
-
-        const bookDescription = volumeInfo.description || 'Descrição não disponível';
-        const bookCategories = volumeInfo.categories || ['Desconhecido'];
-        const bookPublisher = volumeInfo.publisher || 'Desconhecido';
-        const bookPublishedDate = volumeInfo.publishedDate || 'Desconhecido';
-
-        const imagesSql = 'SELECT imagem_url FROM livro_imagens WHERE livro_id = ?';
-        const [imageResults] = await db.promise().query(imagesSql, [book.id]);
-
-        const images = imageResults.map(row => row.imagem_url);
-
-        res.status(200).json({
-            success: true,
-            book: {
-                id: book.id,
-                title: book.titulo,
-                author: book.autor,
-                description: bookDescription,
-                categories: bookCategories,
-                publisher: bookPublisher,
-                publishedDate: bookPublishedDate,
-                coverImage: book.imagem,
-                images: images
-            }
-        });
-    } catch (err) {
-        console.error('Erro ao carregar os detalhes do livro:', err);
-        res.status(500).json({ success: false, message: 'Erro ao carregar os detalhes do livro.' });
+    if (bookResults.length === 0) {
+      return res.status(404).json({ success: false, message: 'Livro não encontrado.' });
     }
-});
 
+    const book = bookResults[0];
+
+    // Buscar a descrição do livro usando a Google Books API
+    const googleBooksUrl = `https://www.googleapis.com/books/v1/volumes/${googleBooksId}`;
+    const googleBooksResponse = await axios.get(googleBooksUrl);
+    const volumeInfo = googleBooksResponse.data.volumeInfo;
+
+    const bookDescription = volumeInfo.description || 'Descrição não disponível';
+    const bookCategories = volumeInfo.categories || ['Desconhecido'];
+    const bookPublisher = volumeInfo.publisher || 'Desconhecido';
+    const bookPublishedDate = volumeInfo.publishedDate || 'Desconhecido';
+
+    const imagesSql = 'SELECT imagem_url FROM livro_imagens WHERE livro_id = ?';
+    const [imageResults] = await db.promise().query(imagesSql, [book.id]);
+
+    const images = imageResults.map(row => row.imagem_url);
+
+    res.status(200).json({
+      success: true,
+      book: {
+        id: book.id,
+        title: book.titulo,
+        author: book.autor,
+        description: bookDescription,
+        categories: bookCategories,
+        publisher: bookPublisher,
+        publishedDate: bookPublishedDate,
+        coverImage: book.imagem,
+        images: images
+      }
+    });
+  } catch (err) {
+    console.error('Erro ao carregar os detalhes do livro:', err);
+    res.status(500).json({ success: false, message: 'Erro ao carregar os detalhes do livro.' });
+  }
+});
 // Rota para buscar livros
 app.get('/search-books', async (req, res) => {
   const searchQuery = req.query.q;
@@ -1595,7 +1761,7 @@ app.get('/search-books', async (req, res) => {
     const searchSql = `
       SELECT id, titulo, autor, imagem AS imageUrl, google_books_id AS googleBooksId, user_id AS userId
       FROM livros
-      WHERE titulo LIKE ? OR autor LIKE ?
+      WHERE (titulo LIKE ? OR autor LIKE ?) AND status = "Disponível"
     `;
     const [results] = await db.promise().query(searchSql, [`%${searchQuery}%`, `%${searchQuery}%`]);
 

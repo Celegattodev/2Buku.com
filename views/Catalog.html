@@ -30,28 +30,25 @@
   <!-- NAVBAR -->
   <header>
     <nav id="navbar">
-      <a href="/catalog">
-        <img id="navbar_logo" src="/img/Logo-Buku-branco.png" alt="Logo" />
-      </a>
-      <ul id="nav_list">
-        <li class="nav-item active"><a href="#">Sobre Nós</a></li>
-        <li class="nav-item"><a href="#">Funcionamento</a></li>
-        <li class="nav-item"><a href="#">Perguntas Frequentes</a></li>
-      </ul>
-      <button class="btn-default">Cadastrar/Entrar</button>
-      <button id="mobile_btn">
-        <i class="fa-solid fa-bars"></i>
-      </button>
+        <a href="/inicio">
+            <img id="navbar_logo" src="/img/Logo-Buku-branco.png" alt="Logo" />
+        </a>
+        <ul id="nav_list">
+            <li class="nav-item"><a href="/inicio">Início</a></li>
+            <li class="nav-item"><a href="/profile">Meu Perfil</a></li>
+        </ul>
+        <button id="mobile_btn">
+            <i class="fa-solid fa-bars"></i>
+        </button>
     </nav>
     <div id="mobile_menu">
-      <ul id="mobile_nav_list">
-        <li class="nav-item"><a href="#">Sobre Nós</a></li>
-        <li class="nav-item"><a href="#">Funcionamento</a></li>
-        <li class="nav-item"><a href="#">Perguntas Frequentes</a></li>
-      </ul>
-      <button class="btn-default">Cadastrar/Entrar</button>
+        <ul id="mobile_nav_list">
+            <li class="nav-item"><a href="/inicio">Início</a></li>
+            <li class="nav-item"><a href="/profile">Meu Perfil</a></li>
+        </ul>
+        <button class="btn-default">Cadastrar/Entrar</button>
     </div>
-  </header>
+</header>
 
   <!-- HEADER BANNER -->
   <div class="header-banner">
@@ -62,7 +59,7 @@
 <div class="container mt-5 search-container">
   <form id="searchForm" class="mb-4" onsubmit="searchBooks(event)">
       <div class="input-group">
-          <input type="text" id="searchInput" class="form-control" placeholder="Digite o nome do livro" required>
+          <input type="text" id="searchInput" class="form-control" placeholder="Digite o nome do livro" >
           <button type="submit" class="btn btn-primary">Pesquisar</button>
       </div>
   </form>

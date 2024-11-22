@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buku</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/landingpage.css">
+    <link rel="stylesheet" href="/css/navbar-white.css">
+</head>
+<body>
+
+  <!-- VLIBRAS -->
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>
+    new window.VLibras.Widget('https://vlibras.gov.br/app');
+  </script>
+  
+    <header>
+      <nav id="navbar">
+        <a href="/">
+          <img id="navbar_logo" src="/img/Logo-Buku.png" alt="Logo" />
+        </a>
+        <ul id="nav_list">
+          <li class="nav-item active"><a href="#" class="nav-button">Contato</a></li>
+          <li class="nav-item"><a href="#" class="nav-button">Catálogo</a></li>
+          <li class="nav-item">
+            <a href="#funcionamento">
+              <button type="button" class="nav-button" id="button-funcionamento">Como Funciona</button>
+            </a>
+          </li>
+        </ul>
+        <!--<button class="btn-default">Cadastrar/Entrar</button>-->
+        <button id="mobile_btn">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </nav>
+      <div class="mobile_menu">
+        <ul id="mobile_nav_list">
+          <li class="nav-item active"><a href="#" class="nav-button">Contato</a></li>
+          <li class="nav-item"><a href="#" class="nav-button">Catálogo</a></li>
+          <li class="nav-item">
+            <a href="#funcionamento" class="nav-button" id="link-funcionamento">
+                <button type="button" class="nav-button" id="button-collapse-funcionamento">Como Funciona</button>
+            </a>
+          </li>
+        </ul>
+        <!--<button class="btn-default">Cadastrar/Entrar</button>-->
+      </div>
+  </header>
+    <section class="main">
+        <div class="text">
+            <h1><span id="word1">Peça</span>,</h1>
+            <h1><span id="word2">Troque</span> e</h1>
+            <h1><span id="word3">Leia</span>!</h1>
+            &nbsp;
+            <p>Sabe aquele livro na sua estante que agora só pega poeira? Dê uma renovada na utilidade dele!</p>
+            <p>Através do Buku você consegue trocar livros com outras pessoas de sua região de maneira prática.</p>
+            
+            <a href="/login" class="orange-button" id="btn-cadastrar">Cadastrar/Entrar</a>
+        </div>
+        <div class="img">
+            <img id="img-livros" src="/img/img_livros.png" alt="">
+        </div>
+    </section>
+    <section class="benefits">
+      <div class="benefit">
+          <img src="/img/troca-de-livros-branco.png" alt="">
+          <p>Conheça novas pessoas com os mesmos gostos de livros que você!</p>
+      </div>
+      <div class="benefit">
+        <img src="/img/simbolo-de-reciclagem-branco.png" alt="">
+          <p>Trocando seu livro, você alegra duas pessoas: quem recebeu e a natureza!</p>
+      </div>
+      <div class="benefit">
+        <img src="/img/cofrinho-branco.png" alt="">
+          <p>Você terá um novo livro para ler por um preço bem mais acessível!</p>
+      </div>
+  </section class="benefits">
+
+    
+    <section id="funcionamento">
+        <div class="col">
+            <h3>Como funciona a plataforma?</h3>
+            <div class="column-steps">
+                <img src="/img/livro-aberto-laranja.png" id="livro-laranja" alt="">
+            </div>
+            <div class="item">
+                <div class="circle">
+                    <p><b>1</b></p>
+                </div>
+                <p>Adicione os livros que você possui em casa à sua lista "<b>Estante</b>".</p>
+                <img src="/img/estante-de-livros-branco.png" alt="">
+            </div>
+            <div class="item">
+                <div class="circle">
+                    <p><b>2</b></p>
+                </div>
+                <p>Procure livros que você deseja ler e adicione na sua "<b>Lista de Desejos</b>".</p>
+                <img src="/img/coracao-branco.png" alt="">
+            </div>
+            <div class="item">
+                <div class="circle">
+                    <p><b>3</b></p>
+                </div>
+                <p><b>Explore</b> o catálogo e, ao encontrar um livro que deseja, envie uma <b>solicitação</b> de troca para o proprietário.</p>
+                <img src="/img/lupa-branco.png" alt="">
+            </div>
+            <div class="item">
+                <div class="circle">
+                    <p><b>4</b></p>
+                </div>
+                <p>Para solicitar uma troca, <b>ofereça um livro</b> da sua Estante como contrapartida.</p>
+                <img src="/img/livro-branco.png" alt="">
+            </div>
+            <div class="item">
+                <div class="circle">
+                    <p><b>5</b></p>
+                </div>
+                <p>Quando a solicitação for enviada, o proprietário analisará e poderá <b>aceitar</b> ou <b>recusar</b> a troca.</p>
+                <img src="/img/aceitar-branco.png" alt="">
+            </div>
+            <div class="item">
+                <div class="circle">
+                    <p><b>6</b></p>
+                </div>
+                <p>Se a troca for aceita, <b>envie o livro</b> pelo correio ou entre em contato para combinarem outra forma de entrega.</p>
+                <img src="/img/enviar-correio-branco.png" alt="">
+            </div>
+            <div class="item">
+                <div class="circle" id="last-circle">
+                    <p><b>7</b></p>
+                </div>
+                <p>Assim que ambos os livros chegarem, informe-nos, e pronto: <b>uma nova história estará esperando para ser lida!</b></p>
+                <img src="/img/novo-livro-branco.png" alt="">
+            </div>
+        </div>
+    </section>
+    <footer>
+      <p>email: buku.livro@gmail.com</p>
+      <p>
+        &copy; 2024 Buku. Todos os direitos reservados.
+    </p>
+    </footer>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="/js/navbar-white.js"></script>
+    <script src="/js/landingpage.js"></script>
+</body>
+</html>
