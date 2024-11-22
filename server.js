@@ -674,13 +674,12 @@ app.delete('/delete-book/:id', (req, res) => {
     }
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ success: false, message: 'Livro não encontrado ou não pertence ao usuário.' });
+      return res.status(404).json({ success: false, message: 'Livro não encontrado.' });
     }
 
     res.status(200).json({ success: true, message: 'Livro deletado com sucesso.' });
   });
 });
-
 // Rota para adicionar um livro aos favoritos
 app.post('/add-favorite', isAuthenticated, async (req, res) => {
     const { googleBooksId, title, author, imageUrl } = req.body;
@@ -1607,3 +1606,20 @@ app.get('/search-books', async (req, res) => {
   }
 });
 
+// Rota para obter os detalhes do livro
+app.get('/api/book-details/:id', (req, res) => {
+  const bookId = req.params.id;
+
+  db.query('SELECT * FROM livros WHERE id = ?', [bookId], (err, results) => {
+    if (err) {
+      console.error('Erro ao obter os detalhes do livro:', err);
+      return res.status(500).json({ success: false, message: 'Erro ao obter os detalhes do livro.' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: 'Livro não encontrado.' });
+    }
+
+    res.status(200).json({ success: true, book: results[0] });
+  });
+});

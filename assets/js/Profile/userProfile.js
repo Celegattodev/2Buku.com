@@ -23,10 +23,11 @@ document.addEventListener('DOMContentLoaded', function () {
         loop: false,
     });
 
-    // Função para exibir mensagens de erro
+   // Função para exibir mensagens de erro
     function showError(message) {
         Swal.fire('Erro!', message, 'error');
     }
+
 
     // Função para deletar um livro
     function deleteBook(bookId, bookElement) {
@@ -110,26 +111,27 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
-    // Adicionar evento de clique para os ícones de deletar
-    document.querySelectorAll('.delete-icon').forEach(icon => {
-        icon.addEventListener('click', function () {
-            const bookId = this.closest('.book-item').getAttribute('data-book-id');
-            Swal.fire({
-                title: 'Tem certeza?',
-                text: 'Você não poderá reverter isso!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sim, deletar!',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    deleteBook(bookId, this.closest('.book-item'));
-                }
-            });
+   // Adicionar evento de clique para os ícones de deletar
+document.querySelectorAll('.delete-icon').forEach(icon => {
+    icon.addEventListener('click', function () {
+        const bookId = this.closest('.book-item').getAttribute('data-book-id');
+        console.log('ID do livro a ser deletado:', bookId); // Adicione este log
+        Swal.fire({
+            title: 'Tem certeza?',
+            text: 'Você não poderá reverter isso!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sim, deletar!',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteBook(bookId, this.closest('.book-item'));
+            }
         });
     });
+});
 
     // Adicionar evento de clique para os ícones de deletar na seção de favoritos
     document.querySelectorAll('.delete-favorite-icon').forEach(icon => {
@@ -212,57 +214,75 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+     // Função para exibir detalhes do livro
+     function showBookDetails(bookId) {
+        fetch(`/api/book-details/${bookId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar os detalhes do livro.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data.success) {
+                    throw new Error(data.message);
+                }
+
+                const book = data.book;
+                document.getElementById('bookDescription').innerText = book.description || 'Descrição não disponível';
+                const bookImagesGrid = document.getElementById('bookImagesGrid');
+                bookImagesGrid.innerHTML = ''; // Limpa as imagens anteriores
+
+                // Adicionar a imagem de capa como o primeiro item
+                const coverItem = document.createElement('div');
+                coverItem.classList.add('image-item');
+                const coverImg = document.createElement('img');
+                coverImg.src = book.imagem || 'placeholder.jpg'; // Use uma imagem padrão se não houver imagem
+                coverImg.classList.add('img-fluid');
+                const coverLabel = document.createElement('p');
+                coverLabel.innerText = 'Imagem da Capa';
+                coverItem.appendChild(coverImg);
+                coverItem.appendChild(coverLabel);
+                bookImagesGrid.appendChild(coverItem);
+
+                // Adicionar as imagens adicionais
+                if (book.images) {
+                    book.images.forEach((imageUrl, index) => {
+                        const imageItem = document.createElement('div');
+                        imageItem.classList.add('image-item');
+                        const img = document.createElement('img');
+                        img.src = imageUrl;
+                        img.classList.add('img-fluid');
+                        const imgLabel = document.createElement('p');
+                        imgLabel.innerText = `Imagem ${index + 1}`;
+                        imageItem.appendChild(img);
+                        imageItem.appendChild(imgLabel);
+                        bookImagesGrid.appendChild(imageItem);
+                    });
+                }
+
+                // Exibir o modal
+                var bookDetailsModal = new bootstrap.Modal(document.getElementById('bookDetailsModal'));
+                bookDetailsModal.show();
+            })
+            .catch(error => {
+                console.error('Erro ao carregar os detalhes do livro:', error);
+                showError('Erro ao carregar os detalhes do livro.');
+            });
+    }
+
     // Adicionar evento de clique para exibir detalhes do livro
     document.querySelectorAll('.book-item').forEach(item => {
         item.addEventListener('click', function () {
             const bookId = this.getAttribute('data-book-id');
-            fetch(`/api/book-details/${bookId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('bookDescription').innerText = data.book.description;
-                        const bookImagesGrid = document.getElementById('bookImagesGrid');
-                        bookImagesGrid.innerHTML = ''; // Limpa as imagens anteriores
-
-                        // Adicionar a imagem de capa como o primeiro item
-                        const coverItem = document.createElement('div');
-                        coverItem.classList.add('image-item');
-                        const coverImg = document.createElement('img');
-                        coverImg.src = data.book.coverImage;
-                        coverImg.classList.add('img-fluid');
-                        const coverLabel = document.createElement('p');
-                        coverLabel.innerText = 'Imagem da Capa';
-                        coverItem.appendChild(coverImg);
-                        coverItem.appendChild(coverLabel);
-                        bookImagesGrid.appendChild(coverItem);
-
-                        // Adicionar as imagens adicionais
-                        data.book.images.forEach((imageUrl, index) => {
-                            const imageItem = document.createElement('div');
-                            imageItem.classList.add('image-item');
-                            const img = document.createElement('img');
-                            img.src = imageUrl;
-                            img.classList.add('img-fluid');
-                            const imgLabel = document.createElement('p');
-                            imgLabel.innerText = `Imagem ${index + 1}`;
-                            imageItem.appendChild(img);
-                            imageItem.appendChild(imgLabel);
-                            bookImagesGrid.appendChild(imageItem);
-                        });
-
-                        // Exibir o modal
-                        var bookDetailsModal = new bootstrap.Modal(document.getElementById('bookDetailsModal'));
-                        bookDetailsModal.show();
-                    } else {
-                        showError('Erro ao carregar os detalhes do livro.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao carregar os detalhes do livro:', error);
-                    showError('Erro ao carregar os detalhes do livro.');
-                });
+            if (bookId) {
+                showBookDetails(bookId);
+            } else {
+                showError('ID do livro não encontrado.');
+            }
         });
     });
+});
 
     // Adicionar evento de clique para adicionar um livro à biblioteca
     document.getElementById('addBookButton').addEventListener('click', function () {
@@ -278,4 +298,3 @@ document.addEventListener('DOMContentLoaded', function () {
             showError('Por favor, preencha todos os campos e anexe pelo menos 3 imagens.');
         }
     });
-});
