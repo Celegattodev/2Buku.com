@@ -96,7 +96,7 @@ Contribuições são bem-vindas! Siga os passos abaixo para colaborar:
 ## 📧 **Contato**
 
 Entre em contato com os responsáveis pelo projeto:
-- **GitHub**: [Murilo Celegatto](https://github.com/Celegattodev) [Luís Gustavo](https://github.com/lugustavos) [Enzo Fernandes](https://github.com/Fernandes-ez) [José Augusto](https://github.com/JoseAugustoMRosales)
+- **GitHub**: [Murilo Celegatto](https://github.com/Celegattodev), [Luís Gustavo](https://github.com/lugustavos), [Enzo Fernandes](https://github.com/Fernandes-ez) & [José Augusto](https://github.com/JoseAugustoMRosales)
 - **Email**: buku.livro@gmail.com
 
 ---
