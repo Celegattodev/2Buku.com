@@ -13,7 +13,7 @@ const connection = mysql.createConnection({
 // Dados do administrador
 const admin = {
   name: 'Admin Name',
-  email: 'admin@example.com',
+  email: 'enzo.dantas@hotmail.com',
   state: 'SP',
   city: 'São Paulo',
   password: 'admin12345', 

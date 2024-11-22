@@ -196,3 +196,21 @@ input[type="text"]:focus, textarea:focus {
     padding: 1rem;
   }
 }
+
+#profileImagePreview {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 2px solid #fd9323;
+}
+
+#profileImageElement {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

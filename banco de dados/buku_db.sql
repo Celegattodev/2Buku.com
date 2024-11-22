@@ -146,7 +146,7 @@ CREATE TABLE `admins` (
 
 
 ALTER TABLE `users`
-MODIFY COLUMN `status` ENUM('ativo', 'banido', 'suspenso') DEFAULT 'ativo';
+ADD COLUMN `status` ENUM('ativo', 'banido', 'suspenso') DEFAULT 'ativo';
 
 ALTER TABLE `users`
 ADD COLUMN `suspension_expiry` datetime DEFAULT NULL;
@@ -159,3 +159,5 @@ ADD COLUMN `data_adicao` DATETIME DEFAULT CURRENT_TIMESTAMP;
 
 ALTER TABLE `users`
 ADD COLUMN `data_banimento` DATETIME NULL;
+
+ALTER TABLE users ADD COLUMN profile_image VARCHAR(255) AFTER biography;

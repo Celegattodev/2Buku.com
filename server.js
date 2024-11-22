@@ -266,17 +266,17 @@ app.post("/login", (req, res) => {
           return res.status(403).json({
             success: false,
             status: 'banido',
+            data_banimento: user.data_banimento,
             message: 'Sua conta foi banida permanentemente. Caso tenha dúvidas, entre em contato pelo email buku.livro@gmail.com.'
           });
         }
 
         if (user.status === 'suspenso' && user.suspension_expiry && new Date(user.suspension_expiry) > new Date()) {
-          const formattedDate = format(new Date(user.suspension_expiry), 'dd/MM/yyyy HH:mm:ss');
           return res.status(403).json({
             success: false,
             status: 'suspenso',
-            token_expiry: formattedDate,
-            message: `Sua conta está suspensa até ${formattedDate}. Caso tenha dúvidas, entre em contato pelo email buku.livro@gmail.com.`
+            suspension_expiry: user.suspension_expiry,
+            message: `Sua conta está suspensa até ${user.suspension_expiry}. Caso tenha dúvidas, entre em contato pelo email buku.livro@gmail.com.`
           });
         }
 
@@ -293,9 +293,11 @@ app.post("/login", (req, res) => {
           req.session.bloqueadoAte = null;
           req.session.verificado = false; // Adicionar flag de verificação
 
+          const { email, name } = user;
+          const userName = name;
           // Enviar código de verificação por e-mail
-          enviarCodigoVerificacao(user.email, codigoVerificacao);
-
+          enviarEmailComTemplate(email, 'Código de verificação', 'templateCodigoVerificacao', { userName, codigoVerificacao });
+          
           return res.status(200).json({
             success: true,
             message: 'Login de administrador bem-sucedido. Código de verificação enviado por e-mail.',
@@ -1851,32 +1853,6 @@ app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'inscricao-buku.html'));
 });
 
-// Função para enviar o código de verificação por e-mail
-const enviarCodigoVerificacao = (email, codigo) => {
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'buku.livro@gmail.com',
-      pass: 'sdmj lybh fcrf nqyd'
-    }
-  });
-
-  const mailOptions = {
-    from: '"Buku 📚" <buku.livro@gmail.com>',
-    to: email,
-    subject: 'Código de Verificação',
-    text: `Seu código de verificação é: ${codigo}`
-  };
-
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error('Erro ao enviar o e-mail:', error);
-    } else {
-      console.log('E-mail enviado:', info.response);
-    }
-  });
-};
-
 // Rota para verificar o código de verificação
 app.post('/verificar-codigo', isAuthenticated, (req, res) => {
   const { codigo } = req.body;
@@ -2039,8 +2015,11 @@ app.post('/send-alert', isAuthenticatedAndVerified, (req, res) => {
         return res.status(500).json({ success: false, message: 'Erro no servidor.' });
       }
 
-      // Enviar e-mail de alerta
-      enviarEmailAlerta(email, message);
+    // Enviar e-mail de alerta usando a função enviarEmailComTemplate
+    const { email, name } = user;
+    const userName = name;
+    enviarEmailComTemplate(email, 'Alerta recebido', 'templateAlertaRecebido', { userName, message });
+
 
       res.json({ success: true, message: 'Alerta enviado e punição aplicada com sucesso.' });
     });
@@ -2187,3 +2166,4 @@ app.post('/unban-user', isAuthenticatedAndVerified, (req, res) => {
     res.json({ success: true, message: 'Usuário desbanido com sucesso.' });
   });
 });
+

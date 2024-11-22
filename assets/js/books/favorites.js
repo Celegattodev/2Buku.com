@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function checkFavoritesList() {
         const favoritesList = document.getElementById('favorites-list');
         const noFavoritesMessage = document.getElementById('no-favorites-message');
+        console.log('Número de livros favoritos:', favoritesList.children.length);
         if (favoritesList.children.length === 0) {
             noFavoritesMessage.style.display = 'block';
         } else {
@@ -159,14 +160,14 @@ document.addEventListener('DOMContentLoaded', function () {
                                         </div>
                                     `;
                                     favoritesList.appendChild(favoriteCard);
+                                    // Verificar se há livros favoritos após adicionar cada livro
+                                    checkFavoritesList();
                                 }
                             })
                             .catch(error => {
                                 console.error('Erro ao carregar os detalhes do livro:', error);
                             });
                     });
-                    // Verificar se há livros favoritos após carregar
-                    checkFavoritesList();
                 }
             } else {
                 Swal.fire('Erro!', 'Erro ao carregar os livros favoritos.', 'error');

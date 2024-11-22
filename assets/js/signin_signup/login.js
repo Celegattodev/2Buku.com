@@ -38,13 +38,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
             } else if (data.status === 'banido') {
+                const formattedDate = new Date(data.data_banimento).toLocaleString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
                 Swal.fire({
                     icon: 'error',
                     title: 'Conta Banida',
-                    text: 'Sua conta foi banida permanentemente. Caso tenha dúvidas, entre em contato pelo email buku.livro@gmail.com.',
+                    text: `Sua conta foi banida permanentemente em ${formattedDate}. Caso tenha dúvidas, entre em contato pelo email buku.livro@gmail.com.`,
                 });
             } else if (data.status === 'suspenso') {
-                const formattedDate = new Date(data.token_expiry).toLocaleString('pt-BR', {
+                const formattedDate = new Date(data.suspension_expiry).toLocaleString('pt-BR', {
                     day: '2-digit',
                     month: '2-digit',
                     year: 'numeric',

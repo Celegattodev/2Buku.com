@@ -33,9 +33,7 @@
             <img id="navbar_logo" src="/img/Logo-Buku-branco.png" alt="Logo" />
         </a>
         <ul id="nav_list">
-            <li class="nav-item active"><a href="/inicio">Sobre Nós</a></li>
-            <li class="nav-item"><a href="/inicio">Funcionamento</a></li>
-            <li class="nav-item"><a href="/inicio">Perguntas Frequentes</a></li>
+            <li class="nav-item"><a href="/inicio">Início</a></li>
         </ul>
         <button id="mobile_btn">
             <i class="fa-solid fa-bars"></i>
@@ -43,11 +41,8 @@
     </nav>
     <div id="mobile_menu">
         <ul id="mobile_nav_list">
-            <li class="nav-item"><a href="/inicio">Sobre Nós</a></li>
-            <li class="nav-item"><a href="/inicio">Funcionamento</a></li>
-            <li class="nav-item"><a href="/inicio">Perguntas Frequentes</a></li>
+            <li class="nav-item"><a href="/inicio">Início</a></li>
         </ul>
-        <button class="btn-default">Cadastrar/Entrar</button>
     </div>
 </header>
 
@@ -57,30 +52,29 @@
         <!-- Formulário de Login -->
                 <!-- Formulário de Login -->
                 <!-- Formulário de Login -->
-        <form class="form form-login" action="/login" method="POST">
-          <h2 class="form-title">Entrar</h2>
-          <div class="form-input-container">
-            <div class="input-group">
-              <input type="email" id="login-email" name="email" class="form-input" placeholder="" required />
-              <label for="login-email" class="form-label">Email</label>
-            </div>
-            <div class="input-group">
-              <input type="password" id="login-password" name="password" class="form-input" placeholder="" required />
-              <label for="login-password" class="form-label">Senha</label>
-            </div>
-            <div class="checkbox-container">
-              <input type="checkbox" id="admin-login" name="admin_login" />
-              <label for="admin-login">Login de Administrador</label>
-            </div>
-          </div>
-          <a href="/esqueci-senha" class="form-link">Esqueceu a senha?</a>
-          <button type="submit" class="form-button">Logar</button>
-          <p class="mobile-text">
-            Não tem conta?
-            <a href="#" id="open-register-mobile">Registre-se</a>
-          </p>
-        </form>
-
+                <form class="form form-login" action="/login" method="POST">
+                  <h2 class="form-title">Entrar</h2>
+                  <div class="form-input-container">
+                      <div class="input-group">
+                          <input type="email" id="login-email" name="email" class="form-input" placeholder="" required />
+                          <label for="login-email" class="form-label">Email</label>
+                      </div>
+                      <div class="input-group">
+                          <input type="password" id="login-password" name="password" class="form-input" placeholder="" required />
+                          <label for="login-password" class="form-label">Senha</label>
+                      </div>
+                      <div class="checkbox-container">
+                          <input type="checkbox" id="admin-login" name="admin_login" />
+                          <label for="admin-login">Login de Administrador</label>
+                      </div>
+                  </div>
+                  <a href="/esqueci-senha" class="form-link">Esqueceu a senha?</a>
+                  <button type="submit" class="form-button">Logar</button>
+                  <p class="mobile-text">
+                      Não tem conta?
+                      <a href="#" id="open-register-mobile">Registre-se</a>
+                  </p>
+              </form>
         <!-- Formulário de Registro -->
         <form class="form form-register" action="/register" method="POST" id="register-form">
           <h2 class="form-title">Criar Conta</h2>

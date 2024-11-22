@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function getExchangeStatus(status) {
   switch (status) {
     case 'Pendente':
-      return 'Troca pendente';
+      return 'Troca em andamento';
     case 'Aceito':
       return 'Troca aceita';
     case 'Recusada':
@@ -126,4 +126,21 @@ function getExchangeStatus(status) {
     default:
       return 'Status desconhecido';
   }
+}
+// Adiciona funcionalidade de filtro por checkbox
+const checkboxes = document.querySelectorAll('.checkbox-troca');
+checkboxes.forEach(checkbox => {
+  checkbox.addEventListener('change', () => {
+    filterExchanges(searchInput.value.toLowerCase(), dateInput.value, getSelectedStatuses());
+  });
+});
+
+function getSelectedStatuses() {
+  const selectedStatuses = [];
+  checkboxes.forEach(checkbox => {
+    if (checkbox.checked) {
+      selectedStatuses.push(checkbox.nextElementSibling.textContent.trim());
+    }
+  });
+  return selectedStatuses;
 }
