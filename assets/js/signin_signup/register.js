@@ -90,7 +90,7 @@ if (registerForm) {
                         title: 'Cadastro realizado!',
                         text: data.message,
                     }).then(() => {
-                        window.location.href = '/'; // Redireciona para a página de login
+                        window.location.href = '/login'; // Redireciona para a página de login
                     });
                 } else {
                     // Registro falhou, exibe a mensagem de erro
