@@ -2157,6 +2157,7 @@ app.get('/alert', isAuthenticatedAndVerified, (req, res) => {
 });
 
 // Rota para desbanir um usuário
+
 app.post('/unban-user', isAuthenticatedAndVerified, (req, res) => {
   const { userId } = req.body;
 
@@ -2166,6 +2167,27 @@ app.post('/unban-user', isAuthenticatedAndVerified, (req, res) => {
       return res.status(500).json({ success: false, message: 'Erro no servidor.' });
     }
 
-    res.json({ success: true, message: 'Usuário desbanido com sucesso.' });
+    // Obter o e-mail e o nome do usuário
+    db.query('SELECT email, name FROM users WHERE id = ?', [userId], (err, results) => {
+      if (err) {
+        console.error('Erro ao obter dados do usuário:', err);
+        return res.status(500).json({ success: false, message: 'Erro no servidor.' });
+      }
+
+      if (results.length === 0) {
+        return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
+      }
+
+      const user = results[0];
+      const templateData = { userName: user.name };
+
+      // Adicionar log para depuração
+      console.log('Dados do template:', templateData);
+
+      // Enviar e-mail com o template
+      enviarEmailComTemplate(user.email, 'Sua conta foi desbanida', 'templateContaDesbanida', templateData);
+
+      res.json({ success: true, message: 'Usuário desbanido com sucesso e e-mail enviado.' });
+    });
   });
 });

@@ -12,11 +12,11 @@ const connection = mysql.createConnection({
 
 // Dados do administrador
 const admin = {
-  name: 'Admin Name',
-  email: 'enzo.dantas@hotmail.com',
+  name: 'Luís Gustavo',
+  email: 'lugustavoteste@gmail.com',
   state: 'SP',
   city: 'São Paulo',
-  password: 'admin12345', 
+  password: '@Guto1045', 
   phone: '1234567890',
   biography: 'Administrador da plataforma Buku.'
 };

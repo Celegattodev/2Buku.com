@@ -3,6 +3,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('search-input');
     const usersContainer = document.querySelector('.results .list-group');
 
+    // Função auxiliar para verificar se o valor é null
+    function checkNull(value) {
+        return value === null ? 'Não cadastrado' : value;
+    }
+
     // Função para buscar e renderizar os usuários
     function fetchAndRenderUsers(query = '') {
         fetch(`/api/users?search=${query}`)
@@ -17,23 +22,23 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (!usersMap.has(user.id)) {
                             usersMap.set(user.id, {
                                 id: user.id,
-                                name: user.name,
-                                email: user.email,
-                                state: user.state,
-                                city: user.city,
-                                phone: user.phone,
-                                biography: user.biography,
-                                status: user.status,
+                                name: checkNull(user.name),
+                                email: checkNull(user.email),
+                                state: checkNull(user.state),
+                                city: checkNull(user.city),
+                                phone: checkNull(user.phone),
+                                biography: checkNull(user.biography),
+                                status: checkNull(user.status),
                                 books: []
                             });
                         }
                         if (user.book_id) {
                             usersMap.get(user.id).books.push({
                                 id: user.book_id,
-                                titulo: user.titulo,
-                                autor: user.autor,
-                                imagem: user.imagem,
-                                status: user.book_status
+                                titulo: checkNull(user.titulo),
+                                autor: checkNull(user.autor),
+                                imagem: checkNull(user.imagem),
+                                status: checkNull(user.book_status)
                             });
                         }
                     });

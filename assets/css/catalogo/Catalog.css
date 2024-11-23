@@ -415,3 +415,10 @@ h1, h2 {
 .btn-default a:hover {
   color: white;
 }
+footer {
+  background-color: #3964ff;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+  animation: fadeIn 1s ease-in-out;
+}

@@ -24,8 +24,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     document.getElementById('requested-book-image').src = data.requestedBook.imageUrl;
 
                     // Adicionar eventos aos botões para ver detalhes dos livros
-                    document.getElementById('view-offered-book-details').addEventListener('click', () => viewBookDetails(data.book.id));
-                    document.getElementById('view-requested-book-details').addEventListener('click', () => viewBookDetails(data.requestedBook.id));
+                    document.getElementById('view-offered-book-details').addEventListener('click', () => {
+                        console.log('Ver detalhes do livro ofertado:', data.book.id);
+                        viewBookDetails(data.book.id);
+                    });
+                    document.getElementById('view-requested-book-details').addEventListener('click', () => {
+                        console.log('Ver detalhes do livro solicitado:', data.requestedBook.id);
+                        viewBookDetails(data.requestedBook.id);
+                    });
 
                     // Eventos para aceitar ou negar a troca
                     document.getElementById('confirm-button').addEventListener('click', () => handleExchangeAction(token, 'accept'));
