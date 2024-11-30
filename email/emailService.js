@@ -11,7 +11,9 @@ let transporter = nodemailer.createTransport({
 });
 
 const enviarEmailComTemplate = (to, subject, templateName, templateData) => {
-  ejs.renderFile(path.join(__dirname, '..', 'views', `${templateName}.ejs`), templateData, (err, html) => {
+  const templatePath = path.join(__dirname, '..', 'views', `${templateName}.ejs`);
+
+  ejs.renderFile(templatePath, templateData, (err, html) => {
     if (err) {
       console.error('Erro ao renderizar o template EJS:', err);
       return;

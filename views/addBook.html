@@ -24,32 +24,35 @@
         new window.VLibras.Widget('https://vlibras.gov.br/app');
     </script>
 
-<header>
-    <nav id="navbar">
-      <a href="/catalog">
-        <img id="navbar_logo" src="/img/Logo-Buku-branco.png" alt="Logo" />
-      </a>
-      <ul id="nav_list">
-        <li class="nav-item active"><a href="#">Sobre Nós</a></li>
-        <li class="nav-item"><a href="#">Funcionamento</a></li>
-        <li class="nav-item"><a href="#">Perguntas Frequentes</a></li>
-      </ul>
-      <button class="btn-default">Cadastrar/Entrar</button>
-      <button id="mobile_btn">
-        <i class="fa-solid fa-bars"></i>
-      </button>
-    </nav>
-    <div id="mobile_menu">
-      <ul id="mobile_nav_list">
-        <li class="nav-item"><a href="#">Sobre Nós</a></li>
-        <li class="nav-item"><a href="#">Funcionamento</a></li>
-        <li class="nav-item"><a href="#">Perguntas Frequentes</a></li>
-      </ul>
-      <button class="btn-default">Cadastrar/Entrar</button>
-    </div>
-  </header>
+    <header>
+        <nav id="navbar">
+            <a href="/inicio">
+                <img id="navbar_logo" src="/img/Logo-Buku-branco.png" alt="Logo" />
+            </a>
+            <ul id="nav_list">
+                <li class="nav-item active"><a href="/inicio">Início</a></li>
+                <li class="nav-item"><a href="/catalog">Catálogo</a></li>
+                <li class="nav-item"><a href="/profile">Meu Perfil</a></li>
+            </ul>
+            <button id="mobile_btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </nav>
+        <div id="mobile_menu">
+            <ul id="mobile_nav_list">
+                <li class="nav-item"><a href="/inicio">Sobre Nós</a></li>
+                <li class="nav-item"><a href="/catalog">Catálogo</a></li>
+                <li class="nav-item"><a href="/profile">Meu Perfil</a></li>
+            </ul>
+        </div>
+    </header>
 
     <div class="container mt-5">
+        <div class="d-flex justify-content-start mb-4">
+            <button id="backToProfile" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </button>
+        </div>
         <h1 class="text-center mb-4">Pesquisar Livros</h1>
         <form id="searchForm" class="mb-4">
             <div class="input-group">

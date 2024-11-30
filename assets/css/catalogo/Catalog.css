@@ -22,6 +22,7 @@ h1, h2 {
   justify-content: center;
   align-items: center;
   position: relative;
+  margin-bottom: -80px;
 }
 
 .header-banner h1 {
@@ -260,4 +261,164 @@ h1, h2 {
 .collection:nth-child(3) {
   grid-column: span 2;
   margin-bottom: 10px;
+}
+
+/*------------ SEARCH ---------------*/
+.input-group {
+  border: 1px solid #ddd;
+  border-radius: 25px;
+  overflow: hidden;
+  /* Para evitar bordas em destaque */
+}
+
+.input-group .form-control {
+  border: none;
+  border-radius: 25px 0 0 25px;
+}
+
+.input-group .form-control:focus {
+  box-shadow: none;
+}
+
+.btn-primary {
+  border-radius: 0 25px 25px 0;
+  background-color: #fd9323;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #e57e1f;
+}
+.search-container {
+  max-width: 800px; /* Ajuste a largura conforme necessário */
+  margin: 20px auto 0 auto; /* Ajuste a margem superior conforme necessário */
+}
+.card {
+  margin-bottom: 20px;
+}
+
+.card-body {
+  padding: 15px;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Espaçamento entre os botões */
+  margin-top: 10px;
+}
+
+.button-container .btn {
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.button-container .btn-owner {
+    background-color: #fd9323; /* Cor chamativa seguindo as cores do site */
+    color: #fff;
+    border: none;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.button-container .btn-owner:hover {
+    background-color: #e57e1f; /* Cor mais escura ao passar o mouse */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.button-container .btn-primary {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.button-container .btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.button-container .btn-secondary {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+.button-container .btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.button-container .btn-success {
+  background-color: #fd9323;
+  color: #fff;
+}
+
+.button-container .btn-success:hover {
+  background-color: #c46c0d;
+}
+
+.user-books-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.user-book-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 120px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.user-book-option.selected {
+  border-color: #007bff;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
+.user-book-option:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.user-book-image {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.user-book-info {
+  text-align: center;
+}
+
+.user-book-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #343a40;
+}
+
+.user-book-author {
+  font-size: 12px;
+  color: #6c757d;
+}
+.btn-default a {
+  color: white;
+  text-decoration: none;
+}
+
+.btn-default a:hover {
+  color: white;
+}
+footer {
+  background-color: #3964ff;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+  animation: fadeIn 1s ease-in-out;
 }

@@ -35,30 +35,26 @@
     new window.VLibras.Widget('https://vlibras.gov.br/app');
   </script>
 
-  <header>
-    <nav id="navbar">
+<header>
+  <nav id="navbar">
       <a href="/catalog">
-        <img id="navbar_logo" src="/img/Logo-Buku-branco.png" alt="Logo" />
+          <img id="navbar_logo" src="/img/Logo-Buku-branco.png" alt="Logo" />
       </a>
       <ul id="nav_list">
-        <li class="nav-item active"><a href="#">Sobre Nós</a></li>
-        <li class="nav-item"><a href="#">Funcionamento</a></li>
-        <li class="nav-item"><a href="#">Perguntas Frequentes</a></li>
+          <li class="nav-item"><a href="/inicio">Início</a></li>
+          <li class="nav-item active"><a href="/catalog">Catálogo</a></li>
       </ul>
-      <button class="btn-default">Cadastrar/Entrar</button>
       <button id="mobile_btn">
-        <i class="fa-solid fa-bars"></i>
+          <i class="fa-solid fa-bars"></i>
       </button>
-    </nav>
-    <div id="mobile_menu">
+  </nav>
+  <div id="mobile_menu">
       <ul id="mobile_nav_list">
-        <li class="nav-item"><a href="#">Sobre Nós</a></li>
-        <li class="nav-item"><a href="#">Funcionamento</a></li>
-        <li class="nav-item"><a href="#">Perguntas Frequentes</a></li>
+          <li class="nav-item"><a href="/inicio">Início</a></li>
+          <li class="nav-item"><a href="/inicio">Catálogo</a></li>
       </ul>
-      <button class="btn-default">Cadastrar/Entrar</button>
-    </div>
-  </header>
+  </div>
+</header>
 
   <div class="container-fluid p-5">
     <div class="row justify-content-center">
@@ -66,8 +62,11 @@
         <div class="card shadow p-4">
           <section class="details-profile text-center mb-5">
             <div class="profile-image-container">
-              <img src="/img/profile-image/th.jpeg" alt="Foto de Perfil" class="profile-image">
+              <img src="/img/profile-image/th.jpeg" alt="Foto de Perfil" class="profile-image" id="profile-image">
+              <input type="file" id="upload-profile-image" accept="image/jpeg, image/png">
+              <button class="btn btn-primary mt-2" id="save-profile-image">Salvar Imagem</button>
             </div>
+            
 
             <h3 class="card-title" id="profile-name">{{userName}}</h3>
             <p class="card-text" id="profile-email">{{userEmail}} - {{userState}}</p>
@@ -82,17 +81,20 @@
           </section>
 
           <h2 class="text-center mb-4">Meus Livros</h2>
-          <div class="swiper-container" id="meus-livros-swiper">
+          <div class="swiper-container position-relative" id="meus-livros-swiper">
             <div class="swiper-wrapper">
-              {{userBooks}} <!-- Placeholder para os livros renderizados pelo servidor -->
+              <!-- Placeholder para os livros renderizados pelo servidor -->
+              {{userBooks}}
             </div>
             <div class="swiper-button-next meus-livros-next"></div>
             <div class="swiper-button-prev meus-livros-prev"></div>
+            <p id="no-books-message" class="text-center position-absolute top-50 start-50 translate-middle">Sem livros na biblioteca</p>
           </div>
 
           <div class="d-flex justify-content-center mt-4">
             <a href="/addbook" class="btn btn-primary">Adicionar seu Livro</a>
             <a href="/favorites" class="btn btn-primary mx-2"><i class="fas fa-heart"></i></a>
+            <a href="/historico" class="btn btn-primary">Histórico de trocas</a>
           </div>
 
           <div class="d-flex justify-content-center mt-4">
@@ -116,12 +118,8 @@
         </div>
         <div class="modal-body">
           <div id="bookDescription"></div>
-          <div class="swiper-container" id="bookImagesSwiper">
-            <div class="swiper-wrapper" id="bookImagesWrapper">
-              <!-- As imagens do livro serão inseridas aqui -->
-            </div>
-            <div class="swiper-button-next book-images-next"></div>
-            <div class="swiper-button-prev book-images-prev"></div>
+          <div class="image-grid" id="bookImagesGrid">
+            <!-- As imagens do livro serão inseridas aqui -->
           </div>
         </div>
       </div>

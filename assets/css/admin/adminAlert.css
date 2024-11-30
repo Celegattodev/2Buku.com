@@ -1,0 +1,28 @@
+body{
+    background-image: url('/img/Buku-fundo.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.card{
+    width: 80vh;
+}
+
+.btn{
+    border: none;
+}
+#button-send{
+    color: #fff;
+    background-color: #fd9323;
+}
+#button-send:hover{
+    background-color: #ff9d34;
+}
+
+#button-cancel{
+    color: #fff;
+    background-color: #007bff;
+}
+#button-cancel:hover{
+    background-color: #1b89ff;
+}

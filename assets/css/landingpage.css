@@ -1,0 +1,368 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    overflow-x: hidden;
+}
+
+header {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px 0;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    transition: background-color 0.3s ease;
+}
+
+#navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 50px;
+}
+
+#navbar_logo {
+    width: 150px;
+    transition: transform 0.3s ease;
+}
+
+#nav_list {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-item {
+    list-style: none;
+}
+
+.nav-button {
+    background-color: #fd9323;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: #ffa03b;
+    transform: scale(1.1);
+}
+
+#mobile_btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.mobile_menu {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.mobile_menu.active {
+    display: flex;
+}
+
+#mobile_nav_list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.main {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-items: center;
+    padding: 100px 0;
+    background-color: #fff;
+    animation: fadeIn 1s ease-in-out;
+}
+
+.text {
+    max-width: 500px;
+    animation: slideInLeft 1s ease-in-out;
+}
+
+.text h1 {
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    animation: bounceIn 1s ease-in-out;
+}
+
+.text p {
+    font-size: 18px;
+    margin-bottom: 20px;
+    animation: fadeInUp 1s ease-in-out;
+}
+
+.orange-button {
+    background-color: #fd9323;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.orange-button:hover {
+    background-color: #ffa03b;
+    transform: scale(1.1);
+}
+
+.img {
+    max-width: 500px;
+    animation: slideInRight 1s ease-in-out;
+}
+
+#img-livros {
+    width: 100%;
+}
+
+.benefits {
+    background-color: #6c8bf7;
+    color: #fff;
+    padding: 50px 0;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    animation: fadeIn 1s ease-in-out;
+}
+
+.benefit {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    max-width: 300px;
+    text-align: center;
+    animation: zoomIn 1s ease-in-out;
+}
+
+.benefit img {
+    width: 50px;
+}
+
+#funcionamento {
+    padding: 50px 0;
+    background-color: #f5f5f5;
+    animation: fadeIn 1s ease-in-out;
+}
+
+#funcionamento h3 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 32px;
+    font-weight: 700;
+    animation: fadeInDown 1s ease-in-out;
+}
+
+.column-steps {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+#livro-laranja {
+    width: 100px;
+    margin-bottom: 20px;
+    animation: rotateIn 1s ease-in-out;
+}
+
+.item {
+    background-color: #6c8bf7;
+    color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    max-width: 600px;
+    margin: 0 auto 15px auto;
+    animation: fadeInUp 1s ease-in-out;
+}
+
+.item img {
+    width: 50px;
+}
+
+.circle {
+    background-color: #a9dfa1;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    text-align: center;
+    line-height: 40px; /* Adicionado para centralizar verticalmente o texto */
+}
+#last-circle {
+    background-color: #fd9323;
+}
+
+footer {
+    background-color: #3964ff;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    animation: fadeIn 1s ease-in-out;
+}
+
+@media screen and (max-width: 768px) {
+    #navbar {
+        padding: 0 20px;
+    }
+
+    #nav_list {
+        display: none;
+    }
+
+    #mobile_btn {
+        display: block;
+    }
+
+    .main {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .text {
+        max-width: 100%;
+    }
+
+    .img {
+        max-width: 100%;
+    }
+
+    .benefits {
+        flex-direction: column;
+    }
+
+    .item {
+        max-width: 100%;
+    }
+}
+
+/* Keyframes for animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes bounceIn {
+    from, 20%, 40%, 60%, 80%, to {
+        animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+    0% {
+        opacity: 0;
+        transform: scale3d(0.3, 0.3, 0.3);
+    }
+    20% {
+        transform: scale3d(1.1, 1.1, 1.1);
+    }
+    40% {
+        transform: scale3d(0.9, 0.9, 0.9);
+    }
+    60% {
+        opacity: 1;
+        transform: scale3d(1.03, 1.03, 1.03);
+    }
+    80% {
+        transform: scale3d(0.97, 0.97, 0.97);
+    }
+    to {
+        opacity: 1;
+        transform: scale3d(1, 1, 1);
+    }
+}
+
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale3d(0.3, 0.3, 0.3);
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+@keyframes rotateIn {
+    from {
+        transform: rotate(-200deg);
+        opacity: 0;
+    }
+    to {
+        transform: rotate(0);
+        opacity: 1;
+    }
+}

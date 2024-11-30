@@ -1,0 +1,47 @@
+body{
+    background-image: url('/img/Buku-fundo.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+html{
+    height: 100%;
+}
+
+.container-fluid{
+    flex: 1;
+}
+
+.container-fluid>.col{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.card{
+    text-align: center;
+    height: min-content;
+    width: 50vh;
+    background-color: #00a30e;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.7), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+form{
+    text-align: start;
+}
+.card-body>h3{
+    color: #fff;
+}
+label{
+    color: #fff;
+}
+#login-button{
+    background-color: #bbb;
+    width: 20vh;
+    justify-self: center;
+}
+#login-button:hover{
+    background-color: #ccc;
+}

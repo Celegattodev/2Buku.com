@@ -1,0 +1,116 @@
+body{
+        background: url('/assets/img/Buku-fundo.png') no-repeat center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+h3{
+    text-align: center;
+}
+#check-buttons{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+
+.checkbox-troca{
+    appearance: none;
+    background-color: #fff;
+    margin-right: 5px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    transition: 0.2s ease-in-out;
+}
+.checkbox-troca:before{
+    content: '';
+    position: absolute;
+    height: 15px;
+    width: 10px;
+    opacity: 0;
+    border-right: 3px solid #fff;
+    border-bottom: 3px solid #fff;
+    transform: rotate(45deg);
+    margin-bottom: 5px;
+}
+.checkbox-troca:checked{
+    background-color: #00b80f;
+    border: none;
+}
+.checkbox-troca:checked:before{
+    opacity: 1;
+}
+
+#date-item{
+    background-color: #6c8bf7;
+    color: #fff;
+}
+
+.card{
+    width: 70vw;
+    background-color: #f39e43;
+    min-width: 300px;
+}
+#sub-title{
+    background-color: #6c8bf7;
+    border: none;
+}
+#list-group{
+    background-color: #6c8bf7;
+}
+#list-message{
+    background: none;
+    border: none;
+    overflow: hidden;
+    overflow-y: auto;
+}
+.desc{
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 20px;
+}
+
+@media screen and (min-width: 600px) and (max-width: 1400px) and (min-height: 1000px) and (max-height: 1400px){
+    .card{
+        width: 82vw;
+    }
+    label{
+        font-size: 1.8vh;
+    }
+    input{
+        height: 60px;
+    }
+    .checkbox-troca{
+        width: 30px;
+        height: 30px;
+        border: 2px solid #ccc;
+    }
+    p{
+        font-size: 1.8vh;
+    }
+    h5{
+        font-size: 2.5vh;
+    }
+    h3{
+        font-size: 40px;
+    }
+    h4{
+        font-size: 30px;
+    }
+    .btn{
+        font-size: 2vh;
+    }
+}
+.btn-default a {
+    color: white;
+    text-decoration: none;
+  }
+  
+  .btn-default a:hover {
+    color: white;
+  }

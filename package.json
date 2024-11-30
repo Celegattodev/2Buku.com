@@ -11,12 +11,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@vitalets/google-translate-api": "^9.2.0",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.3",
     "cloudinary": "^2.5.1",
     "crypto": "^1.0.1",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.21.1",
@@ -30,7 +32,7 @@
     "mysql": "^2.18.1",
     "mysql2": "^3.11.3",
     "node-fetch": "^3.3.2",
-    "nodemailer": "^6.9.15",
+    "nodemailer": "^6.9.16",
     "sharp": "^0.33.5",
     "winston": "^3.14.2"
   }
