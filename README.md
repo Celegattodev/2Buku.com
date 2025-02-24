@@ -1,3 +1,5 @@
+# 2Buku.com
+
 O Buku é uma plataforma inovadora criada para facilitar a troca de livros usados, promovendo a leitura, a sustentabilidade e a conexão entre leitores. Aqui está um resumo do funcionamento:
  ✅ Os usuários podem navegar no catálogo e encontrar títulos de interesse.
  ✅ Enviam propostas ao proprietário do livro desejado.
@@ -13,4 +15,3 @@ O Buku é uma plataforma inovadora criada para facilitar a troca de livros usado
  - API de localidades do IBGE (cadastro de localização).
  - Cloudinary (armazenamento de imagens na nuvem).
 - Banco de dados: MySQL.
-# 2Buku.com
